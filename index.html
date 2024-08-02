@@ -5,42 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Content Hub</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        :root {
+            --nav-bg: #333;
+            --nav-text: #fff;
+            --main-bg: #f4f4f4;
+            --main-text: #333;
+        }
+        body, html {
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
             min-height: 100vh;
         }
         nav {
-            background-color: #333;
+            background: var(--nav-bg);
             padding: 1rem;
         }
-        nav a {
-            color: white;
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        nav ul li {
+            margin: 0 10px;
+        }
+        nav ul li a {
+            color: var(--nav-text);
             text-decoration: none;
-            margin-right: 1rem;
+            padding: 5px 10px;
         }
         main {
-            flex: 1;
-            padding: 1rem;
+            padding: 20px;
+            background: var(--main-bg);
+            color: var(--main-text);
+            overflow-y: auto;
         }
         footer {
-            background-color: #333;
-            color: white;
+            background: var(--nav-bg);
+            color: var(--nav-text);
             text-align: center;
             padding: 1rem;
         }
     </style>
 </head>
 <body>
-    <nav id="main-nav">
-        <!-- Navigation links will be dynamically inserted here -->
+    <nav>
+        <ul id="nav-list"></ul>
     </nav>
     
     <main id="content">
-        <!-- Page content will be loaded here -->
+        <!-- Content will be loaded here -->
     </main>
     
     <footer>
@@ -48,39 +70,56 @@
     </footer>
 
     <script>
-        const baseUrl = '/pooltool'; // Adjust this if your baseurl is different
-        
+        const navList = document.getElementById('nav-list');
+        const contentArea = document.getElementById('content');
+
         async function loadPages() {
-            const response = await fetch(`${baseUrl}/pages.json`);
-            const pages = await response.json();
-            const nav = document.getElementById('main-nav');
-            
-            pages.forEach(page => {
-                const link = document.createElement('a');
-                link.href = `${baseUrl}/${page.url}`;
-                link.textContent = page.title;
-                link.onclick = (e) => {
-                    e.preventDefault();
-                    loadContent(page.url);
-                    history.pushState(null, '', link.href);
-                };
-                nav.appendChild(link);
-            });
+            try {
+                const response = await fetch('https://api.github.com/repos/junovhs/pooltool/contents/pages');
+                const files = await response.json();
+                
+                files.forEach(file => {
+                    if (file.name.endsWith('.html')) {
+                        const pageName = file.name.replace('.html', '');
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.href = `#${pageName}`;
+                        a.textContent = pageName.charAt(0).toUpperCase() + pageName.slice(1);
+                        li.appendChild(a);
+                        navList.appendChild(li);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading pages:', error);
+            }
         }
 
-        async function loadContent(url) {
-            const response = await fetch(`${baseUrl}/${url}`);
-            const content = await response.text();
-            document.getElementById('content').innerHTML = content;
+        async function loadContent(pageName) {
+            try {
+                const response = await fetch(`https://raw.githubusercontent.com/junovhs/pooltool/main/pages/${pageName}.html`);
+                const content = await response.text();
+                contentArea.innerHTML = content;
+            } catch (error) {
+                console.error('Error loading content:', error);
+                contentArea.innerHTML = '<p>Error loading content. Please try again.</p>';
+            }
         }
 
-        window.onpopstate = () => {
-            const path = window.location.pathname.replace(baseUrl, '');
-            loadContent(path || 'index.html');
-        };
+        function handleNavigation() {
+            const hash = window.location.hash.slice(1);
+            if (hash) {
+                loadContent(hash);
+            } else {
+                // Load a default page or show a welcome message
+                contentArea.innerHTML = '<h1>Welcome to the Dynamic Content Hub</h1><p>Select a page from the navigation menu above.</p>';
+            }
+        }
 
-        loadPages();
-        loadContent('index.html');
+        window.addEventListener('hashchange', handleNavigation);
+        window.addEventListener('load', () => {
+            loadPages();
+            handleNavigation();
+        });
     </script>
 </body>
 </html>
