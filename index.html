@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Content Hub</title>
+  <style>
+    /* Minimal CSS using variables, grid, and flexbox */
+  </style>
+</head>
+<body>
+  <nav-bar></nav-bar>
+  <main id="content"></main>
+  <foot-er></foot-er>
+
+  <script type="module">
+    // Web Components definitions
+    class NavBar extends HTMLElement { ... }
+    class Footer extends HTMLElement { ... }
+    customElements.define('nav-bar', NavBar);
+    customElements.define('foot-er', Footer);
+
+    // Dynamic content loading
+    async function loadContent(page) {
+      const response = await fetch(`pages/${page}.html`);
+      const content = await response.text();
+      document.getElementById('content').innerHTML = content;
+    }
+
+    // Navigation handling
+    window.addEventListener('popstate', (e) => loadContent(e.state.page));
+
+    // Initial load
+    loadContent('home');
+
+    // Service Worker registration
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js');
+    }
+  </script>
+</body>
+</html>
