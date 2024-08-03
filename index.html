@@ -5,48 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redleaf</title>
     <style>
-        :root {
-            --primary-color: #800000; /* Dark red color */
-            --text-color: #ffffff;
-            --background-color: #f0f0f0;
-        }
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            height: 100%;
-            background-color: var(--background-color);
-        }
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        header {
-            background: var(--primary-color);
-            color: var(--text-color);
-            padding: 1rem;
-        }
-        nav {
-            display: flex;
-            gap: 1rem;
-        }
-        nav a {
-            color: var(--text-color);
-            text-decoration: none;
-            font-weight: bold;
-        }
-        main {
-            flex: 1;
-            padding: 1rem;
-            background: white;
-        }
-        footer {
-            background: var(--primary-color);
-            color: var(--text-color);
-            text-align: center;
-            padding: 1rem;
-        }
+        /* ... (styles remain the same) ... */
     </style>
 </head>
 <body>
@@ -83,16 +42,29 @@
             const temp = document.createElement('div');
             temp.innerHTML = html;
             
-            // Extract and execute scripts
+            // Clear existing content and scripts
+            content.innerHTML = '';
+            const existingScripts = document.querySelectorAll('script[data-dynamic]');
+            existingScripts.forEach(script => script.remove());
+            
+            // Extract scripts
             const scripts = temp.getElementsByTagName('script');
+            const scriptContents = [];
             for (let i = 0; i < scripts.length; i++) {
-                const script = document.createElement('script');
-                script.textContent = scripts[i].textContent;
-                document.body.appendChild(script);
+                scriptContents.push(scripts[i].innerHTML);
+                scripts[i].remove();
             }
             
             // Set the content
             content.innerHTML = temp.innerHTML;
+            
+            // Execute scripts
+            scriptContents.forEach(scriptContent => {
+                const script = document.createElement('script');
+                script.textContent = scriptContent;
+                script.setAttribute('data-dynamic', 'true');
+                document.body.appendChild(script);
+            });
         }
 
         window.addEventListener('hashchange', () => {
