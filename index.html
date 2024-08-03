@@ -4,8 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redleaf</title>
-    <style>
-        /* ... (styles remain the same) ... */
+   <style>
+        :root {
+            --primary-color: #800000; /* Dark red color */
+            --text-color: #ffffff;
+            --background-color: #f0f0f0;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100%;
+            background-color: var(--background-color);
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background: var(--primary-color);
+            color: var(--text-color);
+            padding: 1rem;
+        }
+        nav {
+            display: flex;
+            gap: 1rem;
+        }
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        main {
+            flex: 1;
+            padding: 1rem;
+            background: white;
+        }
+        footer {
+            background: var(--primary-color);
+            color: var(--text-color);
+            text-align: center;
+            padding: 1rem;
+        }
     </style>
 </head>
 <body>
