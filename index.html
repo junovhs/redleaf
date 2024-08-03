@@ -49,21 +49,44 @@
             
             // Extract scripts
             const scripts = temp.getElementsByTagName('script');
-            const scriptContents = [];
+            const scriptPromises = [];
             for (let i = 0; i < scripts.length; i++) {
-                scriptContents.push(scripts[i].innerHTML);
-                scripts[i].remove();
+                const script = scripts[i];
+                if (script.src) {
+                    // For external scripts
+                    scriptPromises.push(loadExternalScript(script.src));
+                } else {
+                    // For inline scripts
+                    scriptPromises.push(executeScript(script.innerHTML));
+                }
+                script.remove();
             }
             
             // Set the content
             content.innerHTML = temp.innerHTML;
             
-            // Execute scripts
-            scriptContents.forEach(scriptContent => {
+            // Wait for all scripts to load and execute
+            await Promise.all(scriptPromises);
+        }
+
+        function loadExternalScript(src) {
+            return new Promise((resolve, reject) => {
                 const script = document.createElement('script');
-                script.textContent = scriptContent;
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
                 script.setAttribute('data-dynamic', 'true');
                 document.body.appendChild(script);
+            });
+        }
+
+        function executeScript(content) {
+            return new Promise((resolve) => {
+                const script = document.createElement('script');
+                script.textContent = content;
+                script.setAttribute('data-dynamic', 'true');
+                document.body.appendChild(script);
+                resolve();
             });
         }
 
