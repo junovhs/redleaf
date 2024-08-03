@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redleaf</title>
-   <style>
+    <style>
         :root {
             --primary-color: #800000; /* Dark red color */
             --text-color: #ffffff;
@@ -47,23 +47,35 @@
             text-align: center;
             padding: 1rem;
         }
+        #loading {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+        }
     </style>
 </head>
 <body>
     <header>
-        <nav id="navbar"></nav>
+        <nav id="navbar" aria-label="Main Navigation"></nav>
     </header>
     <main id="content"></main>
     <footer>
         <p>&copy; 2024 Redleaf</p>
     </footer>
+    <div id="loading">Loading...</div>
     <script>
         const navbar = document.getElementById('navbar');
         const content = document.getElementById('content');
 
         async function fetchPages() {
-            const response = await fetch('https://api.github.com/repos/junovhs/redleaf/contents/pages');
-            return (await response.json()).filter(file => file.name.endsWith('.html'));
+            try {
+                const response = await fetch('https://api.github.com/repos/junovhs/redleaf/contents/pages');
+                if (!response.ok) throw new Error('Network response was not ok');
+                return (await response.json()).filter(file => file.name.endsWith('.html'));
+            } catch (error) {
+                console.error('Failed to fetch pages:', error);
+                return [];
+            }
         }
 
         function createNavLinks(pages) {
@@ -75,39 +87,48 @@
         }
 
         async function loadContent(pageName) {
+            document.getElementById('loading').style.display = 'block';
             const url = pageName === 'home' ? 'index.html' : `pages/${pageName}.html`;
-            const response = await fetch(url);
-            const html = await response.text();
-            
-            // Create a temporary container
-            const temp = document.createElement('div');
-            temp.innerHTML = html;
-            
-            // Clear existing content and scripts
-            content.innerHTML = '';
-            const existingScripts = document.querySelectorAll('script[data-dynamic]');
-            existingScripts.forEach(script => script.remove());
-            
-            // Extract scripts
-            const scripts = temp.getElementsByTagName('script');
-            const scriptPromises = [];
-            for (let i = 0; i < scripts.length; i++) {
-                const script = scripts[i];
-                if (script.src) {
-                    // For external scripts
-                    scriptPromises.push(loadExternalScript(script.src));
-                } else {
-                    // For inline scripts
-                    scriptPromises.push(executeScript(script.innerHTML));
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const html = await response.text();
+                
+                // Create a temporary container
+                const temp = document.createElement('div');
+                temp.innerHTML = html;
+                
+                // Clear existing content
+                content.innerHTML = '';
+                const existingScripts = document.querySelectorAll('script[data-dynamic]');
+                existingScripts.forEach(script => script.remove());
+                
+                // Extract and execute scripts
+                const scripts = temp.getElementsByTagName('script');
+                const scriptPromises = [];
+                for (let i = 0; i < scripts.length; i++) {
+                    const script = scripts[i];
+                    if (script.src) {
+                        // For external scripts
+                        scriptPromises.push(loadExternalScript(script.src));
+                    } else {
+                        // For inline scripts
+                        scriptPromises.push(executeScript(script.innerHTML));
+                    }
+                    script.remove();
                 }
-                script.remove();
+                
+                // Set the content
+                content.innerHTML = temp.innerHTML;
+                
+                // Wait for all scripts to load and execute
+                await Promise.all(scriptPromises);
+            } catch (error) {
+                console.error('Failed to load content:', error);
+                content.innerHTML = '<p>Failed to load content.</p>';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
             }
-            
-            // Set the content
-            content.innerHTML = temp.innerHTML;
-            
-            // Wait for all scripts to load and execute
-            await Promise.all(scriptPromises);
         }
 
         function loadExternalScript(src) {
