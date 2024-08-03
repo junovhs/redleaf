@@ -57,7 +57,6 @@
     <footer>
         <p>&copy; 2024 Redleaf</p>
     </footer>
-
     <script>
         const navbar = document.getElementById('navbar');
         const content = document.getElementById('content');
@@ -79,7 +78,21 @@
             const url = pageName === 'home' ? 'index.html' : `pages/${pageName}.html`;
             const response = await fetch(url);
             const html = await response.text();
-            content.innerHTML = html;
+            
+            // Create a temporary container
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            
+            // Extract and execute scripts
+            const scripts = temp.getElementsByTagName('script');
+            for (let i = 0; i < scripts.length; i++) {
+                const script = document.createElement('script');
+                script.textContent = scripts[i].textContent;
+                document.body.appendChild(script);
+            }
+            
+            // Set the content
+            content.innerHTML = temp.innerHTML;
         }
 
         window.addEventListener('hashchange', () => {
