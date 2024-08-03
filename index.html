@@ -145,7 +145,7 @@
         function executeScript(content) {
             return new Promise((resolve) => {
                 const script = document.createElement('script');
-                script.textContent = content;
+                script.textContent = `(function() { ${content} })()`;
                 script.setAttribute('data-dynamic', 'true');
                 document.body.appendChild(script);
                 resolve();
