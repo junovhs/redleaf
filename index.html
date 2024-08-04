@@ -14,12 +14,13 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            min-height: 100vh;
+            height: 100%;
             background-color: var(--background-color);
         }
         body {
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
         }
         header {
             background: var(--primary-color);
@@ -40,7 +41,6 @@
             display: flex;
             flex-direction: column;
             background: white;
-            min-height: calc(100vh - 150px);
         }
         #content-container {
             flex: 1;
@@ -58,7 +58,6 @@
             color: var(--text-color);
             text-align: center;
             padding: 1rem;
-            margin-top: 50px;
         }
         #loading {
             text-align: center;
@@ -99,11 +98,26 @@
         }
 
         function createNavLinks(pages) {
-            navbar.innerHTML = '<a href="/redleaf/" onclick="loadContent(\'home\'); return false;">Home</a>';
+            navbar.innerHTML = '<a href="/redleaf/" data-page="home">Home</a>';
             pages.forEach(page => {
                 const pageName = page.name.replace('.html', '');
-                navbar.innerHTML += `<a href="/redleaf/${pageName}" onclick="loadContent('${pageName}'); return false;">${pageName}</a>`;
+                navbar.innerHTML += `<a href="/redleaf/${pageName}" data-page="${pageName}">${pageName}</a>`;
             });
+            navbar.addEventListener('click', handleNavClick);
+        }
+
+        function handleNavClick(event) {
+            if (event.target.tagName === 'A') {
+                event.preventDefault();
+                const pageName = event.target.getAttribute('data-page');
+                navigateTo(pageName);
+            }
+        }
+
+        function navigateTo(pageName) {
+            const url = pageName === 'home' ? '/redleaf/' : `/redleaf/${pageName}`;
+            history.pushState(null, '', url);
+            loadContent(pageName);
         }
 
         async function loadContent(pageName) {
@@ -157,18 +171,17 @@
             }
         });
 
-        function handleNavigation() {
+        window.addEventListener('popstate', () => {
             const path = window.location.pathname.replace('/redleaf/', '').split('/')[0] || 'home';
             loadContent(path);
-        }
-
-        window.addEventListener('popstate', handleNavigation);
+        });
 
         // Initialize
         (async () => {
             const pages = await fetchPages();
             createNavLinks(pages);
-            handleNavigation();
+            const initialPath = window.location.pathname.replace('/redleaf/', '').split('/')[0] || 'home';
+            loadContent(initialPath);
         })();
     </script>
 </body>
