@@ -66,6 +66,7 @@
     <script>
         const navbar = document.getElementById('navbar');
         const content = document.getElementById('content');
+        const loading = document.getElementById('loading');
 
         async function fetchPages() {
             try {
@@ -87,7 +88,7 @@
         }
 
         async function loadContent(pageName) {
-            document.getElementById('loading').style.display = 'block';
+            loading.style.display = 'block';
             const url = pageName === 'home' ? 'index.html' : `pages/${pageName}.html`;
             try {
                 const response = await fetch(url);
@@ -98,21 +99,18 @@
                 const temp = document.createElement('div');
                 temp.innerHTML = html;
                 
-                // Clear existing content
+                // Clear existing content and scripts
                 content.innerHTML = '';
                 const existingScripts = document.querySelectorAll('script[data-dynamic]');
                 existingScripts.forEach(script => script.remove());
                 
-                // Extract and execute scripts
+                // Extract scripts
                 const scripts = temp.getElementsByTagName('script');
                 const scriptPromises = [];
-                for (let i = 0; i < scripts.length; i++) {
-                    const script = scripts[i];
+                for (let script of scripts) {
                     if (script.src) {
-                        // For external scripts
                         scriptPromises.push(loadExternalScript(script.src));
                     } else {
-                        // For inline scripts
                         scriptPromises.push(executeScript(script.innerHTML));
                     }
                     script.remove();
@@ -127,7 +125,7 @@
                 console.error('Failed to load content:', error);
                 content.innerHTML = '<p>Failed to load content.</p>';
             } finally {
-                document.getElementById('loading').style.display = 'none';
+                loading.style.display = 'none';
             }
         }
 
@@ -144,11 +142,16 @@
 
         function executeScript(content) {
             return new Promise((resolve) => {
-                const script = document.createElement('script');
-                script.textContent = `(function() { ${content} })()`;
-                script.setAttribute('data-dynamic', 'true');
-                document.body.appendChild(script);
-                resolve();
+                try {
+                    const script = document.createElement('script');
+                    script.textContent = `(function() { ${content} })();`;
+                    script.setAttribute('data-dynamic', 'true');
+                    document.body.appendChild(script);
+                    resolve();
+                } catch (error) {
+                    console.error('Error executing script:', error);
+                    resolve(); // Resolve anyway to prevent blocking
+                }
             });
         }
 
