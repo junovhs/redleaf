@@ -135,16 +135,7 @@
             text-align: center;
             padding: 1rem;
         }
-    </style>
-    <script>
-        // This script runs immediately and redirects to the index if needed
-        (function() {
-            var path = window.location.pathname.replace('/redleaf/', '');
-            if (path && path !== 'index.html') {
-                window.history.replaceState(null, '', '/redleaf/');
-            }
-        })();
-    </script>
+    /style>
 </head>
 <body>
     <header>
@@ -190,26 +181,12 @@
         }
 
         function createNavLinks(pages) {
-            navbar.innerHTML = '<div class="nav-item" data-page="home">Home</div>';
+            navbar.innerHTML = '<a href="/redleaf/" class="nav-item">Home</a>';
             pages.forEach(page => {
                 const pageName = page.name.replace('.html', '');
-                navbar.innerHTML += `<div class="nav-item" data-page="${pageName}">${pageName}</div>`;
+                navbar.innerHTML += `<a href="/redleaf/${pageName}" class="nav-item">${pageName}</a>`;
                 availablePages.push(pageName);
             });
-            navbar.addEventListener('click', handleNavClick);
-        }
-
-        function handleNavClick(event) {
-            if (event.target.classList.contains('nav-item')) {
-                const pageName = event.target.getAttribute('data-page');
-                navigateTo(pageName);
-            }
-        }
-
-        function navigateTo(pageName) {
-            const url = pageName === 'home' ? '/redleaf/' : `/redleaf/#${pageName}`;
-            history.pushState(null, '', url);
-            loadContent(pageName);
         }
 
         async function loadContent(pageName) {
@@ -267,12 +244,20 @@
         });
 
         function handleRoute() {
-            const hash = window.location.hash.slice(1);
-            const path = hash || 'home';
+            const path = window.location.pathname.replace('/redleaf/', '').split('/')[0] || 'home';
             loadContent(path);
         }
 
-        window.addEventListener('hashchange', handleRoute);
+        window.addEventListener('popstate', handleRoute);
+
+        document.body.addEventListener('click', (e) => {
+            if (e.target.classList.contains('nav-item')) {
+                e.preventDefault();
+                const pageName = e.target.getAttribute('href').replace('/redleaf/', '');
+                history.pushState(null, '', e.target.getAttribute('href'));
+                loadContent(pageName || 'home');
+            }
+        });
 
         // Initialize
         (async () => {
