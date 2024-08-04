@@ -136,6 +136,15 @@
             padding: 1rem;
         }
     </style>
+    <script>
+        // This script runs immediately and redirects to the index if needed
+        (function() {
+            var path = window.location.pathname.replace('/redleaf/', '');
+            if (path && path !== 'index.html') {
+                window.history.replaceState(null, '', '/redleaf/');
+            }
+        })();
+    </script>
 </head>
 <body>
     <header>
@@ -198,7 +207,7 @@
         }
 
         function navigateTo(pageName) {
-            const url = pageName === 'home' ? '/redleaf/' : `/redleaf/${pageName}`;
+            const url = pageName === 'home' ? '/redleaf/' : `/redleaf/#${pageName}`;
             history.pushState(null, '', url);
             loadContent(pageName);
         }
@@ -213,8 +222,8 @@
                     contentFrame.style.display = 'none';
                     homeContent.style.display = 'block';
                     homeContent.innerHTML = '<h1>Welcome to Redleaf</h1><p>Select a page from the navigation menu.</p>';
-                    if (pageName !== 'home') {
-                        homeContent.innerHTML += '<p>The requested page was not found.</p>';
+                    if (pageName !== 'home' && pageName !== '') {
+                        homeContent.innerHTML += `<p>The requested page "${pageName}" was not found.</p>`;
                     }
                 } else {
                     homeContent.style.display = 'none';
@@ -258,11 +267,12 @@
         });
 
         function handleRoute() {
-            const path = window.location.pathname.replace('/redleaf/', '').split('/')[0] || 'home';
+            const hash = window.location.hash.slice(1);
+            const path = hash || 'home';
             loadContent(path);
         }
 
-        window.addEventListener('popstate', handleRoute);
+        window.addEventListener('hashchange', handleRoute);
 
         // Initialize
         (async () => {
