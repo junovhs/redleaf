@@ -5,60 +5,132 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redleaf</title>
     <style>
-        :root {
-            --primary-color: #800000;
-            --text-color: #ffffff;
-            --background-color: #f0f0f0;
-        }
-        body, html {
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
-            height: 100%;
-            background-color: var(--background-color);
-        }
-        body {
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
         }
-        header {
-            background: var(--primary-color);
-            color: var(--text-color);
-            padding: 1rem;
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        nav {
+
+        .navbar {
+            background-color: #ffffff;
+            border-radius: 15px;
+            padding: 0 20px;
+            box-shadow: 0 10px 20px 0px rgba(0, 0, 0, 0.08);
             display: flex;
-            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            height: 70px;
+            width: 1200px;
+            margin: 0 auto;
         }
-        nav a {
-            color: var(--text-color);
+
+        .navbar-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            height: 40px;
+            margin: 0px;
+        }
+
+        .nav-items {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            margin: 0px;
+        }
+
+        .nav-item {
+            color: #333333;
+            text-decoration: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            letter-spacing: 0px;
+            font-weight: 500;
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            transition: color 0.3s ease;
+            margin: 0 0px;
+            cursor: pointer;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 5px;
+            right: 5px;
+            height: calc(100% + 10px);
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            transform: translateY(-50%) scale(0.95);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .nav-item:hover::before {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+
+        .cta-button {
+            background-color: #2196f3;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
             text-decoration: none;
             font-weight: bold;
+            transition: background-color 0.3s ease;
+            margin: 0px;
         }
+
+        .cta-button:hover {
+            background-color: #0d82df;
+        }
+
         main {
             flex: 1;
             display: flex;
             flex-direction: column;
             background: white;
+            padding: 20px;
         }
+
         #content-container {
             flex: 1;
             display: flex;
             flex-direction: column;
         }
+
         #content-frame {
             flex: 1;
             width: 100%;
             border: none;
             min-height: 500px;
         }
+
         footer {
-            background: var(--primary-color);
-            color: var(--text-color);
+            background: #800000;
+            color: #ffffff;
             text-align: center;
             padding: 1rem;
         }
+
         #loading {
             text-align: center;
             padding: 1rem;
@@ -67,7 +139,17 @@
 </head>
 <body>
     <header>
-        <nav id="navbar"></nav>
+        <div class="container">
+            <nav class="navbar">
+                <div class="navbar-inner">
+                    <img src="https://crowdriff.com/wp-content/uploads/CrowdRiff-Logo-Blue-icon-with-grey-text.svg" alt="Logo" class="logo">
+                    <div class="nav-items" id="navbar">
+                        <!-- Dynamic nav items will be inserted here -->
+                    </div>
+                    <!-- <a href="#preview" class="cta-button">Watch a preview</a> -->
+                </div>
+            </nav>
+        </div>
     </header>
     <main>
         <div id="content-container">
@@ -98,17 +180,16 @@
         }
 
         function createNavLinks(pages) {
-            navbar.innerHTML = '<a href="/redleaf/" data-page="home">Home</a>';
+            navbar.innerHTML = '<div class="nav-item" data-page="home">Home</div>';
             pages.forEach(page => {
                 const pageName = page.name.replace('.html', '');
-                navbar.innerHTML += `<a href="/redleaf/${pageName}" data-page="${pageName}">${pageName}</a>`;
+                navbar.innerHTML += `<div class="nav-item" data-page="${pageName}">${pageName}</div>`;
             });
             navbar.addEventListener('click', handleNavClick);
         }
 
         function handleNavClick(event) {
-            if (event.target.tagName === 'A') {
-                event.preventDefault();
+            if (event.target.classList.contains('nav-item')) {
                 const pageName = event.target.getAttribute('data-page');
                 navigateTo(pageName);
             }
