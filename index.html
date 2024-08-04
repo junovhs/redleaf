@@ -38,8 +38,19 @@
         }
         main {
             flex: 1;
-            padding: 1rem;
+            display: flex;
+            flex-direction: column;
             background: white;
+        }
+        #content-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        #content-frame {
+            flex: 1;
+            width: 100%;
+            border: none;
         }
         footer {
             background: var(--primary-color);
@@ -54,23 +65,20 @@
         #error-message {
             color: red;
         }
-        #content-frame {
-            width: 100%;
-            height: 600px;
-            border: none;
-        }
     </style>
 </head>
 <body>
     <header>
         <nav id="navbar"></nav>
     </header>
-    <main id="content">
-        <div id="home-content"></div>
-        <iframe id="content-frame" sandbox="allow-scripts allow-forms allow-popups" style="display:none;"></iframe>
+    <main>
+        <div id="content-container">
+            <div id="home-content"></div>
+            <iframe id="content-frame" sandbox="allow-scripts allow-forms allow-popups" style="display:none;"></iframe>
+        </div>
+        <div id="loading" style="display:none;">Loading...</div>
+        <div id="error-message"></div>
     </main>
-    <div id="loading" style="display:none;">Loading...</div>
-    <div id="error-message"></div>
     <footer>
         <p>&copy; 2024 Redleaf</p>
     </footer>
@@ -124,6 +132,9 @@
                     await new Promise(resolve => {
                         contentFrame.onload = resolve;
                     });
+
+                    // Adjust iframe height to content
+                    contentFrame.style.height = `${contentFrame.contentWindow.document.body.scrollHeight}px`;
                 }
             } catch (error) {
                 console.error('Error loading content:', error);
