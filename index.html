@@ -56,7 +56,7 @@
         }
         #content-frame {
             width: 100%;
-            height: 100%;
+            height: 600px;
             border: none;
         }
     </style>
@@ -66,7 +66,8 @@
         <nav id="navbar"></nav>
     </header>
     <main id="content">
-        <iframe id="content-frame" sandbox="allow-scripts allow-same-origin"></iframe>
+        <div id="home-content"></div>
+        <iframe id="content-frame" sandbox="allow-scripts allow-forms allow-popups" style="display:none;"></iframe>
     </main>
     <div id="loading" style="display:none;">Loading...</div>
     <div id="error-message"></div>
@@ -76,6 +77,7 @@
     <script>
         const navbar = document.getElementById('navbar');
         const contentFrame = document.getElementById('content-frame');
+        const homeContent = document.getElementById('home-content');
         const loading = document.getElementById('loading');
         const errorMessage = document.getElementById('error-message');
 
@@ -104,20 +106,25 @@
             errorMessage.textContent = '';
 
             try {
-                const url = pageName === 'home' ? 'index.html' : `pages/${pageName}.html`;
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Failed to fetch page content');
-                
-                const html = await response.text();
-                
-                // Load content into iframe
-                contentFrame.srcdoc = html;
+                if (pageName === 'home') {
+                    contentFrame.style.display = 'none';
+                    homeContent.style.display = 'block';
+                    homeContent.innerHTML = '<h1>Welcome to Redleaf</h1><p>Select a page from the navigation menu.</p>';
+                } else {
+                    homeContent.style.display = 'none';
+                    contentFrame.style.display = 'block';
+                    const url = `pages/${pageName}.html`;
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('Failed to fetch page content');
+                    
+                    const html = await response.text();
+                    contentFrame.srcdoc = html;
 
-                // Wait for iframe to load
-                await new Promise(resolve => {
-                    contentFrame.onload = resolve;
-                });
-
+                    // Wait for iframe to load
+                    await new Promise(resolve => {
+                        contentFrame.onload = resolve;
+                    });
+                }
             } catch (error) {
                 console.error('Error loading content:', error);
                 errorMessage.textContent = `Failed to load ${pageName}. Please try again.`;
