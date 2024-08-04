@@ -167,6 +167,7 @@
         const homeContent = document.getElementById('home-content');
         const loading = document.getElementById('loading');
         let isLoading = false;
+        let availablePages = [];
 
         async function fetchPages() {
             try {
@@ -184,6 +185,7 @@
             pages.forEach(page => {
                 const pageName = page.name.replace('.html', '');
                 navbar.innerHTML += `<div class="nav-item" data-page="${pageName}">${pageName}</div>`;
+                availablePages.push(pageName);
             });
             navbar.addEventListener('click', handleNavClick);
         }
@@ -207,10 +209,13 @@
             loading.style.display = 'block';
 
             try {
-                if (pageName === 'home') {
+                if (pageName === 'home' || !availablePages.includes(pageName)) {
                     contentFrame.style.display = 'none';
                     homeContent.style.display = 'block';
                     homeContent.innerHTML = '<h1>Welcome to Redleaf</h1><p>Select a page from the navigation menu.</p>';
+                    if (pageName !== 'home') {
+                        homeContent.innerHTML += '<p>The requested page was not found.</p>';
+                    }
                 } else {
                     homeContent.style.display = 'none';
                     contentFrame.style.display = 'block';
@@ -252,17 +257,18 @@
             }
         });
 
-        window.addEventListener('popstate', () => {
+        function handleRoute() {
             const path = window.location.pathname.replace('/redleaf/', '').split('/')[0] || 'home';
             loadContent(path);
-        });
+        }
+
+        window.addEventListener('popstate', handleRoute);
 
         // Initialize
         (async () => {
             const pages = await fetchPages();
             createNavLinks(pages);
-            const initialPath = window.location.pathname.replace('/redleaf/', '').split('/')[0] || 'home';
-            loadContent(initialPath);
+            handleRoute();
         })();
     </script>
 </body>
