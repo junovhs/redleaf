@@ -122,11 +122,11 @@
                     contentFrame.style.display = 'none';
                     homeContent.style.display = 'block';
                     homeContent.innerHTML = '<h1>Welcome to Redleaf</h1><p>Select a page from the navigation menu.</p>';
-                    history.pushState(null, '', '/');
+                    history.pushState(null, '', '/redleaf/');
                 } else {
                     homeContent.style.display = 'none';
                     contentFrame.style.display = 'block';
-                    const url = `pages/${pageName}.html`;
+                    const url = `/redleaf/pages/${pageName}.html`;
                     const response = await fetch(url);
                     if (!response.ok) throw new Error('Failed to fetch page content');
                     
@@ -147,7 +147,7 @@
                     `;
                     
                     contentFrame.srcdoc = injectedScript + html;
-                    history.pushState(null, '', `/${pageName}`);
+                    history.pushState(null, '', `/redleaf/${pageName}`);
 
                     await new Promise(resolve => {
                         contentFrame.onload = resolve;
@@ -169,7 +169,7 @@
         });
 
         window.addEventListener('popstate', () => {
-            const path = window.location.pathname.slice(1) || 'home';
+            const path = window.location.pathname.replace('/redleaf/', '').split('/')[0] || 'home';
             loadContent(path);
         });
 
@@ -177,7 +177,7 @@
         (async () => {
             const pages = await fetchPages();
             createNavLinks(pages);
-            const initialPath = window.location.pathname.slice(1) || 'home';
+            const initialPath = window.location.pathname.replace('/redleaf/', '').split('/')[0] || 'home';
             loadContent(initialPath);
         })();
     </script>
