@@ -126,35 +126,14 @@
                     if (!response.ok) throw new Error('Failed to fetch page content');
                     
                     const html = await response.text();
-                    contentFrame.srcdoc = html;
-
-                    // Wait for iframe to load
-                    await new Promise(resolve => {
-                        contentFrame.onload = resolve;
-                    });
-
-                    // Adjust iframe height to content
-                    contentFrame.style.height = `${contentFrame.contentWindow.document.body.scrollHeight}px`;
-                }
-            } catch (error) {
-                console.error('Error loading content:', error);
-                errorMessage.textContent = `Failed to load ${pageName}. Please try again.`;
-            } finally {
-                loading.style.display = 'none';
-            }
-        }
-
-        window.addEventListener('hashchange', () => {
-            const pageName = window.location.hash.slice(1) || 'home';
-            loadContent(pageName);
-        });
-
-        // Initialize
-        (async () => {
-            const pages = await fetchPages();
-            createNavLinks(pages);
-            loadContent('home');
-        })();
-    </script>
-</body>
-</html>
+                    
+                    // Inject a script to communicate the height back to the parent
+                    const injectedScript = `
+                        <script>
+                            function updateParentHeight() {
+                                window.parent.postMessage({
+                                    type: 'resize',
+                                    height: document.body.scrollHeight
+                                }, '*');
+                            }
+                            window.addEventListener('load', updateParentHeight
