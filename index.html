@@ -127,7 +127,6 @@
                     
                     const html = await response.text();
                     
-                    // Inject a script to communicate the height back to the parent
                     const injectedScript = `
                         <script>
                             function updateParentHeight() {
@@ -138,12 +137,11 @@
                             }
                             window.addEventListener('load', updateParentHeight);
                             window.addEventListener('resize', updateParentHeight);
-                        </script>
+                        <\/script>
                     `;
                     
                     contentFrame.srcdoc = injectedScript + html;
 
-                    // Wait for iframe to load
                     await new Promise(resolve => {
                         contentFrame.onload = resolve;
                     });
@@ -156,7 +154,6 @@
             }
         }
 
-        // Listen for messages from the iframe
         window.addEventListener('message', (event) => {
             if (event.data.type === 'resize') {
                 contentFrame.style.height = `${event.data.height}px`;
@@ -168,7 +165,6 @@
             loadContent(pageName);
         });
 
-        // Initialize
         (async () => {
             const pages = await fetchPages();
             createNavLinks(pages);
