@@ -135,7 +135,21 @@
             text-align: center;
             padding: 1rem;
         }
-    /style>
+   </style>
+    <script>
+        // This script runs immediately and handles routing
+        (function() {
+            var segmentCount = 1;
+            var l = window.location;
+            l.replace(
+                l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+                l.pathname.split('/').slice(0, 1 + segmentCount).join('/') + '/?p=/' +
+                l.pathname.slice(1).split('/').slice(segmentCount).join('/').replace(/&/g, '~and~') +
+                (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+                l.hash
+            );
+        })();
+    </script>
 </head>
 <body>
     <header>
@@ -169,6 +183,18 @@
         let isLoading = false;
         let availablePages = [];
 
+        // Handle routing
+        (function(l) {
+            if (l.search[1] === '/') {
+                var decoded = l.search.slice(1).split('&').map(function(s) { 
+                    return s.replace(/~and~/g, '&')
+                }).join('?');
+                window.history.replaceState(null, null,
+                    l.pathname.slice(0, -1) + decoded + l.hash
+                );
+            }
+        }(window.location));
+
         async function fetchPages() {
             try {
                 const response = await fetch('https://api.github.com/repos/junovhs/redleaf/contents/pages');
@@ -181,12 +207,26 @@
         }
 
         function createNavLinks(pages) {
-            navbar.innerHTML = '<a href="/redleaf/" class="nav-item">Home</a>';
+            navbar.innerHTML = '<div class="nav-item" data-page="home">Home</div>';
             pages.forEach(page => {
                 const pageName = page.name.replace('.html', '');
-                navbar.innerHTML += `<a href="/redleaf/${pageName}" class="nav-item">${pageName}</a>`;
+                navbar.innerHTML += `<div class="nav-item" data-page="${pageName}">${pageName}</div>`;
                 availablePages.push(pageName);
             });
+            navbar.addEventListener('click', handleNavClick);
+        }
+
+        function handleNavClick(event) {
+            if (event.target.classList.contains('nav-item')) {
+                const pageName = event.target.getAttribute('data-page');
+                navigateTo(pageName);
+            }
+        }
+
+        function navigateTo(pageName) {
+            const url = pageName === 'home' ? '/redleaf/' : `/redleaf/${pageName}`;
+            window.history.pushState(null, '', url);
+            loadContent(pageName);
         }
 
         async function loadContent(pageName) {
@@ -249,15 +289,6 @@
         }
 
         window.addEventListener('popstate', handleRoute);
-
-        document.body.addEventListener('click', (e) => {
-            if (e.target.classList.contains('nav-item')) {
-                e.preventDefault();
-                const pageName = e.target.getAttribute('href').replace('/redleaf/', '');
-                history.pushState(null, '', e.target.getAttribute('href'));
-                loadContent(pageName || 'home');
-            }
-        });
 
         // Initialize
         (async () => {
