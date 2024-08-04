@@ -14,13 +14,12 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-            height: 100%;
+            min-height: 100vh;
             background-color: var(--background-color);
         }
         body {
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
         }
         header {
             background: var(--primary-color);
@@ -41,6 +40,7 @@
             display: flex;
             flex-direction: column;
             background: white;
+            min-height: calc(100vh - 150px);
         }
         #content-container {
             flex: 1;
@@ -58,13 +58,11 @@
             color: var(--text-color);
             text-align: center;
             padding: 1rem;
+            margin-top: 50px;
         }
-        #loading, #error-message {
+        #loading {
             text-align: center;
             padding: 1rem;
-        }
-        #error-message {
-            color: red;
         }
     </style>
 </head>
@@ -78,7 +76,6 @@
             <iframe id="content-frame" sandbox="allow-scripts allow-forms allow-popups" style="display:none;"></iframe>
         </div>
         <div id="loading" style="display:none;">Loading...</div>
-        <div id="error-message"></div>
     </main>
     <footer>
         <p>&copy; 2024 Redleaf</p>
@@ -88,7 +85,6 @@
         const contentFrame = document.getElementById('content-frame');
         const homeContent = document.getElementById('home-content');
         const loading = document.getElementById('loading');
-        const errorMessage = document.getElementById('error-message');
         let isLoading = false;
 
         async function fetchPages() {
@@ -98,16 +94,15 @@
                 return (await response.json()).filter(file => file.name.endsWith('.html'));
             } catch (error) {
                 console.error('Error fetching pages:', error);
-                errorMessage.textContent = 'Failed to load page list. Please refresh the page.';
                 return [];
             }
         }
 
         function createNavLinks(pages) {
-            navbar.innerHTML = '<a href="/" onclick="loadContent(\'home\'); return false;">Home</a>';
+            navbar.innerHTML = '<a href="/redleaf/" onclick="loadContent(\'home\'); return false;">Home</a>';
             pages.forEach(page => {
                 const pageName = page.name.replace('.html', '');
-                navbar.innerHTML += `<a href="/${pageName}" onclick="loadContent('${pageName}'); return false;">${pageName}</a>`;
+                navbar.innerHTML += `<a href="/redleaf/${pageName}" onclick="loadContent('${pageName}'); return false;">${pageName}</a>`;
             });
         }
 
@@ -115,18 +110,16 @@
             if (isLoading) return;
             isLoading = true;
             loading.style.display = 'block';
-            errorMessage.textContent = '';
 
             try {
                 if (pageName === 'home') {
                     contentFrame.style.display = 'none';
                     homeContent.style.display = 'block';
                     homeContent.innerHTML = '<h1>Welcome to Redleaf</h1><p>Select a page from the navigation menu.</p>';
-                    history.pushState(null, '', '/redleaf/');
                 } else {
                     homeContent.style.display = 'none';
                     contentFrame.style.display = 'block';
-                    const url = `/redleaf/pages/${pageName}.html`;
+                    const url = `pages/${pageName}.html`;
                     const response = await fetch(url);
                     if (!response.ok) throw new Error('Failed to fetch page content');
                     
@@ -147,15 +140,11 @@
                     `;
                     
                     contentFrame.srcdoc = injectedScript + html;
-                    history.pushState(null, '', `/redleaf/${pageName}`);
-
-                    await new Promise(resolve => {
-                        contentFrame.onload = resolve;
-                    });
                 }
             } catch (error) {
                 console.error('Error loading content:', error);
-                errorMessage.textContent = `Failed to load ${pageName}. Please try again.`;
+                homeContent.style.display = 'block';
+                homeContent.innerHTML = '<h1>Error</h1><p>Failed to load content. Please try again.</p>';
             } finally {
                 loading.style.display = 'none';
                 isLoading = false;
@@ -168,17 +157,18 @@
             }
         });
 
-        window.addEventListener('popstate', () => {
+        function handleNavigation() {
             const path = window.location.pathname.replace('/redleaf/', '').split('/')[0] || 'home';
             loadContent(path);
-        });
+        }
+
+        window.addEventListener('popstate', handleNavigation);
 
         // Initialize
         (async () => {
             const pages = await fetchPages();
             createNavLinks(pages);
-            const initialPath = window.location.pathname.replace('/redleaf/', '').split('/')[0] || 'home';
-            loadContent(initialPath);
+            handleNavigation();
         })();
     </script>
 </body>
