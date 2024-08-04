@@ -51,6 +51,7 @@
             flex: 1;
             width: 100%;
             border: none;
+            min-height: 500px; /* Set a minimum height */
         }
         footer {
             background: var(--primary-color);
@@ -88,6 +89,7 @@
         const homeContent = document.getElementById('home-content');
         const loading = document.getElementById('loading');
         const errorMessage = document.getElementById('error-message');
+        let isLoading = false;
 
         async function fetchPages() {
             try {
@@ -110,6 +112,8 @@
         }
 
         async function loadContent(pageName) {
+            if (isLoading) return; // Prevent multiple simultaneous loads
+            isLoading = true;
             loading.style.display = 'block';
             errorMessage.textContent = '';
 
@@ -132,11 +136,12 @@
                             function updateParentHeight() {
                                 window.parent.postMessage({
                                     type: 'resize',
-                                    height: document.body.scrollHeight
+                                    height: Math.max(document.body.scrollHeight, 500)
                                 }, '*');
                             }
                             window.addEventListener('load', updateParentHeight);
                             window.addEventListener('resize', updateParentHeight);
+                            setInterval(updateParentHeight, 1000); // Check periodically
                         <\/script>
                     `;
                     
@@ -151,24 +156,28 @@
                 errorMessage.textContent = `Failed to load ${pageName}. Please try again.`;
             } finally {
                 loading.style.display = 'none';
+                isLoading = false;
             }
         }
 
         window.addEventListener('message', (event) => {
             if (event.data.type === 'resize') {
-                contentFrame.style.height = `${event.data.height}px`;
+                contentFrame.style.height = `${Math.max(event.data.height, 500)}px`;
             }
         });
 
-        window.addEventListener('hashchange', () => {
+        function handleHashChange() {
             const pageName = window.location.hash.slice(1) || 'home';
             loadContent(pageName);
-        });
+        }
 
+        window.addEventListener('hashchange', handleHashChange);
+
+        // Initialize
         (async () => {
             const pages = await fetchPages();
             createNavLinks(pages);
-            loadContent('home');
+            handleHashChange(); // Load the correct page based on initial URL
         })();
     </script>
 </body>
