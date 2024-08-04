@@ -136,4 +136,44 @@
                                     height: document.body.scrollHeight
                                 }, '*');
                             }
-                            window.addEventListener('load', updateParentHeight
+                            window.addEventListener('load', updateParentHeight);
+                            window.addEventListener('resize', updateParentHeight);
+                        </script>
+                    `;
+                    
+                    contentFrame.srcdoc = injectedScript + html;
+
+                    // Wait for iframe to load
+                    await new Promise(resolve => {
+                        contentFrame.onload = resolve;
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading content:', error);
+                errorMessage.textContent = `Failed to load ${pageName}. Please try again.`;
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Listen for messages from the iframe
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'resize') {
+                contentFrame.style.height = `${event.data.height}px`;
+            }
+        });
+
+        window.addEventListener('hashchange', () => {
+            const pageName = window.location.hash.slice(1) || 'home';
+            loadContent(pageName);
+        });
+
+        // Initialize
+        (async () => {
+            const pages = await fetchPages();
+            createNavLinks(pages);
+            loadContent('home');
+        })();
+    </script>
+</body>
+</html>
