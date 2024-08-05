@@ -1,0 +1,81 @@
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+h1, h2 {
+    color: #333;
+}
+
+#designerControls {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input, select {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+input[type="checkbox"] {
+    width: auto;
+}
+
+#menuEditor {
+    margin-bottom: 20px;
+}
+
+#addMenuItem {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+#addMenuItem:hover {
+    background-color: #45a049;
+}
+
+#menuItems {
+    margin-top: 10px;
+}
+
+.menuItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.menuItem input {
+    margin-right: 5px;
+}
+
+#navbarPreview {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: white;
+}
+
+#generatedCode {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: 20px;
+}
+
+#codeOutput {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
