@@ -1,0 +1,409 @@
+<html>
+<head>
+    
+</head>
+<body>
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Open+Sans:wght@300;400;700&family=Lato:wght@300;400;700&family=Montserrat:wght@300;400;700&family=Raleway:wght@300;400;700&family=Poppins:wght@300;400;700&family=Nunito:wght@300;400;700&family=Source+Sans+Pro:wght@300;400;700&family=Ubuntu:wght@300;400;700&family=Noto+Sans:wght@300;400;700&display=swap');
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #ffffff;
+    }
+    .container {
+        text-align: center;
+        width: 100%;
+        max-width: 800px;
+    }
+    #chart {
+        width: 100%;
+        height: 70vh;
+        margin: 20px auto;
+    }
+    .axis-handle {
+        cursor: ns-resize;
+        fill: #6699cc;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+    .blob-hover-area:hover + .handles .axis-handle,
+    .handles:hover .axis-handle {
+        opacity: 0.7;
+    }
+    .axis-label {
+        font-weight: 300;
+        text-anchor: middle;
+        dominant-baseline: middle;
+        cursor: move;
+    }
+    .axis-label:hover {
+        font-weight: 400;
+    }
+    #downloadBtn, #colorPicker, #fontSelector, #segmentsInput, #fontSizeInput, #blobOpacityInput, #lineColorPicker, #lineOpacityInput {
+        margin: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: 400;
+        background-color: #6699cc;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    #downloadBtn:hover, #colorPicker:hover, #fontSelector:hover, #segmentsInput:hover, #fontSizeInput:hover, #blobOpacityInput:hover, #lineColorPicker:hover, #lineOpacityInput:hover {
+        background-color: #4477aa;
+    }
+    h1 {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #333;
+        cursor: pointer;
+    }
+    h1:hover {
+        text-decoration: underline;
+    }
+    .controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+    #colorPicker, #lineColorPicker {
+        width: 100px;
+    }
+    #segmentsInput, #fontSizeInput {
+        width: 60px;
+        text-align: center;
+    }
+    #blobOpacityInput, #lineOpacityInput {
+        width: 80px;
+    }
+    .control-group {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 10px;
+    }
+    .control-label {
+        font-size: 14px;
+        margin-bottom: 5px;
+        color: #333;
+    }
+</style>
+
+<div class="container">
+    <h1 id="mainTitle">Salvia</h1>
+    <div id="chart"></div>
+    <div class="controls">
+        <div class="control-group">
+            <button id="downloadBtn">Download Vector</button>
+        </div>
+        <div class="control-group">
+            <label for="colorPicker" class="control-label">Blob Color</label>
+            <input type="color" id="colorPicker" value="#6699cc">
+        </div>
+        <div class="control-group">
+            <label for="blobOpacityInput" class="control-label">Blob Opacity</label>
+            <input type="number" id="blobOpacityInput" min="0" max="1" step="0.1" value="0.7">
+        </div>
+        <div class="control-group">
+            <label for="lineColorPicker" class="control-label">Line Color</label>
+            <input type="color" id="lineColorPicker" value="#000000">
+        </div>
+        <div class="control-group">
+            <label for="lineOpacityInput" class="control-label">Line Opacity</label>
+            <input type="number" id="lineOpacityInput" min="0" max="1" step="0.1" value="1">
+        </div>
+        <div class="control-group">
+            <label for="fontSelector" class="control-label">Font Family</label>
+            <select id="fontSelector">
+                <option value="Roboto">Roboto</option>
+                <option value="Open Sans">Open Sans</option>
+                <option value="Lato">Lato</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="Raleway">Raleway</option>
+                <option value="Poppins">Poppins</option>
+                <option value="Nunito">Nunito</option>
+                <option value="Source Sans Pro">Source Sans Pro</option>
+                <option value="Ubuntu">Ubuntu</option>
+                <option value="Noto Sans">Noto Sans</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="fontSizeInput" class="control-label">Font Size</label>
+            <input type="number" id="fontSizeInput" min="8" max="24" value="16">
+        </div>
+        <div class="control-group">
+            <label for="segmentsInput" class="control-label">Number of Segments</label>
+            <input type="number" id="segmentsInput" min="3" max="12" value="5">
+        </div>
+    </div>
+</div>
+
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script>
+const svg = d3.select("#chart")
+    .append("svg")
+    .attr("viewBox", "0 0 900 900")
+    .append("g")
+    .attr("transform", "translate(450,450)");
+
+const scale = d3.scaleLinear().domain([0, 10]).range([0, 300]);
+let axes = ["Visuals", "Strength & Potency", "Safety Level", "Consciousness Expansion", "Duration of Effects"];
+
+let data = [
+    {axis: "Visuals", value: 8},
+    {axis: "Strength & Potency", value: 9},
+    {axis: "Safety Level", value: 6},
+    {axis: "Consciousness Expansion", value: 7},
+    {axis: "Duration of Effects", value: 3}
+];
+
+const line = d3.lineRadial()
+    .radius(d => scale(d.value))
+    .angle((d, i) => i * 2 * Math.PI / axes.length)
+    .curve(d3.curveCatmullRomClosed);
+
+// Create noise pattern
+const noise = svg.append("defs")
+    .append("filter")
+    .attr("id", "noise");
+
+noise.append("feTurbulence")
+    .attr("type", "fractalNoise")
+    .attr("baseFrequency", "0.65")
+    .attr("numOctaves", "3")
+    .attr("stitchTiles", "stitch");
+
+noise.append("feColorMatrix")
+    .attr("type", "saturate")
+    .attr("values", "0.1");
+
+// Create grain texture
+const grainTexture = svg.append("defs")
+    .append("filter")
+    .attr("id", "grain");
+
+grainTexture.append("feTurbulence")
+    .attr("type", "fractalNoise")
+    .attr("baseFrequency", "0.8")
+    .attr("numOctaves", "3")
+    .attr("stitchTiles", "stitch");
+
+grainTexture.append("feColorMatrix")
+    .attr("type", "matrix")
+    .attr("values", "0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0");
+
+grainTexture.append("feBlend")
+    .attr("in", "SourceGraphic")
+    .attr("in2", "grain")
+    .attr("mode", "soft-light");
+
+let blobColor = "#6699cc";
+let blobOpacity = 0.7;
+let lineColor = "#000000";
+let lineOpacity = 1;
+let fontSize = 16;
+
+function updateChart() {
+    svg.selectAll("*").remove();
+
+    // Draw outer dashed circle
+    svg.append("circle")
+        .attr("cx", 0)
+        .attr("cy", 0)
+        .attr("r", scale(10))
+        .attr("fill", "none")
+        .attr("stroke", lineColor)
+        .attr("stroke-opacity", lineOpacity)
+        .attr("stroke-dasharray", "10,10");
+
+    // Draw axis lines
+    svg.selectAll(".axis")
+        .data(axes)
+        .enter().append("line")
+        .attr("x1", 0)
+        .attr("y1", 0)
+        .attr("x2", (d, i) => scale(10) * Math.sin(i * 2 * Math.PI / axes.length))
+        .attr("y2", (d, i) => -scale(10) * Math.cos(i * 2 * Math.PI / axes.length))
+        .attr("stroke", lineColor)
+        .attr("stroke-opacity", lineOpacity)
+        .attr("stroke-dasharray", "10,10");
+
+    // Draw axes labels
+    svg.selectAll(".axis-label")
+        .data(axes)
+        .enter().append("text")
+        .attr("class", "axis-label")
+        .attr("x", (d, i) => scale(13.5) * Math.sin(i * 2 * Math.PI / axes.length))
+        .attr("y", (d, i) => -scale(13.5) * Math.cos(i * 2 * Math.PI / axes.length))
+        .attr("font-size", fontSize)
+        .each(function(d, i) {
+            const words = d.split(' ');
+            const text = d3.select(this);
+            text.text(null);
+            for (let j = 0; j < words.length; j++) {
+                text.append("tspan")
+                    .attr("x", text.attr("x"))
+                    .attr("dy", j ? "1.2em" : "-0.6em")
+                    .text(words[j]);
+            }
+        })
+        .on("click", function(d, i) {
+            const newText = prompt("Enter new label:", d);
+            if (newText !== null) {
+                axes[i] = newText;
+                data[i].axis = newText;
+                updateChart();
+            }
+        })
+        .call(d3.drag()
+            .on("drag", function(d, i) {
+                const [x, y] = d3.mouse(svg.node());
+                const angle = Math.atan2(y, x);
+                const distance = Math.sqrt(x * x + y * y);
+                const newX = scale(13.5) * Math.cos(angle);
+                const newY = scale(13.5) * Math.sin(angle);
+                d3.select(this)
+                    .attr("x", newX)
+                    .attr("y", newY);
+            })
+        );
+
+    // Draw the blob
+    svg.append("path")
+        .attr("class", "blob")
+        .datum(data)
+        .attr("d", line)
+        .attr("fill", blobColor)
+        .attr("fill-opacity", blobOpacity)
+        .style("filter", "url(#noise) url(#grain)");
+
+    // Add an increased hover area around the blob
+    svg.append("path")
+        .attr("class", "blob-hover-area")
+        .datum(data)
+        .attr("d", d3.lineRadial()
+            .radius(d => scale(d.value) + 40)
+            .angle((d, i) => i * 2 * Math.PI / axes.length)
+            .curve(d3.curveCatmullRomClosed))
+        .attr("fill", "transparent");
+
+    // Add draggable handles
+    const handlesGroup = svg.append("g").attr("class", "handles");
+    handlesGroup.selectAll(".handle")
+        .data(data)
+        .enter().append("circle")
+        .attr("class", "axis-handle")
+        .attr("r", 16)
+        .attr("cx", (d, i) => scale(d.value) * Math.sin(i * 2 * Math.PI / axes.length))
+        .attr("cy", (d, i) => -scale(d.value) * Math.cos(i * 2 * Math.PI / axes.length))
+        .call(d3.drag().on("drag", dragged));
+}
+
+function dragged(d, i) {
+    const [x, y] = d3.mouse(svg.node());
+    const angle = i * 2 * Math.PI / axes.length;
+    const distance = Math.sqrt(x * x + y * y);
+    let value = scale.invert(distance);
+    value = Math.max(0, Math.min(10, value));
+    d.value = value;
+    updateChart();
+}
+
+function updateSegments(numSegments) {
+    axes = Array.from({length: numSegments}, (_, i) => `Axis ${i + 1}`);
+    data = axes.map(axis => ({axis, value: 5}));
+    updateChart();
+}
+
+updateChart();
+
+// Download SVG functionality
+document.getElementById('downloadBtn').addEventListener('click', function() {
+    const svgElement = document.querySelector('#chart svg');
+    const clonedSvg = svgElement.cloneNode(true);
+    clonedSvg.setAttribute('width', '900');
+    clonedSvg.setAttribute('height', '900');
+    clonedSvg.querySelectorAll('.handles, .blob-hover-area').forEach(el => el.remove());
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        @import url('https://fonts.googleapis.com/css2?family=${document.body.style.fontFamily.replace(/['"]+/g, '')}:wght@300;400;700&display=swap');
+        .axis-label { font-family: '${document.body.style.fontFamily}', sans-serif; font-weight: 300; }
+    `;
+    clonedSvg.insertBefore(style, clonedSvg.firstChild);
+    
+    const serializer = new XMLSerializer();
+    const svgString = serializer.serializeToString(clonedSvg);
+    const blob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'chart.svg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+});
+
+// Color picker functionality
+document.getElementById('colorPicker').addEventListener('input', function(event) {
+    blobColor = event.target.value;
+    updateChart();
+});
+
+// Blob opacity functionality
+document.getElementById('blobOpacityInput').addEventListener('input', function(event) {
+    blobOpacity = parseFloat(event.target.value);
+    updateChart();
+});
+
+// Line color picker functionality
+document.getElementById('lineColorPicker').addEventListener('input', function(event) {
+    lineColor = event.target.value;
+    updateChart();
+});
+
+// Line opacity functionality
+document.getElementById('lineOpacityInput').addEventListener('input', function(event) {
+    lineOpacity = parseFloat(event.target.value);
+    updateChart();
+});
+
+// Font selector functionality
+document.getElementById('fontSelector').addEventListener('change', function(event) {
+    document.body.style.fontFamily = event.target.value;
+    updateChart();
+});
+
+// Font size functionality
+document.getElementById('fontSizeInput').addEventListener('input', function(event) {
+    fontSize = parseInt(event.target.value);
+    updateChart();
+});
+
+// Segments input functionality
+document.getElementById('segmentsInput').addEventListener('change', function(event) {
+    const numSegments = parseInt(event.target.value);
+    if (numSegments >= 3 && numSegments <= 12) {
+        updateSegments(numSegments);
+    }
+});
+
+// Main title edit functionality
+document.getElementById('mainTitle').addEventListener('click', function() {
+    const newTitle = prompt("Enter new title:", this.textContent);
+    if (newTitle !== null) {
+        this.textContent = newTitle;
+    }
+});
+</script>
+</body></html>
