@@ -1,4 +1,4 @@
-<html><head><base
+<html><head><base href="https://dailytodolist.com/">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DailyTodoList - Your Dynamic Task Organizer</title>
@@ -10,7 +10,7 @@
         max-width: 800px;
         margin: 0 auto;
         padding: 20px;
-        background-color: #ffffff;
+        background-color: #f0f4f8;
         transition: background-color 0.3s, color 0.3s;
     }
     body.dark-mode {
@@ -62,7 +62,10 @@
         border-radius: 4px;
     }
     .dark-mode #todoInput,
-    .dark-mode #workDuration {
+    .dark-mode #workDuration,
+    .dark-mode #manualTaskInput,
+    .dark-mode #manualTimeInput,
+    .dark-mode #manualNoteInput {
         background-color: #2c2c2c;
         color: #f0f0f0;
         border-color: #555;
@@ -178,61 +181,99 @@
         pointer-events: none;
         z-index: 9999;
     }
-    .add-task-button {
-        width: 100%;
+    #manualAdd {
+        margin-top: 10px;
+    }
+    #manualTaskInput, #manualTimeInput, #manualNoteInput {
+        width: calc(50% - 5px);
         padding: 10px;
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    .add-task-button:hover {
-        background-color: #45a049;
-        transform: scale(1.05);
-    }
-    .new-task-item {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 10px;
-        padding: 10px;
-        background-color: #f8f9fa;
-        border-radius: 4px;
-        transition: all 0.3s ease;
-    }
-    .new-task-item input {
-        margin-bottom: 5px;
-        padding: 5px;
+        margin-right: 10px;
         border: 1px solid #ced4da;
         border-radius: 4px;
     }
-    .new-task-item input:focus {
-        outline: none;
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    #manualNoteInput {
+        width: calc(50% - 5px);
+        padding: 10px;
+        margin-right: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
     }
-    .dark-mode .new-task-item {
-        background-color: #2c2c2c;
+    #addManualTask {
+        width: calc(50% - 5px);
     }
-    .dark-mode .new-task-item input {
-        background-color: #3a3a3a;
-        color: #f0f0f0;
-        border-color: #555;
+    [contenteditable="true"]:focus {
+        outline: 2px solid #007bff;
+        border-radius: 2px;
     }
-    #memeOverlay {
+    #darkModeToggle {
         position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 1001;
-        display: none;
+        top: 20px;
+        right: 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
     }
-    #memeOverlay img {
-        max-width: 300px;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(255,255,255,0.8);
+    #darkModeToggle:hover {
+        background-color: #0056b3;
     }
+    .drag-handle {
+        cursor: move;
+        padding: 10px;
+        color: #777;
+        margin-right: 10px;
+    }
+    .dark-mode .drag-handle {
+        color: #aaa;
+    }
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+        40% {transform: translateY(-30px);}
+        60% {transform: translateY(-15px);}
+    }
+    @keyframes shake {
+        0%, 100% {transform: translateX(0);}
+        10%, 30%, 50%, 70%, 90% {transform: translateX(-10px);}
+        20%, 40%, 60%, 80% {transform: translateX(10px);}
+    }
+    @keyframes rotate {
+        0% {transform: rotate(0deg);}
+        100% {transform: rotate(360deg);}
+    }
+    @keyframes pulse {
+        0% {transform: scale(1);}
+        50% {transform: scale(1.1);}
+        100% {transform: scale(1);}
+    }
+    @keyframes rainbow {
+        0% {background-color: red;}
+        14% {background-color: orange;}
+        28% {background-color: yellow;}
+        42% {background-color: green;}
+        56% {background-color: blue;}
+        70% {background-color: indigo;}
+        84% {background-color: violet;}
+        100% {background-color: red;}
+    }
+    @keyframes glowPulse {
+        0% {box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);}
+        50% {box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);}
+        100% {box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);}
+    }
+    @keyframes sparkle {
+        0%, 100% { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">✨</text></svg>'); }
+        50% { background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🌟</text></svg>'); }
+    }
+    .bounce { animation: bounce 1s; }
+    .shake { animation: shake 0.5s; }
+    .rotate { animation: rotate 1s linear; }
+    .pulse { animation: pulse 0.5s; }
+    .rainbow { animation: rainbow 2s linear infinite; }
+    .glow { animation: glowPulse 1s infinite; }
+    .sparkle { animation: sparkle 0.5s steps(2, end) infinite; }
 </style>
 </head>
 <body>
@@ -244,21 +285,22 @@
             <textarea id="todoInput" placeholder="Paste your todo list here..."></textarea>
             <input type="number" id="workDuration" placeholder="Total work duration (in minutes)">
             <button id="parseButton">Parse Todo List</button>
+            <div id="manualAdd">
+                <input type="text" id="manualTaskInput" placeholder="Add a task">
+                <input type="number" id="manualTimeInput" placeholder="Time (minutes)">
+                <input type="text" id="manualNoteInput" placeholder="Add a note">
+                <button id="addManualTask">Add Task</button>
+            </div>
         </div>
     </div>
     <div class="container">
         <h2>Your Tasks</h2>
-        <div id="todoItems" class="todo-list">
-            <button id="addTaskButton" class="add-task-button">+ Add Task</button>
-        </div>
+        <div id="todoItems" class="todo-list"></div>
     </div>
     <div class="progress-bar">
         <div class="progress" id="progressBar"></div>
     </div>
     <canvas id="confetti-canvas"></canvas>
-    <div id="memeOverlay">
-        <img src="https://i.imgur.com/3vfAoZk.png" alt="Meme dog with sunglasses">
-    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -269,7 +311,10 @@
         const parseButton = document.getElementById('parseButton');
         const todoItemsContainer = document.getElementById('todoItems');
         const progressBar = document.getElementById('progressBar');
-        const addTaskButton = document.getElementById('addTaskButton');
+        const manualTaskInput = document.getElementById('manualTaskInput');
+        const manualTimeInput = document.getElementById('manualTimeInput');
+        const manualNoteInput = document.getElementById('manualNoteInput');
+        const addManualTaskButton = document.getElementById('addManualTask');
         const collapsible = document.querySelector('.collapsible');
         const collapsibleHeader = document.querySelector('.collapsible-header');
         const darkModeToggle = document.getElementById('darkModeToggle');
@@ -285,7 +330,7 @@
         });
 
         parseButton.addEventListener('click', parseTodoList);
-        addTaskButton.addEventListener('click', createNewTaskItem);
+        addManualTaskButton.addEventListener('click', addManualTask);
         collapsibleHeader.addEventListener('click', () => {
             collapsible.classList.toggle('active');
         });
@@ -308,52 +353,6 @@
         }
         updateDarkModeButton();
 
-        function createNewTaskItem() {
-            const newTaskItem = document.createElement('div');
-            newTaskItem.className = 'new-task-item';
-            newTaskItem.innerHTML = `
-                <input type="text" class="new-task-text" placeholder="Task title">
-                <input type="number" class="new-task-time" placeholder="Time (minutes)">
-                <input type="text" class="new-task-note" placeholder="Add a note">
-            `;
-            todoItemsContainer.insertBefore(newTaskItem, addTaskButton);
-
-            const taskTextInput = newTaskItem.querySelector('.new-task-text');
-            taskTextInput.focus();
-
-            taskTextInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    newTaskItem.querySelector('.new-task-time').focus();
-                }
-            });
-
-            newTaskItem.querySelector('.new-task-time').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    newTaskItem.querySelector('.new-task-note').focus();
-                }
-            });
-
-            newTaskItem.querySelector('.new-task-note').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const text = newTaskItem.querySelector('.new-task-text').value.trim();
-                    const time = parseInt(newTaskItem.querySelector('.new-task-time').value);
-                    const note = newTaskItem.querySelector('.new-task-note').value.trim();
-
-                    if (text && !isNaN(time)) {
-                        todoList.push({ text, time, description: note });
-                        totalTime += time;
-                        renderTodoList();
-                        updateProgressBar();
-                    }
-
-                    newTaskItem.remove();
-                }
-            });
-        }
-
         function parseTodoList() {
             const input = todoInput.value;
             workDuration = parseInt(workDurationInput.value) || 0;
@@ -361,34 +360,65 @@
             totalTime = 0;
             completedTime = 0;
 
-            const tasks = input.split(/\n(?=\d+[\.\)]|\-|\*|\+)/).filter(task => task.trim() !== '');
+            const tasks = input.split(/\d+\.\s/).filter(task => task.trim() !== '');
             tasks.forEach(task => {
                 const lines = task.trim().split('\n');
-                const firstLine = lines[0].replace(/^\d+[\.\)]|\-|\*|\+\s*/, '').trim();
+                const firstLine = lines[0];
                 const description = lines.slice(1).join(' ').trim();
 
-                let match = firstLine.match(/^(.*?)(?:\s*[-–]\s*|\s+)(\d+(?:\.\d+)?)\s*(minutes?|mins?|m|hours?|hrs?|h)?$/i);
+                let match = firstLine.match(/^(.*?)(?:\s*\((.*?)\))?$/);
                 if (match) {
                     let text = match[1].trim();
-                    let time = parseFloat(match[2]);
-                    let unit = match[3] ? match[3].toLowerCase() : 'm';
+                    let timeEstimate = match[2];
+                    let time = 0;
 
-                    if (unit.startsWith('h')) {
-                        time *= 60;
+                    if (timeEstimate) {
+                        let timeMatch = timeEstimate.match(/(\d+(?:\.\d+)?)\s*(minutes?|mins?|m|hours?|hrs?|h)/i);
+                        if (timeMatch) {
+                            time = parseFloat(timeMatch[1]);
+                            if (timeMatch[2].toLowerCase().startsWith('h')) {
+                                time *= 60;
+                            }
+                        } else {
+                            timeMatch = timeEstimate.match(/(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)\s*(minutes?|mins?|m|hours?|hrs?|h)/i);
+                            if (timeMatch) {
+                                let minTime = parseFloat(timeMatch[1]);
+                                let maxTime = parseFloat(timeMatch[2]);
+                                time = (minTime + maxTime) / 2;
+                                if (timeMatch[3].toLowerCase().startsWith('h')) {
+                                    time *= 60;
+                                }
+                            }
+                        }
+                    }
+
+                    if (time === 0) {
+                        time = 30;
                     }
 
                     todoList.push({ text, time: Math.round(time), description });
                     totalTime += Math.round(time);
-                } else {
-                    // If no time is specified, assume 30 minutes
-                    todoList.push({ text: firstLine, time: 30, description });
-                    totalTime += 30;
                 }
             });
 
             renderTodoList();
             updateProgressBar();
             collapsible.classList.remove('active');
+        }
+
+        function addManualTask() {
+            const text = manualTaskInput.value.trim();
+            const time = parseInt(manualTimeInput.value);
+            const note = manualNoteInput.value.trim();
+            if (text && !isNaN(time)) {
+                todoList.push({ text, time, description: note });
+                totalTime += time;
+                renderTodoList();
+                updateProgressBar();
+                manualTaskInput.value = '';
+                manualTimeInput.value = '';
+                manualNoteInput.value = '';
+            }
         }
 
         function renderTodoList() {
@@ -404,7 +434,7 @@
                         <span class="todo-time" contenteditable="true">${item.time}m</span>
                         <span class="todo-delete">❌</span>
                     </div>
-                    <div class="todo-note" contenteditable="true">${item.description ? '"' + item.description + '"' : ""}</div>
+                    <div class="todo-note" contenteditable="true">${item.description ? `"${item.description}"` : ""}</div>
                 `;
                 todoItemsContainer.appendChild(todoItem);
 
@@ -415,8 +445,7 @@
                         completedTime += item.time;
                         applyRandomAnimations(todoItem);
                         triggerConfetti();
-                        playCompletionSound();
-                        triggerCompletionEffects();
+                        playRandomSound();
                     } else {
                         completedTime -= item.time;
                     }
@@ -446,27 +475,22 @@
 
                 noteElement.addEventListener('blur', function() {
                     item.description = this.textContent.replace(/"/g, '');
-                    this.textContent = item.description ? '"' + item.description + '"' : "";
+                    this.textContent = item.description ? `"${item.description}"` : "";
                 });
             });
-
-            todoItemsContainer.appendChild(addTaskButton);
 
             new Sortable(todoItemsContainer, {
                 animation: 150,
                 handle: '.drag-handle',
                 ghostClass: 'sortable-ghost',
                 dragClass: "sortable-drag",
-                filter: '.add-task-button', // Prevent sorting the add task button
                 onEnd: function() {
-                    const newOrder = [...todoItemsContainer.children]
-                        .filter(item => !item.classList.contains('add-task-button'))
-                        .map(item => {
-                            const text = item.querySelector('.todo-text').textContent;
-                            const time = parseInt(item.querySelector('.todo-time').textContent);
-                            const description = item.querySelector('.todo-note').textContent.replace(/"/g, '') || '';
-                            return { text, time, description };
-                        });
+                    const newOrder = [...todoItemsContainer.children].map(item => {
+                        const text = item.querySelector('.todo-text').textContent;
+                        const time = parseInt(item.querySelector('.todo-time').textContent);
+                        const description = item.querySelector('.todo-note').textContent.replace(/"/g, '') || '';
+                        return { text, time, description };
+                    });
                     todoList = newOrder;
                 }
             });
@@ -498,30 +522,13 @@
             }
         }
 
-        function playCompletionSound() {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
-            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
-
-            oscillator.start();
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-            oscillator.stop(audioContext.currentTime + 0.5);
-        }
-
         function getRandomAnimation() {
             const animations = ['bounce', 'shake', 'rotate', 'pulse', 'rainbow', 'glow', 'sparkle'];
             return animations[Math.floor(Math.random() * animations.length)];
         }
 
         function applyRandomAnimations(element) {
-            const animationCount = 3 + Math.floor(Math.random() * 3);
+            const animationCount = 3 + Math.floor(Math.random() * 3); // Apply 3-5 animations
             const appliedAnimations = [];
 
             for (let i = 0; i < animationCount; i++) {
@@ -539,24 +546,15 @@
             }, 2000);
         }
 
-        function triggerCompletionEffects() {
-            document.body.classList.add('screen-shake');
-            setTimeout(() => document.body.classList.remove('screen-shake'), 500);
-            document.body.classList.add('rainbow-bg');
-            setTimeout(() => document.body.classList.remove('rainbow-bg'), 2000);
-            const words = ['RADICAL', 'TUBULAR'];
-            words.forEach((word, index) => {
-                const textElement = document.createElement('div');
-                textElement.textContent = word;
-                textElement.classList.add('popup-text');
-                textElement.style.top = `${20 + index * 60}px`;
-                textElement.style.left = `${20 + index * 100}px`;
-                document.body.appendChild(textElement);
-                setTimeout(() => textElement.remove(), 2000);
-            });
-            const memeOverlay = document.getElementById('memeOverlay');
-            memeOverlay.style.display = 'block';
-            setTimeout(() => memeOverlay.style.display = 'none', 2000);
+        function playRandomSound() {
+            const sounds = [
+                'https://example.com/sound1.mp3',
+                'https://example.com/sound2.mp3',
+                'https://example.com/sound3.mp3',
+                // Add more sound URLs here
+            ];
+            const sound = new Audio(sounds[Math.floor(Math.random() * sounds.length)]);
+            sound.play();
         }
     });
     </script>
