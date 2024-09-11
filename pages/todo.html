@@ -1,0 +1,563 @@
+<html><head><base
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DailyTodoList - Your Dynamic Task Organizer</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f0f4f8;
+        transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark-mode {
+        background-color: #1a1a1a;
+        color: #f0f0f0;
+    }
+    .container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-top: 20px;
+    }
+    .dark-mode .container {
+        background: #2c2c2c;
+        box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+    }
+    h1, h2 {
+        color: #2c3e50;
+        text-align: center;
+    }
+    .dark-mode h1, .dark-mode h2 {
+        color: #ffffff;
+    }
+    .collapsible-header {
+        cursor: pointer;
+        padding: 10px;
+        background-color: #f1f1f1;
+        border-radius: 4px;
+    }
+    .dark-mode .collapsible-header {
+        background-color: #3a3a3a;
+    }
+    .collapsible-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+    }
+    .collapsible.active .collapsible-content {
+        max-height: 1000px; /* Adjust as needed */
+        transition: max-height 0.5s ease-in;
+    }
+    #todoInput {
+        width: 100%;
+        height: 200px;
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+    .dark-mode #todoInput,
+    .dark-mode #workDuration {
+        background-color: #2c2c2c;
+        color: #f0f0f0;
+        border-color: #555;
+    }
+    #workDuration {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+    button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .dark-mode button {
+        background-color: #0056b3;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+    .dark-mode button:hover {
+        background-color: #003d82;
+    }
+    .todo-list {
+        margin-top: 20px;
+    }
+    .todo-item {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+    .dark-mode .todo-item {
+        background-color: #2c2c2c;
+    }
+    .todo-item.completed {
+        background-color: #d4edda;
+    }
+    .dark-mode .todo-item.completed {
+        background-color: #1e3a2b;
+    }
+    .todo-content {
+        display: flex;
+        align-items: center;
+    }
+    .todo-checkbox {
+        margin-right: 10px;
+    }
+    .todo-text {
+        flex-grow: 1;
+    }
+    .todo-time {
+        width: 80px;
+        text-align: right;
+    }
+    .todo-delete {
+        margin-left: 10px;
+        color: #777;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .dark-mode .todo-delete {
+        color: #aaa;
+    }
+    .todo-delete:hover {
+        color: #dc3545;
+        transform: scale(1.1);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    .dark-mode .todo-delete:hover {
+        color: #ff6b6b;
+    }
+    .todo-note {
+        font-size: 0.9em;
+        color: #777;
+        margin-top: 5px;
+        font-style: italic;
+    }
+    .dark-mode .todo-note {
+        color: #aaa;
+    }
+    .progress-bar {
+        background-color: #e9ecef;
+        height: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        overflow: hidden;
+    }
+    .dark-mode .progress-bar {
+        background-color: #3a3a3a;
+    }
+    .progress {
+        width: 0;
+        height: 100%;
+        background-color: #28a745;
+        transition: width 0.5s ease-in-out;
+    }
+    #confetti-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+    }
+    .add-task-button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .add-task-button:hover {
+        background-color: #45a049;
+        transform: scale(1.05);
+    }
+    .new-task-item {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+    .new-task-item input {
+        margin-bottom: 5px;
+        padding: 5px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+    .new-task-item input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+    .dark-mode .new-task-item {
+        background-color: #2c2c2c;
+    }
+    .dark-mode .new-task-item input {
+        background-color: #3a3a3a;
+        color: #f0f0f0;
+        border-color: #555;
+    }
+    #memeOverlay {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1001;
+        display: none;
+    }
+    #memeOverlay img {
+        max-width: 300px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(255,255,255,0.8);
+    }
+</style>
+</head>
+<body>
+    <button id="darkModeToggle">Toggle Dark Mode</button>
+    <h1>Your Dynamic Daily Todo List</h1>
+    <div class="container collapsible">
+        <h2 class="collapsible-header">Input Your Tasks</h2>
+        <div class="collapsible-content">
+            <textarea id="todoInput" placeholder="Paste your todo list here..."></textarea>
+            <input type="number" id="workDuration" placeholder="Total work duration (in minutes)">
+            <button id="parseButton">Parse Todo List</button>
+        </div>
+    </div>
+    <div class="container">
+        <h2>Your Tasks</h2>
+        <div id="todoItems" class="todo-list">
+            <button id="addTaskButton" class="add-task-button">+ Add Task</button>
+        </div>
+    </div>
+    <div class="progress-bar">
+        <div class="progress" id="progressBar"></div>
+    </div>
+    <canvas id="confetti-canvas"></canvas>
+    <div id="memeOverlay">
+        <img src="https://i.imgur.com/3vfAoZk.png" alt="Meme dog with sunglasses">
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const todoInput = document.getElementById('todoInput');
+        const workDurationInput = document.getElementById('workDuration');
+        const parseButton = document.getElementById('parseButton');
+        const todoItemsContainer = document.getElementById('todoItems');
+        const progressBar = document.getElementById('progressBar');
+        const addTaskButton = document.getElementById('addTaskButton');
+        const collapsible = document.querySelector('.collapsible');
+        const collapsibleHeader = document.querySelector('.collapsible-header');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+
+        let todoList = [];
+        let totalTime = 0;
+        let completedTime = 0;
+        let workDuration = 0;
+
+        const myConfetti = confetti.create(document.getElementById('confetti-canvas'), {
+            resize: true,
+            useWorker: true
+        });
+
+        parseButton.addEventListener('click', parseTodoList);
+        addTaskButton.addEventListener('click', createNewTaskItem);
+        collapsibleHeader.addEventListener('click', () => {
+            collapsible.classList.toggle('active');
+        });
+
+        darkModeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            updateDarkModeButton();
+        });
+
+        function updateDarkModeButton() {
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            darkModeToggle.textContent = isDarkMode ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+        }
+
+        const savedDarkMode = localStorage.getItem('darkMode');
+        if (savedDarkMode === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+        updateDarkModeButton();
+
+        function createNewTaskItem() {
+            const newTaskItem = document.createElement('div');
+            newTaskItem.className = 'new-task-item';
+            newTaskItem.innerHTML = `
+                <input type="text" class="new-task-text" placeholder="Task title">
+                <input type="number" class="new-task-time" placeholder="Time (minutes)">
+                <input type="text" class="new-task-note" placeholder="Add a note">
+            `;
+            todoItemsContainer.insertBefore(newTaskItem, addTaskButton);
+
+            const taskTextInput = newTaskItem.querySelector('.new-task-text');
+            taskTextInput.focus();
+
+            taskTextInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    newTaskItem.querySelector('.new-task-time').focus();
+                }
+            });
+
+            newTaskItem.querySelector('.new-task-time').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    newTaskItem.querySelector('.new-task-note').focus();
+                }
+            });
+
+            newTaskItem.querySelector('.new-task-note').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const text = newTaskItem.querySelector('.new-task-text').value.trim();
+                    const time = parseInt(newTaskItem.querySelector('.new-task-time').value);
+                    const note = newTaskItem.querySelector('.new-task-note').value.trim();
+
+                    if (text && !isNaN(time)) {
+                        todoList.push({ text, time, description: note });
+                        totalTime += time;
+                        renderTodoList();
+                        updateProgressBar();
+                    }
+
+                    newTaskItem.remove();
+                }
+            });
+        }
+
+        function parseTodoList() {
+            const input = todoInput.value;
+            workDuration = parseInt(workDurationInput.value) || 0;
+            todoList = [];
+            totalTime = 0;
+            completedTime = 0;
+
+            const tasks = input.split(/\n(?=\d+[\.\)]|\-|\*|\+)/).filter(task => task.trim() !== '');
+            tasks.forEach(task => {
+                const lines = task.trim().split('\n');
+                const firstLine = lines[0].replace(/^\d+[\.\)]|\-|\*|\+\s*/, '').trim();
+                const description = lines.slice(1).join(' ').trim();
+
+                let match = firstLine.match(/^(.*?)(?:\s*[-–]\s*|\s+)(\d+(?:\.\d+)?)\s*(minutes?|mins?|m|hours?|hrs?|h)?$/i);
+                if (match) {
+                    let text = match[1].trim();
+                    let time = parseFloat(match[2]);
+                    let unit = match[3] ? match[3].toLowerCase() : 'm';
+
+                    if (unit.startsWith('h')) {
+                        time *= 60;
+                    }
+
+                    todoList.push({ text, time: Math.round(time), description });
+                    totalTime += Math.round(time);
+                } else {
+                    // If no time is specified, assume 30 minutes
+                    todoList.push({ text: firstLine, time: 30, description });
+                    totalTime += 30;
+                }
+            });
+
+            renderTodoList();
+            updateProgressBar();
+            collapsible.classList.remove('active');
+        }
+
+        function renderTodoList() {
+            todoItemsContainer.innerHTML = '';
+            todoList.forEach((item, index) => {
+                const todoItem = document.createElement('div');
+                todoItem.className = 'todo-item';
+                todoItem.innerHTML = `
+                    <div class="todo-content">
+                        <span class="drag-handle">⋮⋮</span>
+                        <input type="checkbox" class="todo-checkbox" id="todo-${index}">
+                        <label class="todo-text" for="todo-${index}" contenteditable="true">${item.text}</label>
+                        <span class="todo-time" contenteditable="true">${item.time}m</span>
+                        <span class="todo-delete">❌</span>
+                    </div>
+                    <div class="todo-note" contenteditable="true">${item.description ? '"' + item.description + '"' : ""}</div>
+                `;
+                todoItemsContainer.appendChild(todoItem);
+
+                const checkbox = todoItem.querySelector('.todo-checkbox');
+                checkbox.addEventListener('change', function() {
+                    todoItem.classList.toggle('completed', this.checked);
+                    if (this.checked) {
+                        completedTime += item.time;
+                        applyRandomAnimations(todoItem);
+                        triggerConfetti();
+                        playCompletionSound();
+                        triggerCompletionEffects();
+                    } else {
+                        completedTime -= item.time;
+                    }
+                    updateProgressBar();
+                });
+
+                const textElement = todoItem.querySelector('.todo-text');
+                const timeElement = todoItem.querySelector('.todo-time');
+                const noteElement = todoItem.querySelector('.todo-note');
+
+                textElement.addEventListener('blur', function() {
+                    item.text = this.textContent;
+                });
+
+                timeElement.addEventListener('blur', function() {
+                    const newTime = parseInt(this.textContent);
+                    if (!isNaN(newTime)) {
+                        totalTime -= item.time;
+                        item.time = newTime;
+                        totalTime += newTime;
+                        this.textContent = `${newTime}m`;
+                        updateProgressBar();
+                    } else {
+                        this.textContent = `${item.time}m`;
+                    }
+                });
+
+                noteElement.addEventListener('blur', function() {
+                    item.description = this.textContent.replace(/"/g, '');
+                    this.textContent = item.description ? '"' + item.description + '"' : "";
+                });
+            });
+
+            todoItemsContainer.appendChild(addTaskButton);
+
+            new Sortable(todoItemsContainer, {
+                animation: 150,
+                handle: '.drag-handle',
+                ghostClass: 'sortable-ghost',
+                dragClass: "sortable-drag",
+                filter: '.add-task-button', // Prevent sorting the add task button
+                onEnd: function() {
+                    const newOrder = [...todoItemsContainer.children]
+                        .filter(item => !item.classList.contains('add-task-button'))
+                        .map(item => {
+                            const text = item.querySelector('.todo-text').textContent;
+                            const time = parseInt(item.querySelector('.todo-time').textContent);
+                            const description = item.querySelector('.todo-note').textContent.replace(/"/g, '') || '';
+                            return { text, time, description };
+                        });
+                    todoList = newOrder;
+                }
+            });
+        }
+
+        function updateProgressBar() {
+            const percentage = workDuration > 0 ? (completedTime / workDuration) * 100 : (completedTime / totalTime) * 100;
+            progressBar.style.width = `${Math.min(percentage, 100)}%`;
+        }
+
+        function triggerConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            const shapes = ['square', 'circle', 'star'];
+
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    myConfetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0, x: Math.random() },
+                        gravity: 1,
+                        scalar: 1.2,
+                        startVelocity: 30,
+                        ticks: 300,
+                        shapes: shapes,
+                        colors: colors
+                    });
+                }, i * 200);
+            }
+        }
+
+        function playCompletionSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime); // C5
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+
+            oscillator.start();
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        function getRandomAnimation() {
+            const animations = ['bounce', 'shake', 'rotate', 'pulse', 'rainbow', 'glow', 'sparkle'];
+            return animations[Math.floor(Math.random() * animations.length)];
+        }
+
+        function applyRandomAnimations(element) {
+            const animationCount = 3 + Math.floor(Math.random() * 3);
+            const appliedAnimations = [];
+
+            for (let i = 0; i < animationCount; i++) {
+                let animation;
+                do {
+                    animation = getRandomAnimation();
+                } while (appliedAnimations.includes(animation));
+
+                appliedAnimations.push(animation);
+                element.classList.add(animation);
+            }
+
+            setTimeout(() => {
+                appliedAnimations.forEach(animation => element.classList.remove(animation));
+            }, 2000);
+        }
+
+        function triggerCompletionEffects() {
+            document.body.classList.add('screen-shake');
+            setTimeout(() => document.body.classList.remove('screen-shake'), 500);
+            document.body.classList.add('rainbow-bg');
+            setTimeout(() => document.body.classList.remove('rainbow-bg'), 2000);
+            const words = ['RADICAL', 'TUBULAR'];
+            words.forEach((word, index) => {
+                const textElement = document.createElement('div');
+                textElement.textContent = word;
+                textElement.classList.add('popup-text');
+                textElement.style.top = `${20 + index * 60}px`;
+                textElement.style.left = `${20 + index * 100}px`;
+                document.body.appendChild(textElement);
+                setTimeout(() => textElement.remove(), 2000);
+            });
+            const memeOverlay = document.getElementById('memeOverlay');
+            memeOverlay.style.display = 'block';
+            setTimeout(() => memeOverlay.style.display = 'none', 2000);
+        }
+    });
+    </script>
+</body></html>
