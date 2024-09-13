@@ -1,0 +1,363 @@
+<html><head><base href="https://ultra-sleek-workday-timer.com">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ultra Sleek Workday Timer</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+    :root {
+        --primary-color: #0070f3;
+        --secondary-color: #00a8ff;
+        --bg-color: #f7f9fc;
+        --text-color: #333;
+        --light-gray: #e1e5eb;
+        --white: #ffffff;
+        --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1000px;
+        padding: 40px 20px;
+    }
+
+    h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 2rem;
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .timer-wrapper {
+        background-color: var(--white);
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .timer-wrapper::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(0, 112, 243, 0.1) 0%, rgba(0, 168, 255, 0.05) 50%, transparent 70%);
+        animation: gradient-animation 15s ease infinite;
+    }
+
+    @keyframes gradient-animation {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .input-container {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .input-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-color);
+    }
+
+    .drag-input {
+        width: 120px;
+        padding: 0.8rem 1rem;
+        font-size: 1rem;
+        border: 2px solid var(--light-gray);
+        border-radius: 10px;
+        outline: none;
+        transition: all 0.3s ease;
+        background-color: var(--white);
+        cursor: ns-resize;
+        user-select: none;
+        position: relative;
+    }
+
+    .drag-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.2);
+    }
+
+    .drag-input::after {
+        content: '\25BC';
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-color);
+        pointer-events: none;
+    }
+
+    button {
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        color: var(--white);
+        border: none;
+        padding: 0.8rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .timer-container {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .timer-box {
+        text-align: center;
+        position: relative;
+    }
+
+    .timer-value {
+        font-size: 4rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        line-height: 1;
+        position: relative;
+        display: inline-block;
+    }
+
+    .timer-value::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 4px;
+        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+        border-radius: 2px;
+    }
+
+    .timer-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-color);
+        margin-top: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .end-time {
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-top: 2rem;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    .pulse {
+        animation: pulse 2s infinite ease-in-out;
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        .timer-wrapper {
+            padding: 2rem;
+        }
+
+        .input-container {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .timer-container {
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .timer-value {
+            font-size: 3rem;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Ultra Sleek Workday Timer</h1>
+    <div class="timer-wrapper">
+        <div class="input-container">
+            <div class="input-group">
+                <label for="workday-length">Workday Length (hours)</label>
+                <div id="workday-length" class="drag-input" data-min="1" data-max="24" data-value="8">8</div>
+            </div>
+            <div class="input-group">
+                <label for="hours-worked">Hours worked</label>
+                <div id="hours-worked" class="drag-input" data-min="0" data-max="23" data-value="0">0</div>
+            </div>
+            <div class="input-group">
+                <label for="minutes-worked">Minutes worked</label>
+                <div id="minutes-worked" class="drag-input" data-min="0" data-max="59" data-value="0">0</div>
+            </div>
+            <button onclick="startCountdown()">Start Timer</button>
+        </div>
+        <div class="timer-container">
+            <div class="timer-box">
+                <div id="hours" class="timer-value">00</div>
+                <div class="timer-label">Hours</div>
+            </div>
+            <div class="timer-box">
+                <div id="minutes" class="timer-value">00</div>
+                <div class="timer-label">Minutes</div>
+            </div>
+            <div class="timer-box">
+                <div id="seconds" class="timer-value">00</div>
+                <div class="timer-label">Seconds</div>
+            </div>
+        </div>
+        <div class="end-time" id="end-time"></div>
+    </div>
+</div>
+
+<script>
+let countdown;
+
+function startCountdown() {
+    clearInterval(countdown);
+    
+    const workdayLength = parseInt(document.getElementById('workday-length').textContent) || 8;
+    const hoursWorked = parseInt(document.getElementById('hours-worked').textContent) || 0;
+    const minutesWorked = parseInt(document.getElementById('minutes-worked').textContent) || 0;
+    
+    const totalMinutesInWorkday = workdayLength * 60;
+    const minutesWorkedTotal = hoursWorked * 60 + minutesWorked;
+    const minutesRemaining = totalMinutesInWorkday - minutesWorkedTotal;
+    
+    if (minutesRemaining <= 0) {
+        document.getElementById('hours').textContent = "00";
+        document.getElementById('minutes').textContent = "00";
+        document.getElementById('seconds').textContent = "00";
+        document.getElementById('end-time').textContent = "Your workday is complete!";
+        return;
+    }
+    
+    let totalSeconds = minutesRemaining * 60;
+    
+    updateEndTime(totalSeconds);
+    
+    countdown = setInterval(function() {
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        
+        document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+        document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        
+        if (totalSeconds <= 300) { // Last 5 minutes
+            document.querySelectorAll('.timer-value').forEach(el => el.classList.add('pulse'));
+        } else {
+            document.querySelectorAll('.timer-value').forEach(el => el.classList.remove('pulse'));
+        }
+        
+        if (totalSeconds <= 0) {
+            clearInterval(countdown);
+            document.getElementById('end-time').textContent = "Your workday is complete!";
+            document.querySelectorAll('.timer-value').forEach(el => el.classList.remove('pulse'));
+        }
+        
+        totalSeconds--;
+    }, 1000);
+}
+
+function updateEndTime(secondsRemaining) {
+    const now = new Date();
+    const endTime = new Date(now.getTime() + secondsRemaining * 1000);
+    const formattedTime = endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('end-time').textContent = `Workday ends at ${formattedTime}`;
+}
+
+// Drag to change value functionality
+document.querySelectorAll('.drag-input').forEach(input => {
+    let isDragging = false;
+    let startY, startValue;
+
+    input.addEventListener('mousedown', e => {
+        isDragging = true;
+        startY = e.clientY;
+        startValue = parseInt(input.textContent);
+        e.preventDefault(); // Prevent text selection
+    });
+
+    document.addEventListener('mousemove', e => {
+        if (!isDragging) return;
+        
+        const deltaY = startY - e.clientY;
+        const min = parseInt(input.dataset.min);
+        const max = parseInt(input.dataset.max);
+        let newValue = startValue + Math.round(deltaY / 5);
+        
+        newValue = Math.max(min, Math.min(max, newValue));
+        input.textContent = newValue;
+        input.dataset.value = newValue;
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+    // Prevent text selection
+    input.addEventListener('selectstart', e => e.preventDefault());
+});
+</script>
+</body>
+</html>
