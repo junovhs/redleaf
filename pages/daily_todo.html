@@ -1,0 +1,578 @@
+<html><head><base href="https://dailytodolist.com/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DailyTodoList - Your Dynamic Task Organizer</title>
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f0f4f8;
+        transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark-mode {
+        background-color: #1a1a1a;
+        color: #f0f0f0;
+    }
+    @keyframes rainbowBackground {
+        0% { background-color: red; }
+        14% { background-color: orange; }
+        28% { background-color: yellow; }
+        42% { background-color: green; }
+        57% { background-color: blue; }
+        71% { background-color: indigo; }
+        85% { background-color: violet; }
+        100% { background-color: red; }
+    }
+    @keyframes textPop {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    @keyframes glowingOutline {
+        0%, 100% { box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #ff00de, 0 0 35px #ff00de, 0 0 40px #ff00de, 0 0 50px #ff00de, 0 0 75px #ff00de; }
+        50% { box-shadow: 0 0 2px #fff, 0 0 5px #fff, 0 0 7px #fff, 0 0 10px #ff00de, 0 0 17px #ff00de, 0 0 20px #ff00de, 0 0 25px #ff00de, 0 0 37px #ff00de; }
+    }
+    @keyframes sparkle {
+        0%, 100% { opacity: 0; }
+        50% { opacity: 1; }
+    }
+    @keyframes checkmarkDance {
+        0%, 100% { transform: scale(1) rotate(0deg); }
+        25% { transform: scale(1.2) rotate(-15deg); }
+        75% { transform: scale(1.2) rotate(15deg); }
+    }
+    @keyframes colorWave {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+    @keyframes fireworks {
+        0% { transform: translateY(0); opacity: 1; }
+        100% { transform: translateY(-100px); opacity: 0; }
+    }
+    @keyframes discoBall {
+        0%, 100% { background-size: 10px 10px; }
+        50% { background-size: 20px 20px; }
+    }
+    .reward-animation {
+        animation: 
+            rainbowBackground 5s linear,
+            textPop 1s ease-in-out,
+            shake 0.5s infinite,
+            glowingOutline 1s infinite;
+        position: relative;
+        overflow: hidden;
+    }
+    .reward-animation::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        right: -50%;
+        bottom: -50%;
+        background: linear-gradient(45deg, #ff00de, #00ff00, #00ffff, #ff00de);
+        animation: colorWave 5s linear;
+        z-index: -1;
+    }
+    .reward-animation::after {
+        content: '✨';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2em;
+        animation: sparkle 0.5s infinite;
+    }
+    .reward-animation .todo-checkbox::after {
+        content: '✔';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.2em;
+        animation: checkmarkDance 1s infinite;
+    }
+    .reward-animation .firework {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background-color: #ff00de;
+        animation: fireworks 1s ease-out;
+    }
+    body.disco-mode {
+        background-image: radial-gradient(circle, #fff 20%, transparent 20%),
+                          radial-gradient(circle, #fff 20%, transparent 20%);
+        background-size: 10px 10px;
+        animation: discoBall 1s infinite;
+    }
+    .container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-top: 20px;
+    }
+    .dark-mode .container {
+        background: #2c2c2c;
+        box-shadow: 0 4px 6px rgba(255, 255, 255, 0.1);
+    }
+    h1, h2 {
+        color: #2c3e50;
+        text-align: center;
+    }
+    .dark-mode h1, .dark-mode h2 {
+        color: #ffffff;
+    }
+    .collapsible-header {
+        cursor: pointer;
+        padding: 10px;
+        background-color: #f1f1f1;
+        border-radius: 4px;
+    }
+    .dark-mode .collapsible-header {
+        background-color: #3a3a3a;
+    }
+    .collapsible-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+    }
+    .collapsible.active .collapsible-content {
+        max-height: 1000px;
+        transition: max-height 0.5s ease-in;
+    }
+    #todoInput {
+        width: 100%;
+        height: 200px;
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+    .dark-mode #todoInput {
+        background-color: #2c2c2c;
+        color: #f0f0f0;
+        border-color: #555;
+    }
+    button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .dark-mode button {
+        background-color: #0056b3;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+    .dark-mode button:hover {
+        background-color: #003d82;
+    }
+    .todo-list {
+        margin-top: 20px;
+    }
+    .todo-item {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+    }
+    .dark-mode .todo-item {
+        background-color: #2c2c2c;
+    }
+    .todo-item.completed {
+        background-color: #d4edda;
+    }
+    .dark-mode .todo-item.completed {
+        background-color: #1e3a2b;
+    }
+    .todo-content {
+        display: flex;
+        align-items: center;
+    }
+    .todo-checkbox {
+        margin-right: 10px;
+    }
+    .todo-text {
+        flex-grow: 1;
+    }
+    .todo-time {
+        width: 80px;
+        text-align: right;
+    }
+    .todo-delete {
+        margin-left: 10px;
+        color: #777;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .dark-mode .todo-delete {
+        color: #aaa;
+    }
+    .todo-delete:hover {
+        color: #dc3545;
+        transform: scale(1.1);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    .dark-mode .todo-delete:hover {
+        color: #ff6b6b;
+    }
+    .todo-note {
+        font-size: 0.9em;
+        color: #777;
+        margin-top: 5px;
+        font-style: italic;
+    }
+    .dark-mode .todo-note {
+        color: #aaa;
+    }
+    .progress-bar {
+        background-color: #e9ecef;
+        height: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        overflow: hidden;
+    }
+    .dark-mode .progress-bar {
+        background-color: #3a3a3a;
+    }
+    .progress {
+        width: 0;
+        height: 100%;
+        background-color: #28a745;
+        transition: width 0.5s ease-in-out;
+    }
+    .add-task-button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .add-task-button:hover {
+        background-color: #45a049;
+        transform: scale(1.05);
+    }
+    .new-task-item {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+    .new-task-item input {
+        margin-bottom: 5px;
+        padding: 5px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+    .new-task-item input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    }
+    .dark-mode .new-task-item {
+        background-color: #2c2c2c;
+    }
+    .dark-mode .new-task-item input {
+        background-color: #3a3a3a;
+        color: #f0f0f0;
+        border-color: #555;
+    }
+</style>
+</head>
+<body>
+    <button id="darkModeToggle">Toggle Dark Mode</button>
+    <h1>Your Dynamic Daily Todo List</h1>
+    <div class="container collapsible">
+        <h2 class="collapsible-header">Input Your Tasks</h2>
+        <div class="collapsible-content">
+            <textarea id="todoInput" placeholder="Paste your todo list here..."></textarea>
+            <button id="parseButton">Parse Todo List</button>
+        </div>
+    </div>
+    <div class="container">
+        <h2>Your Tasks</h2>
+        <div id="todoItems" class="todo-list">
+            <button id="addTaskButton" class="add-task-button">+ Add Task</button>
+        </div>
+    </div>
+    <div class="progress-bar">
+        <div class="progress" id="progressBar"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const todoInput = document.getElementById('todoInput');
+        const parseButton = document.getElementById('parseButton');
+        const todoItemsContainer = document.getElementById('todoItems');
+        const progressBar = document.getElementById('progressBar');
+        const addTaskButton = document.getElementById('addTaskButton');
+        const collapsible = document.querySelector('.collapsible');
+        const collapsibleHeader = document.querySelector('.collapsible-header');
+        const darkModeToggle = document.getElementById('darkModeToggle');
+
+        let todoList = [];
+        let totalTime = 0;
+        let completedTime = 0;
+
+        parseButton.addEventListener('click', parseTodoList);
+        addTaskButton.addEventListener('click', createNewTaskItem);
+        collapsibleHeader.addEventListener('click', () => {
+            collapsible.classList.toggle('active');
+        });
+
+        darkModeToggle.addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            updateDarkModeButton();
+        });
+
+        function updateDarkModeButton() {
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            darkModeToggle.textContent = isDarkMode ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+        }
+
+        const savedDarkMode = localStorage.getItem('darkMode');
+        if (savedDarkMode === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+        updateDarkModeButton();
+
+        function createNewTaskItem() {
+            const newTaskItem = document.createElement('div');
+            newTaskItem.className = 'new-task-item';
+            newTaskItem.innerHTML = `
+                <input type="text" class="new-task-text" placeholder="Task title">
+                <input type="number" class="new-task-time" placeholder="Time (minutes)">
+                <input type="text" class="new-task-note" placeholder="Add a note">
+            `;
+            todoItemsContainer.insertBefore(newTaskItem, addTaskButton);
+
+            const taskTextInput = newTaskItem.querySelector('.new-task-text');
+            taskTextInput.focus();
+
+            taskTextInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    newTaskItem.querySelector('.new-task-time').focus();
+                }
+            });
+
+            newTaskItem.querySelector('.new-task-time').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    newTaskItem.querySelector('.new-task-note').focus();
+                }
+            });
+
+            newTaskItem.querySelector('.new-task-note').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const text = newTaskItem.querySelector('.new-task-text').value.trim();
+                    const time = parseInt(newTaskItem.querySelector('.new-task-time').value);
+                    const note = newTaskItem.querySelector('.new-task-note').value.trim();
+
+                    if (text && !isNaN(time)) {
+                        todoList.push({ text, time, description: note });
+                        totalTime += time;
+                        renderTodoList();
+                        updateProgressBar();
+                    }
+
+                    newTaskItem.remove();
+                }
+            });
+        }
+
+        function formatTime(minutes) {
+            if (minutes < 60) {
+                return `${minutes}m`;
+            } else {
+                const hours = Math.floor(minutes / 60);
+                const remainingMinutes = minutes % 60;
+                return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+            }
+        }
+
+        function parseTodoList() {
+            const input = todoInput.value;
+            todoList = [];
+            totalTime = 0;
+            completedTime = 0;
+
+            const tasks = input.split(/\n(?=\d+[\.\)]|\-|\*|\+)/).filter(task => task.trim() !== '');
+            tasks.forEach(task => {
+                const lines = task.trim().split('\n');
+                const firstLine = lines[0].replace(/^\d+[\.\)]|\-|\*|\+\s*/, '').trim();
+                const description = lines.slice(1).join(' ').trim();
+
+                const timeRegex = /(?:(\d+(?:\.\d+)?)\s*(minutes?|mins?|m|hours?|hrs?|h))|(?:(\d+(?:\.\d+)?)\s*(?:minutes?|mins?|m|hours?|hrs?|h))/i;
+                const match = firstLine.match(timeRegex);
+
+                let text = firstLine;
+                let time = 30;
+
+                if (match) {
+                    const value = parseFloat(match[1] || match[3]);
+                    const unit = (match[2] || '').toLowerCase();
+                    
+                    if (unit.startsWith('h')) {
+                        time = value * 60;
+                    } else {
+                        time = value;
+                    }
+
+                    text = firstLine.replace(timeRegex, '').trim();
+                }
+
+                text = text.replace(/\([^)]*\)/g, '').trim();
+
+                todoList.push({ text, time: Math.round(time), description });
+                totalTime += Math.round(time);
+            });
+
+            renderTodoList();
+            updateProgressBar();
+            collapsible.classList.remove('active');
+        }
+
+        function renderTodoList() {
+            todoItemsContainer.innerHTML = '';
+            todoList.forEach((item, index) => {
+                const todoItem = document.createElement('div');
+                todoItem.className = 'todo-item';
+                todoItem.innerHTML = `
+                    <div class="todo-content">
+                        <span class="drag-handle">⋮⋮</span>
+                        <input type="checkbox" class="todo-checkbox" id="todo-${index}">
+                        <label class="todo-text" for="todo-${index}" contenteditable="true">${item.text}</label>
+                        <span class="todo-time" contenteditable="true">${formatTime(item.time)}</span>
+                        <span class="todo-delete">❌</span>
+                    </div>
+                    <div class="todo-note" contenteditable="true">${item.description ? '"' + item.description + '"' : ""}</div>
+                `;
+                todoItemsContainer.appendChild(todoItem);
+
+                const checkbox = todoItem.querySelector('.todo-checkbox');
+                checkbox.addEventListener('change', function() {
+                    todoItem.classList.toggle('completed', this.checked);
+                    const textElement = todoItem.querySelector('.todo-text');
+                    if (this.checked) {
+                        completedTime += item.time;
+                        textElement.style.textDecoration = 'line-through';
+                        applyRewardAnimation(todoItem);
+                    } else {
+                        completedTime -= item.time;
+                        textElement.style.textDecoration = 'none';
+                    }
+                    updateProgressBar();
+                });
+
+                const deleteButton = todoItem.querySelector('.todo-delete');
+                deleteButton.addEventListener('click', function() {
+                    todoList.splice(index, 1);
+                    totalTime -= item.time;
+                    if (todoItem.classList.contains('completed')) {
+                        completedTime -= item.time;
+                    }
+                    renderTodoList();
+                    updateProgressBar();
+                });
+
+                const textElement = todoItem.querySelector('.todo-text');
+                const timeElement = todoItem.querySelector('.todo-time');
+                const noteElement = todoItem.querySelector('.todo-note');
+
+                textElement.addEventListener('blur', function() {
+                    item.text = this.textContent;
+                });
+
+                timeElement.addEventListener('blur', function() {
+                    const newTime = parseInt(this.textContent);
+                    if (!isNaN(newTime)) {
+                        totalTime -= item.time;
+                        item.time = newTime;
+                        totalTime += newTime;
+                        this.textContent = formatTime(newTime);
+                        updateProgressBar();
+                    } else {
+                        this.textContent = formatTime(item.time);
+                    }
+                });
+
+                noteElement.addEventListener('blur', function() {
+                    item.description = this.textContent.replace(/"/g, '');
+                    this.textContent = item.description ? '"' + item.description + '"' : "";
+                });
+            });
+
+            todoItemsContainer.appendChild(addTaskButton);
+
+            new Sortable(todoItemsContainer, {
+                animation: 150,
+                handle: '.drag-handle',
+                ghostClass: 'sortable-ghost',
+                dragClass: "sortable-drag",
+                filter: '.add-task-button',
+                onEnd: function() {
+                    const newOrder = [...todoItemsContainer.children]
+                        .filter(item => !item.classList.contains('add-task-button'))
+                        .map(item => {
+                            const text = item.querySelector('.todo-text').textContent;
+                            const time = parseInt(item.querySelector('.todo-time').textContent);
+                            const description = item.querySelector('.todo-note').textContent.replace(/"/g, '') || '';
+                            return { text, time, description };
+                        });
+                    todoList = newOrder;
+                }
+            });
+        }
+
+        function applyRewardAnimation(todoItem) {
+            todoItem.classList.add('reward-animation');
+            document.body.classList.add('disco-mode');
+
+            for (let i = 0; i < 20; i++) {
+                const firework = document.createElement('div');
+                firework.classList.add('firework');
+                firework.style.left = `${Math.random() * 100}%`;
+                firework.style.top = `${Math.random() * 100}%`;
+                todoItem.appendChild(firework);
+            }
+
+            setTimeout(() => {
+                todoItem.classList.remove('reward-animation');
+                document.body.classList.remove('disco-mode');
+                todoItem.querySelectorAll('.firework').forEach(fw => fw.remove());
+            }, 5000);
+        }
+
+        function updateProgressBar() {
+            const percentage = (completedTime / totalTime) * 100;
+            progressBar.style.width = `${Math.min(percentage, 100)}%`;
+        }
+    });
+    </script>
+</body></html>
