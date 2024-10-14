@@ -1,0 +1,277 @@
+<html><head><base href="https://hotdeal.chatbot.sex"></head><body><html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HotDeal Image Fetcher</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        .masonry-container {
+            column-count: 1;
+            column-gap: 1rem;
+        }
+        @media (min-width: 640px) {
+            .masonry-container {
+                column-count: 2;
+            }
+        }
+        @media (min-width: 768px) {
+            .masonry-container {
+                column-count: 3;
+            }
+        }
+        @media (min-width: 1024px) {
+            .masonry-container {
+                column-count: 4;
+            }
+        }
+        .masonry-item {
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="h-full bg-gradient-to-r from-blue-100 to-indigo-200">
+    <div class="min-h-full flex items-center justify-center p-5">
+        <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-5xl">
+            <!-- Title -->
+            <h1 class="text-3xl font-bold mb-6 text-center text-indigo-600">HotDeal Image Fetcher</h1>
+            
+            <!-- Selection Section -->
+            <div class="space-y-6">
+                <!-- Brand Selection -->
+                <div>
+                    <label for="brand" class="block text-gray-700 font-medium mb-2">Select Brand</label>
+                    <select id="brand" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="" disabled selected>Select a brand</option>
+                    </select>
+                </div>
+                
+                <!-- Tag Selection Buttons -->
+                <div id="tagContainer">
+                    <label class="block text-gray-700 font-medium mb-2">Select Deal Category Tags</label>
+                </div>
+                
+                <!-- Fetch Images Button -->
+                <div class="flex justify-center">
+                    <button id="fetchButton" class="bg-indigo-500 text-white px-6 py-3 rounded hover:bg-indigo-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50">
+                        Fetch Images
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Loading Indicator -->
+            <div id="loadingIndicator" class="hidden flex justify-center mt-8">
+                <svg class="animate-spin h-8 w-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+            </div>
+            
+            <!-- Images Gallery -->
+            <div id="imageGallery" class="mt-8 masonry-container"></div>
+            
+            <!-- No Results Message -->
+            <div id="noResultsMessage" class="hidden mt-8 text-center text-gray-500">
+                No images found for the selected brand and category tags.
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal -->
+    <div id="imageModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <script>
+        const brands = [
+            { name: "Viking", domain: "viking.com" },
+            { name: "Norwegian Cruise Line", domain: "ncl.com" },
+            { name: "Royal Caribbean", domain: "royalcaribbean.com" },
+            { name: "Disney Cruise Line", domain: "disneycruise.com" },
+            { name: "Celebrity Cruises", domain: "celebrity.com" },
+            { name: "Virgin Voyages", domain: "virginvoyages.com" },
+            { name: "Holland America Line", domain: "hollandamerica.com" },
+            { name: "Princess", domain: "princess.com" },
+            { name: "Avalon Waterways", domain: "avalonwaterways.com" },
+            { name: "AmaWaterways", domain: "amawaterways.com" },
+            { name: "Scenic Luxury Cruises & Tours", domain: "scenic.com.au" },
+            { name: "Silversea", domain: "silversea.com" },
+            { name: "Regent Seven Seas Cruises", domain: "regentsevenseas.com" },
+            { name: "Seabourn", domain: "seabourn.com" },
+            { name: "Azamara", domain: "azamara.com" },
+            { name: "Sandals", domain: "sandals.com" },
+            { name: "Oceania Cruises", domain: "oceaniacruises.com" },
+            { name: "MSC Cruises", domain: "msccruises.com" },
+            { name: "Carnival", domain: "carnival.com" },
+            { name: "Trafalgar", domain: "trafalgar.com" },
+            { name: "Globus", domain: "globusjourneys.com" },
+            { name: "Aulani, a Disney Resort & Spa", domain: "aulanihawaii.com" },
+            { name: "Disneyland Resort", domain: "disneyland.com" },
+            { name: "Walt Disney World", domain: "disneyworld.disney.go.com" },
+            { name: "Rocky Mountaineer", domain: "rockymountaineer.com" },
+            { name: "Hard Rock Hotel & Casino", domain: "hardrock.com" },
+            { name: "Palace Resorts", domain: "palaceresorts.com" },
+            { name: "Iberostar Beachfront Resorts", domain: "iberostar.com" },
+            { name: "G Adventures", domain: "gadventures.com" },
+            { name: "RIU Hotels & Resorts", domain: "riu.com" },
+            { name: "Hurtigruten", domain: "hurtigruten.com" }
+        ];
+
+        const tags = {
+            "Onboard Credit Offers": ["Dining", "Spa", "Shopping", "Excursions", "Casino"],
+            "Free Gratuities": ["Room Service", "Cocktail Bars", "Housekeeping", "Concierge", "Butler"],
+            "Drink Packages": ["Alcoholic Beverages", "Soft Drinks", "Premium Coffees", "Specialty Cocktails", "Wine Tastings"],
+            "Free WiFi": ["Social Media", "Streaming", "Email", "Video Calls", "Unlimited Data"],
+            "Specialty Dining": ["Steakhouse", "Italian Restaurant", "Sushi Bar", "French Cuisine", "Teppanyaki"],
+            "Cabin Upgrades": ["Balcony", "Suite", "Ocean View", "Premium Location", "Concierge Class"],
+            "Kids Sail Free": ["Family Activities", "Kids Club", "Teen Lounge", "Babysitting", "Family Suites"],
+            "Reduced Deposits": ["Low Down Payment", "Flexible Payment Plans", "No Money Down", "Book Now Pay Later", "Deposit Waivers"],
+            "Airfare Deals": ["Free Airfare", "Discounted Flights", "Airport Transfers", "Air Credits", "Business Class Upgrades"],
+            "Group Discounts": ["Wedding Parties", "Family Reunions", "Corporate Events", "Social Clubs", "Educational Groups"]
+        };
+
+        const brandSelect = document.getElementById('brand');
+        const tagContainer = document.getElementById('tagContainer');
+        const fetchButton = document.getElementById('fetchButton');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const imageGallery = document.getElementById('imageGallery');
+        const noResultsMessage = document.getElementById('noResultsMessage');
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const closeModal = document.getElementsByClassName('close')[0];
+
+        brands.forEach(brand => {
+            const option = document.createElement('option');
+            option.value = brand.name;
+            option.textContent = brand.name;
+            brandSelect.appendChild(option);
+        });
+
+        Object.entries(tags).forEach(([category, tagList]) => {
+            const categoryDiv = document.createElement('div');
+            categoryDiv.innerHTML = `<h3 class="text-lg font-semibold mb-2">${category}</h3>`;
+            const tagButtonsDiv = document.createElement('div');
+            tagButtonsDiv.className = 'flex flex-wrap gap-2';
+
+            tagList.forEach(tag => {
+                const button = document.createElement('button');
+                button.textContent = tag;
+                button.className = 'tag-button bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-4 py-2 rounded focus:outline-none';
+                button.dataset.selected = 'false';
+                button.addEventListener('click', () => toggleTag(button));
+                tagButtonsDiv.appendChild(button);
+            });
+
+            categoryDiv.appendChild(tagButtonsDiv);
+            tagContainer.appendChild(categoryDiv);
+        });
+
+        function toggleTag(button) {
+            button.dataset.selected = button.dataset.selected === 'true' ? 'false' : 'true';
+            button.classList.toggle('bg-indigo-500');
+            button.classList.toggle('text-white');
+        }
+
+        fetchButton.addEventListener('click', fetchImages);
+
+        async function fetchImages() {
+            const selectedBrand = brandSelect.value;
+            const selectedTags = Array.from(document.querySelectorAll('.tag-button[data-selected="true"]'))
+                .map(button => button.textContent);
+
+            if (!selectedBrand || selectedTags.length === 0) {
+                alert("Please select a brand and at least one tag.");
+                return;
+            }
+
+            loadingIndicator.classList.remove('hidden');
+            imageGallery.innerHTML = '';
+            noResultsMessage.classList.add('hidden');
+
+            const brand = brands.find(b => b.name === selectedBrand);
+            const query = `site:${brand.domain} ${selectedTags.join(' ')}`;
+            const apiKey = 'AIzaSyAerlE_XL6TZ1omGuCrInCsrdVhY7OFGUM';
+            const cseId = '17e10a5c56723497e';
+            const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cseId}&searchType=image&num=10&q=${encodeURIComponent(query)}`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.items && data.items.length > 0) {
+                    data.items.forEach(item => {
+                        const imgContainer = document.createElement('div');
+                        imgContainer.className = 'masonry-item';
+                        const img = document.createElement('img');
+                        img.src = item.link;
+                        img.alt = item.title;
+                        img.className = 'w-full h-auto rounded shadow-lg animate__animated animate__fadeIn cursor-pointer transition-transform duration-300 transform hover:scale-105';
+                        img.addEventListener('click', () => openModal(item.link));
+                        imgContainer.appendChild(img);
+                        imageGallery.appendChild(imgContainer);
+                    });
+                } else {
+                    noResultsMessage.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Error fetching images:", error);
+                alert("Error fetching images. Check the console for details.");
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+
+        function openModal(imgSrc) {
+            modal.style.display = "block";
+            modalImg.src = imgSrc;
+        }
+
+        closeModal.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
