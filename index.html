@@ -137,8 +137,8 @@
             <nav class="navbar">
                 <div class="navbar-inner">
                     <a href="https://junovhs.github.io/redleaf/">
-    <img src="https://raw.githubusercontent.com/junovhs/redleaf/main/assets/redleaf_logo.svg" alt="Logo" class="logo">
-</a>
+                        <img src="https://raw.githubusercontent.com/junovhs/redleaf/main/assets/redleaf_logo.svg" alt="Logo" class="logo">
+                    </a>
                     <div class="nav-items" id="navbar">
                         <!-- Dynamic nav items will be inserted here -->
                     </div>
@@ -149,7 +149,8 @@
     <main>
         <div id="content-container">
             <div id="home-content"></div>
-            <iframe id="content-frame" sandbox="allow-scripts allow-forms allow-popups allow-modals" style="display:none;"></iframe>
+            <!-- Updated iframe with allow-downloads in the sandbox attribute -->
+            <iframe id="content-frame" sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads" style="display:none;"></iframe>
         </div>
         <div id="loading" style="display:none;">Loading...</div>
     </main>
