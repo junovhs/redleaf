@@ -1,13 +1,5 @@
-<html><head><base href="https://hotdeal.chatbot.sex"></head><body><html lang="en" class="h-full">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HotDeal Image Fetcher</title>
-    <!-- Tailwind CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <style>
+
+<html><head><base href="https://hotdeal.chatbot.com"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>HotDeal Image Fetcher with Cropper</title><link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script><style>
         .masonry-container {
             column-count: 1;
             column-gap: 1rem;
@@ -64,9 +56,12 @@
             text-decoration: none;
             cursor: pointer;
         }
-    </style>
-</head>
-<body class="h-full bg-gradient-to-r from-blue-100 to-indigo-200">
+        #cropperContainer {
+            max-width: 500px;
+            max-height: 300px;
+            margin: 0 auto;
+        }
+    </style></head><body class="h-full bg-gradient-to-r from-blue-100 to-indigo-200">
     <div class="min-h-full flex items-center justify-center p-5">
         <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-5xl">
             <!-- Title -->
@@ -82,9 +77,10 @@
                     </select>
                 </div>
                 
-                <!-- Tag Selection Buttons -->
-                <div id="tagContainer">
-                    <label class="block text-gray-700 font-medium mb-2">Select Deal Category Tags</label>
+                <!-- Keyword Input -->
+                <div>
+                    <label for="keywords" class="block text-gray-700 font-medium mb-2">Enter Keywords</label>
+                    <input type="text" id="keywords" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter keywords separated by spaces">
                 </div>
                 
                 <!-- Fetch Images Button -->
@@ -108,7 +104,7 @@
             
             <!-- No Results Message -->
             <div id="noResultsMessage" class="hidden mt-8 text-center text-gray-500">
-                No images found for the selected brand and category tags.
+                No images found for the selected brand and keywords.
             </div>
         </div>
     </div>
@@ -116,7 +112,13 @@
     <!-- Modal -->
     <div id="imageModal" class="modal">
         <span class="close">&times;</span>
-        <img class="modal-content" id="modalImage">
+        <div id="cropperContainer">
+            <img id="cropperImage" src="" alt="Image to crop">
+        </div>
+        <div class="flex justify-center mt-4">
+            <button id="cropButton" class="bg-green-500 text-white px-4 py-2 rounded mr-2">Crop</button>
+            <button id="downloadButton" class="bg-blue-500 text-white px-4 py-2 rounded">Download</button>
+        </div>
     </div>
 
     <script>
@@ -154,28 +156,19 @@
             { name: "Hurtigruten", domain: "hurtigruten.com" }
         ];
 
-        const tags = {
-            "Onboard Credit Offers": ["Dining", "Spa", "Shopping", "Excursions", "Casino"],
-            "Free Gratuities": ["Room Service", "Cocktail Bars", "Housekeeping", "Concierge", "Butler"],
-            "Drink Packages": ["Alcoholic Beverages", "Soft Drinks", "Premium Coffees", "Specialty Cocktails", "Wine Tastings"],
-            "Free WiFi": ["Social Media", "Streaming", "Email", "Video Calls", "Unlimited Data"],
-            "Specialty Dining": ["Steakhouse", "Italian Restaurant", "Sushi Bar", "French Cuisine", "Teppanyaki"],
-            "Cabin Upgrades": ["Balcony", "Suite", "Ocean View", "Premium Location", "Concierge Class"],
-            "Kids Sail Free": ["Family Activities", "Kids Club", "Teen Lounge", "Babysitting", "Family Suites"],
-            "Reduced Deposits": ["Low Down Payment", "Flexible Payment Plans", "No Money Down", "Book Now Pay Later", "Deposit Waivers"],
-            "Airfare Deals": ["Free Airfare", "Discounted Flights", "Airport Transfers", "Air Credits", "Business Class Upgrades"],
-            "Group Discounts": ["Wedding Parties", "Family Reunions", "Corporate Events", "Social Clubs", "Educational Groups"]
-        };
-
         const brandSelect = document.getElementById('brand');
-        const tagContainer = document.getElementById('tagContainer');
         const fetchButton = document.getElementById('fetchButton');
         const loadingIndicator = document.getElementById('loadingIndicator');
         const imageGallery = document.getElementById('imageGallery');
         const noResultsMessage = document.getElementById('noResultsMessage');
         const modal = document.getElementById('imageModal');
-        const modalImg = document.getElementById('modalImage');
+        const cropperImage = document.getElementById('cropperImage');
         const closeModal = document.getElementsByClassName('close')[0];
+        const cropButton = document.getElementById('cropButton');
+        const downloadButton = document.getElementById('downloadButton');
+
+        let cropper;
+        let currentImageData;
 
         brands.forEach(brand => {
             const option = document.createElement('option');
@@ -184,40 +177,15 @@
             brandSelect.appendChild(option);
         });
 
-        Object.entries(tags).forEach(([category, tagList]) => {
-            const categoryDiv = document.createElement('div');
-            categoryDiv.innerHTML = `<h3 class="text-lg font-semibold mb-2">${category}</h3>`;
-            const tagButtonsDiv = document.createElement('div');
-            tagButtonsDiv.className = 'flex flex-wrap gap-2';
-
-            tagList.forEach(tag => {
-                const button = document.createElement('button');
-                button.textContent = tag;
-                button.className = 'tag-button bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-4 py-2 rounded focus:outline-none';
-                button.dataset.selected = 'false';
-                button.addEventListener('click', () => toggleTag(button));
-                tagButtonsDiv.appendChild(button);
-            });
-
-            categoryDiv.appendChild(tagButtonsDiv);
-            tagContainer.appendChild(categoryDiv);
-        });
-
-        function toggleTag(button) {
-            button.dataset.selected = button.dataset.selected === 'true' ? 'false' : 'true';
-            button.classList.toggle('bg-indigo-500');
-            button.classList.toggle('text-white');
-        }
-
         fetchButton.addEventListener('click', fetchImages);
 
         async function fetchImages() {
             const selectedBrand = brandSelect.value;
-            const selectedTags = Array.from(document.querySelectorAll('.tag-button[data-selected="true"]'))
-                .map(button => button.textContent);
+            const keywordsInput = document.getElementById('keywords');
+            const keywords = keywordsInput.value.trim();
 
-            if (!selectedBrand || selectedTags.length === 0) {
-                alert("Please select a brand and at least one tag.");
+            if (!selectedBrand || !keywords) {
+                alert("Please select a brand and enter at least one keyword.");
                 return;
             }
 
@@ -226,9 +194,9 @@
             noResultsMessage.classList.add('hidden');
 
             const brand = brands.find(b => b.name === selectedBrand);
-            const query = `site:${brand.domain} ${selectedTags.join(' ')}`;
-            const apiKey = 'AIzaSyAerlE_XL6TZ1omGuCrInCsrdVhY7OFGUM';
-            const cseId = '17e10a5c56723497e';
+            const query = `site:${brand.domain} ${keywords}`;
+            const apiKey = 'AIzaSyAerlE_XL6TZ1omGuCrInCsrdVhY7OFGUM'; // Replace with your actual API key
+            const cseId = '17e10a5c56723497e';   // Replace with your actual Custom Search Engine ID
             const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cseId}&searchType=image&num=10&q=${encodeURIComponent(query)}`;
 
             try {
@@ -243,7 +211,7 @@
                         img.src = item.link;
                         img.alt = item.title;
                         img.className = 'w-full h-auto rounded shadow-lg animate__animated animate__fadeIn cursor-pointer transition-transform duration-300 transform hover:scale-105';
-                        img.addEventListener('click', () => openModal(item.link));
+                        img.addEventListener('click', () => openModal(item.link, selectedBrand, keywords));
                         imgContainer.appendChild(img);
                         imageGallery.appendChild(imgContainer);
                     });
@@ -258,20 +226,72 @@
             }
         }
 
-        function openModal(imgSrc) {
+        function openModal(imgSrc, brand, keywords) {
             modal.style.display = "block";
-            modalImg.src = imgSrc;
+            cropperImage.src = imgSrc;
+            currentImageData = { brand, keywords, src: imgSrc };
+
+            if (cropper) {
+                cropper.destroy();
+            }
+
+            cropper = new Cropper(cropperImage, {
+                aspectRatio: 5 / 3,
+                viewMode: 1,
+                dragMode: 'move',
+                autoCropArea: 1,
+                restore: false,
+                modal: false,
+                guides: false,
+                highlight: false,
+                cropBoxMovable: false,
+                cropBoxResizable: false,
+                toggleDragModeOnDblclick: false,
+            });
         }
 
         closeModal.onclick = function() {
             modal.style.display = "none";
+            if (cropper) {
+                cropper.destroy();
+            }
         }
 
         window.onclick = function(event) {
             if (event.target == modal) {
                 modal.style.display = "none";
+                if (cropper) {
+                    cropper.destroy();
+                }
             }
         }
+
+        cropButton.addEventListener('click', () => {
+            if (cropper) {
+                cropper.crop();
+            }
+        });
+
+        downloadButton.addEventListener('click', () => {
+            if (cropper) {
+                const canvas = cropper.getCroppedCanvas({
+                    width: 500,
+                    height: 300
+                });
+
+                if (canvas) {
+                    const randomId = Math.floor(1000 + Math.random() * 9000);
+                    const fileName = `hotdeal_${currentImageData.brand.replace(/\s+/g, '_')}_${currentImageData.keywords.replace(/\s+/g, '_')}_${randomId}.jpg`;
+
+                    canvas.toBlob((blob) => {
+                        const link = document.createElement('a');
+                        link.download = fileName;
+                        link.href = URL.createObjectURL(blob);
+                        link.click();
+                        URL.revokeObjectURL(link.href);
+                    }, 'image/jpeg');
+                }
+            }
+        });
     </script>
-</body>
-</html>
+</body></html>
