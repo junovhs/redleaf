@@ -1,0 +1,298 @@
+
+<html><head><base href="." /><title>Bill and Coin Counter with Drawers</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+  }
+  
+  .counter-container {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: white;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  .counter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+  
+  .bills-section, .coins-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .section-title {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .denomination-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .bill-icon, .coin-icon {
+    width: 50px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+  
+  .bill-icon {
+    background-color: #00854d;
+    color: white;
+  }
+  
+  .coin-icon {
+    background-color: #666;
+    color: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+  }
+  
+  input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  
+  .total {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+  
+  .drawers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+  }
+  
+  .drawer {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 8px;
+    background: linear-gradient(to bottom, #f8f8f8, #fff);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .drawer:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .drawer.active {
+    border-color: #009688;
+    background: linear-gradient(to bottom, #e6f7f5, #fff);
+  }
+  
+  .drawer-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .drawer-amount {
+    color: #009688;
+    font-size: 1.1em;
+  }
+</style>
+</head>
+<body>
+<div class="counter-container">
+  <div class="header">
+    <h2>BILL & COIN COUNTER</h2>
+    <button class="close-btn">×</button>
+  </div>
+  
+  <div class="counter-grid">
+    <div class="bills-section">
+      <div class="section-title">BILLS</div>
+      <div class="denomination-row">
+        <div class="bill-icon">100</div>
+        <input type="number" min="0" id="hundred" value="0">
+      </div>
+      
+      <div class="denomination-row">
+        <div class="bill-icon">50</div>
+        <input type="number" min="0" id="fifty" value="0">
+      </div>
+      
+      <div class="denomination-row">
+        <div class="bill-icon">20</div>
+        <input type="number" min="0" id="twenty" value="0">
+      </div>
+      
+      <div class="denomination-row">
+        <div class="bill-icon">10</div>
+        <input type="number" min="0" id="ten" value="0">
+      </div>
+      
+      <div class="denomination-row">
+        <div class="bill-icon">5</div>
+        <input type="number" min="0" id="five" value="0">
+      </div>
+      
+      <div class="denomination-row">
+        <div class="bill-icon">1</div>
+        <input type="number" min="0" id="one" value="0">
+      </div>
+    </div>
+    
+    <div class="coins-section">
+      <div class="section-title">COINS</div>
+      <div class="denomination-row">
+        <div class="coin-icon">25¢</div>
+        <input type="number" min="0" id="quarter" value="0">
+      </div>
+      
+      <div class="denomination-row">
+        <div class="coin-icon">10¢</div>
+        <input type="number" min="0" id="dime" value="0">
+      </div>
+      
+      <div class="denomination-row">
+        <div class="coin-icon">5¢</div>
+        <input type="number" min="0" id="nickel" value="0">
+      </div>
+      
+      <div class="denomination-row">
+        <div class="coin-icon">1¢</div>
+        <input type="number" min="0" id="penny" value="0">
+      </div>
+    </div>
+  </div>
+  
+  <div class="total">
+    TOTAL: <span id="total-amount">$0.00</span>
+  </div>
+  
+  <div class="drawers">
+    <div class="drawer" data-drawer="1">
+      <div class="drawer-title">Drawer #1</div>
+      <div class="drawer-amount">$0.00</div>
+    </div>
+    <div class="drawer" data-drawer="2">
+      <div class="drawer-title">Drawer #2</div>
+      <div class="drawer-amount">$0.00</div>
+    </div>
+    <div class="drawer" data-drawer="3">
+      <div class="drawer-title">Drawer #3</div>
+      <div class="drawer-amount">$0.00</div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const inputs = document.querySelectorAll('input');
+  const totalDisplay = document.getElementById('total-amount');
+  const drawers = document.querySelectorAll('.drawer');
+  
+  const denominations = {
+    hundred: 100,
+    fifty: 50,
+    twenty: 20,
+    ten: 10,
+    five: 5,
+    one: 1,
+    quarter: 0.25,
+    dime: 0.10,
+    nickel: 0.05,
+    penny: 0.01
+  };
+  
+  function calculateTotal() {
+    let total = 0;
+    inputs.forEach(input => {
+      const value = parseFloat(input.value) || 0;
+      const denomination = denominations[input.id];
+      total += value * denomination;
+    });
+    totalDisplay.textContent = '$' + total.toFixed(2);
+    return total;
+  }
+  
+  inputs.forEach(input => {
+    input.addEventListener('input', calculateTotal);
+  });
+  
+  drawers.forEach(drawer => {
+    drawer.addEventListener('click', function() {
+      const currentTotal = calculateTotal();
+      const drawerAmount = drawer.querySelector('.drawer-amount');
+      
+      // Remove active class from all drawers
+      drawers.forEach(d => d.classList.remove('active'));
+      
+      // Add active class to clicked drawer
+      drawer.classList.add('active');
+      
+      // Save current total to drawer
+      drawerAmount.textContent = '$' + currentTotal.toFixed(2);
+      
+      // Reset all inputs
+      inputs.forEach(input => {
+        input.value = '0';
+      });
+      
+      // Reset main total
+      calculateTotal();
+      
+      // Add save animation
+      drawer.style.animation = 'none';
+      drawer.offsetHeight; // Trigger reflow
+      drawer.style.animation = 'saveFlash 0.5s ease';
+    });
+  });
+  
+  document.querySelector('.close-btn').addEventListener('click', function() {
+    if(confirm('Are you sure you want to close?')) {
+      alert('Closing...');
+    }
+  });
+  
+  // Add some keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    if(e.key >= '1' && e.key <= '3') {
+      const drawerIndex = parseInt(e.key) - 1;
+      drawers[drawerIndex].click();
+    }
+  });
+});
+</script>
+</body></html>
