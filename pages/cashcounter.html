@@ -347,13 +347,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Handle keyboard navigation
-  document.addEventListener('keydown', function(e) {
-    if(e.key >= '1' && e.key <= '3') {
-      const drawerIndex = parseInt(e.key) - 1;
-      drawers[drawerIndex].click();
-    }
-  });
   
   // Save drawer totals to localStorage
   function saveDrawerTotals() {
