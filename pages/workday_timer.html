@@ -1,114 +1,117 @@
-<!DOCTYPE html><html><head><base href=".">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultra Sleek Workday Timer</title>
-<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer=""></script>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-
-<style>
-  :root {
-    --gradient-start: #2563eb;
-    --gradient-end: #3b82f6;
-  }
-
-  body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    min-height: 100vh;
-  }
-
-  .timer-card {
-    background: white;
-    border-radius: 1.5rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-  }
-
-  .timer-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-  }
-
-  .countdown {
-    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-    -webkit-background-clip: text;
-    color: transparent;
-    font-size: 3.5rem;
-    font-weight: 600;
-    text-align: center;
-  }
-
-  .input-group {
-    position: relative;
-    margin-bottom: 1.5rem;
-  }
-
-  .time-input-group {
-    display: flex;
-    align-items: center;
-    border: 2px solid #e2e8f0;
-    border-radius: 0.75rem;
-    overflow: hidden;
-    transition: all 0.3s ease;
-  }
-
-  .time-input-group:focus-within {
-    border-color: var(--gradient-start);
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
-  }
-
-  .time-input-segment {
-    width: 50%;
-    padding: 0.75rem 0.5rem;
-    text-align: center;
-    border: none;
-    outline: none;
-    background: transparent;
-  }
-
-  .time-input-segment:first-child {
-    border-right: 2px solid #e2e8f0;
-  }
-
-  .time-input-segment::placeholder {
-    color: #94a3b8;
-  }
-
-  .time-separator {
-    color: #94a3b8;
-    padding: 0 0.25rem;
-    user-select: none;
-  }
-
-  .start-btn {
-    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-    border-radius: 0.75rem;
-    color: white;
-    font-weight: 500;
-    padding: 1rem 2rem;
-    transition: all 0.3s ease;
-  }
-
-  .start-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 5px 15px rgba(37,99,235,0.3);
-  }
-
-  @keyframes pulse-border {
-    0% { border-color: var(--gradient-start); }
-    50% { border-color: var(--gradient-end); }
-    100% { border-color: var(--gradient-start); }
-  }
-
-  .alert {
-    animation: pulse-border 2s infinite;
-  }
-</style>
+<!DOCTYPE html>
+<html>
+<head>
+  <base href=".">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultra Sleek Workday Timer</title>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      window.Alpine = Alpine;
+      Alpine.start();
+    });
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  
+  <style>
+    :root {
+      --gradient-start: #2563eb;
+      --gradient-end: #3b82f6;
+    }
+  
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      min-height: 100vh;
+    }
+  
+    .timer-card {
+      background: white;
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+  
+    .timer-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+  
+    .countdown {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      -webkit-background-clip: text;
+      color: transparent;
+      font-size: 3.5rem;
+      font-weight: 600;
+      text-align: center;
+    }
+  
+    .input-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+  
+    .time-input-group {
+      display: flex;
+      align-items: center;
+      border: 2px solid #e2e8f0;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+  
+    .time-input-group:focus-within {
+      border-color: var(--gradient-start);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+  
+    .time-input-segment {
+      width: 50%;
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+      border: none;
+      outline: none;
+      background: transparent;
+    }
+  
+    .time-input-segment:first-child {
+      border-right: 2px solid #e2e8f0;
+    }
+  
+    .time-input-segment::placeholder {
+      color: #94a3b8;
+    }
+  
+    .start-btn {
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      border-radius: 0.75rem;
+      color: white;
+      font-weight: 500;
+      padding: 1rem 2rem;
+      transition: all 0.3s ease;
+    }
+  
+    .start-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 15px rgba(37,99,235,0.3);
+    }
+  
+    @keyframes pulse-border {
+      0% { border-color: var(--gradient-start); }
+      50% { border-color: var(--gradient-end); }
+      100% { border-color: var(--gradient-start); }
+    }
+  
+    .alert {
+      animation: pulse-border 2s infinite;
+    }
+  </style>
 </head>
 
-<body class="p-4 md:p-8" x-data="timerApp()">
+<body class="p-4 md:p-8" x-data="timerApp()" x-init="init()">
   <div class="max-w-2xl mx-auto">
     <div class="timer-card p-6 md:p-8">
       <h1 class="text-2xl md:text-3xl font-semibold text-gray-800 mb-6 text-center">Workday Timer</h1>
@@ -117,24 +120,54 @@
         <div class="input-group">
           <label class="block text-sm font-medium text-gray-700 mb-2 text-center">Workday Length</label>
           <div class="time-input-group">
-            <input type="text" x-model="workdayHours" @input="validateHours($event, 'workdayHours')" placeholder="HH" maxlength="2" class="time-input-segment">
-            <input type="text" x-model="workdayMinutes" @input="validateMinutes($event, 'workdayMinutes')" placeholder="MM" maxlength="2" class="time-input-segment">
+            <input type="text" 
+                   x-model="workdayHours" 
+                   @input="validateHours($event, 'workdayHours')" 
+                   placeholder="08" 
+                   maxlength="2" 
+                   class="time-input-segment">
+            <input type="text" 
+                   x-model="workdayMinutes" 
+                   @input="validateMinutes($event, 'workdayMinutes')" 
+                   placeholder="00" 
+                   maxlength="2" 
+                   class="time-input-segment">
           </div>
         </div>
         
         <div class="input-group">
           <label class="block text-sm font-medium text-gray-700 mb-2">Break Duration</label>
           <div class="time-input-group">
-            <input type="text" x-model="breakHours" @input="validateHours($event, 'breakHours')" placeholder="HH" maxlength="2" class="time-input-segment">
-            <input type="text" x-model="breakMinutes" @input="validateMinutes($event, 'breakMinutes')" placeholder="MM" maxlength="2" class="time-input-segment">
+            <input type="text" 
+                   x-model="breakHours" 
+                   @input="validateHours($event, 'breakHours')" 
+                   placeholder="00" 
+                   maxlength="2" 
+                   class="time-input-segment">
+            <input type="text" 
+                   x-model="breakMinutes" 
+                   @input="validateMinutes($event, 'breakMinutes')" 
+                   placeholder="20" 
+                   maxlength="2" 
+                   class="time-input-segment">
           </div>
         </div>
         
         <div class="input-group">
           <label class="block text-sm font-medium text-gray-700 mb-2">Time Already Worked</label>
           <div class="time-input-group">
-            <input type="text" x-model="workedHours" @input="validateHours($event, 'workedHours')" placeholder="HH" maxlength="2" class="time-input-segment">
-            <input type="text" x-model="workedMinutes" @input="validateMinutes($event, 'workedMinutes')" placeholder="MM" maxlength="2" class="time-input-segment">
+            <input type="text" 
+                   x-model="workedHours" 
+                   @input="validateHours($event, 'workedHours')" 
+                   placeholder="HH" 
+                   maxlength="2" 
+                   class="time-input-segment">
+            <input type="text" 
+                   x-model="workedMinutes" 
+                   @input="validateMinutes($event, 'workedMinutes')" 
+                   placeholder="MM" 
+                   maxlength="2" 
+                   class="time-input-segment">
           </div>
         </div>
       </div>
@@ -158,11 +191,22 @@
           <label class="block text-sm font-medium text-gray-700 mb-2">What time will it be</label>
           <div class="flex items-center gap-4">
             <div class="time-input-group flex-1">
-              <input type="text" x-model="futureHours" @input="validateHours($event, 'futureHours')" placeholder="HH" maxlength="2" class="time-input-segment">
-              <input type="text" x-model="futureMinutes" @input="validateMinutes($event, 'futureMinutes')" placeholder="MM" maxlength="2" class="time-input-segment">
+              <input type="text" 
+                     x-model="futureHours" 
+                     @input="validateHours($event, 'futureHours')" 
+                     placeholder="HH" 
+                     maxlength="2" 
+                     class="time-input-segment">
+              <input type="text" 
+                     x-model="futureMinutes" 
+                     @input="validateMinutes($event, 'futureMinutes')" 
+                     placeholder="MM" 
+                     maxlength="2" 
+                     class="time-input-segment">
             </div>
             <span class="text-gray-600">from now</span>
-            <button @click="calculateFutureTime()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+            <button @click="calculateFutureTime()" 
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
               Calculate
             </button>
           </div>
@@ -177,10 +221,10 @@
   <script>
     function timerApp() {
       return {
-        workdayHours: '',
-        workdayMinutes: '',
-        breakHours: '',
-        breakMinutes: '',
+        workdayHours: '08',
+        workdayMinutes: '00',
+        breakHours: '00',
+        breakMinutes: '20',
         workedHours: '',
         workedMinutes: '',
         futureHours: '',
@@ -192,10 +236,30 @@
         isNearingEnd: false,
 
         init() {
-          this.loadFromLocalStorage();
+          // Set default values if nothing in localStorage
+          if (!localStorage.getItem('timerSettings')) {
+            this.workdayHours = '08';
+            this.workdayMinutes = '00';
+            this.breakHours = '00';
+            this.breakMinutes = '20';
+            this.workedHours = '';
+            this.workedMinutes = '';
+            this.updateTimeString();
+            this.saveToLocalStorage();
+          } else {
+            this.loadFromLocalStorage();
+          }
+          
           if (Notification.permission !== 'granted') {
             Notification.requestPermission();
           }
+          
+          // Cleanup on page unload
+          window.addEventListener('unload', () => {
+            if (this.timerInterval) {
+              window.clearInterval(this.timerInterval);
+            }
+          });
         },
 
         validateHours(event, field) {
@@ -214,26 +278,20 @@
 
         setFutureAsMain() {
           if (this.futureHours || this.futureMinutes) {
-            // Convert future time to seconds
             const futureSeconds = this.timeToSeconds(this.futureHours, this.futureMinutes);
-            
-            // Clear break and worked time
             this.breakHours = '0';
             this.breakMinutes = '0';
             this.workedHours = '0';
-            this.workedMinutes = '0';
+            this.workedMinutes = '';
             
-            // Set workday time to match future time
             const hours = Math.floor(futureSeconds / 3600);
             const minutes = Math.floor((futureSeconds % 3600) / 60);
             
             this.workdayHours = hours.toString();
             this.workdayMinutes = minutes.toString();
             
-            // Start the timer automatically
             this.startTimer();
             
-            // Clear future time inputs
             this.futureHours = '';
             this.futureMinutes = '';
             this.futureTimeResult = '';
@@ -270,28 +328,29 @@
         },
 
         startTimer() {
-          clearInterval(this.timerInterval);
+          if (this.timerInterval) {
+            window.clearInterval(this.timerInterval);
+          }
           
           const workdaySeconds = this.timeToSeconds(this.workdayHours, this.workdayMinutes);
           const breakSeconds = this.timeToSeconds(this.breakHours, this.breakMinutes);
           const workedSeconds = this.timeToSeconds(this.workedHours, this.workedMinutes);
           
-          // Changed calculation to ADD break time since breaks extend the workday
           this.remainingTime = Math.max(0, workdaySeconds + breakSeconds - workedSeconds);
           this.isRunning = true;
           this.isNearingEnd = false;
           
           this.saveToLocalStorage();
 
-          this.timerInterval = setInterval(() => {
+          this.timerInterval = window.setInterval(() => {
             if (this.remainingTime > 0) {
               this.remainingTime--;
-              if (this.remainingTime <= 300) {
+              if (this.remainingTime <= 300) { // 5 minutes warning
                 this.isNearingEnd = true;
               }
             } else {
               this.isRunning = false;
-              clearInterval(this.timerInterval);
+              window.clearInterval(this.timerInterval);
               this.showNotification();
             }
           }, 1000);
@@ -301,7 +360,7 @@
           if ('Notification' in window && Notification.permission === 'granted') {
             new Notification('Workday Complete!', {
               body: 'Your scheduled work time has ended.',
-              icon: 'https://example.com/icon.png'
+              icon: 'https://example.com/icon.png' // Replace with a valid icon URL
             });
           }
         },
@@ -328,4 +387,5 @@
       };
     }
   </script>
-</body></html>
+</body>
+</html>
