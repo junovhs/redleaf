@@ -1,363 +1,306 @@
-<html><head><base href="https://ultra-sleek-workday-timer.com">
+<html><head><base href="." />
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultra Sleek Workday Timer</title>
+<title>Workday Timer</title>
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+  :root {
+    --gradient-start: #2563eb;
+    --gradient-end: #3b82f6;
+  }
 
-    :root {
-        --primary-color: #0070f3;
-        --secondary-color: #00a8ff;
-        --bg-color: #f7f9fc;
-        --text-color: #333;
-        --light-gray: #e1e5eb;
-        --white: #ffffff;
-        --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    min-height: 100vh;
+  }
 
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+  .timer-card {
+    background: white;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
 
-    body {
-        font-family: 'Poppins', sans-serif;
-        background-color: var(--bg-color);
-        color: var(--text-color);
-        line-height: 1.6;
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+  .timer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+  }
 
-    .container {
-        width: 100%;
-        max-width: 1000px;
-        padding: 40px 20px;
-    }
+  .countdown {
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    -webkit-background-clip: text;
+    color: transparent;
+    font-size: 3.5rem;
+    font-weight: 600;
+    text-align: center;
+  }
 
-    h1 {
-        font-size: 3rem;
-        font-weight: 700;
-        text-align: center;
-        margin-bottom: 2rem;
-        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-    }
+  .input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
 
-    .timer-wrapper {
-        background-color: var(--white);
-        border-radius: 20px;
-        padding: 3rem;
-        box-shadow: var(--shadow);
-        position: relative;
-        overflow: hidden;
-    }
+  .time-input-group {
+    display: flex;
+    align-items: center;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
 
-    .timer-wrapper::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle, rgba(0, 112, 243, 0.1) 0%, rgba(0, 168, 255, 0.05) 50%, transparent 70%);
-        animation: gradient-animation 15s ease infinite;
-    }
+  .time-input-group:focus-within {
+    border-color: var(--gradient-start);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+  }
 
-    @keyframes gradient-animation {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
+  .time-input-segment {
+    width: 50%;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+    border: none;
+    outline: none;
+    background: transparent;
+  }
 
-    .input-container {
-        display: flex;
-        justify-content: center;
-        gap: 1.5rem;
-        margin-bottom: 3rem;
-        position: relative;
-        z-index: 1;
-    }
+  .time-input-segment:first-child {
+    border-right: 2px solid #e2e8f0;
+  }
 
-    .input-group {
-        display: flex;
-        flex-direction: column;
-    }
+  .time-input-segment::placeholder {
+    color: #94a3b8;
+  }
 
-    label {
-        font-size: 0.9rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-        color: var(--text-color);
-    }
+  .time-separator {
+    color: #94a3b8;
+    padding: 0 0.25rem;
+    user-select: none;
+  }
 
-    .drag-input {
-        width: 120px;
-        padding: 0.8rem 1rem;
-        font-size: 1rem;
-        border: 2px solid var(--light-gray);
-        border-radius: 10px;
-        outline: none;
-        transition: all 0.3s ease;
-        background-color: var(--white);
-        cursor: ns-resize;
-        user-select: none;
-        position: relative;
-    }
+  .start-btn {
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    border-radius: 0.75rem;
+    color: white;
+    font-weight: 500;
+    padding: 1rem 2rem;
+    transition: all 0.3s ease;
+  }
 
-    .drag-input:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(0, 112, 243, 0.2);
-    }
+  .start-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(37,99,235,0.3);
+  }
 
-    .drag-input::after {
-        content: '\25BC';
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--primary-color);
-        pointer-events: none;
-    }
+  @keyframes pulse-border {
+    0% { border-color: var(--gradient-start); }
+    50% { border-color: var(--gradient-end); }
+    100% { border-color: var(--gradient-start); }
+  }
 
-    button {
-        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-        color: var(--white);
-        border: none;
-        padding: 0.8rem 2rem;
-        font-size: 1rem;
-        font-weight: 600;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    .timer-container {
-        display: flex;
-        justify-content: center;
-        gap: 3rem;
-        position: relative;
-        z-index: 1;
-    }
-
-    .timer-box {
-        text-align: center;
-        position: relative;
-    }
-
-    .timer-value {
-        font-size: 4rem;
-        font-weight: 700;
-        color: var(--primary-color);
-        line-height: 1;
-        position: relative;
-        display: inline-block;
-    }
-
-    .timer-value::after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 40px;
-        height: 4px;
-        background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-        border-radius: 2px;
-    }
-
-    .timer-label {
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: var(--text-color);
-        margin-top: 1rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .end-time {
-        text-align: center;
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: var(--primary-color);
-        margin-top: 2rem;
-    }
-
-    @keyframes pulse {
-        0%, 100% {
-            transform: scale(1);
-        }
-        50% {
-            transform: scale(1.05);
-        }
-    }
-
-    .pulse {
-        animation: pulse 2s infinite ease-in-out;
-    }
-
-    @media (max-width: 768px) {
-        h1 {
-            font-size: 2.5rem;
-        }
-
-        .timer-wrapper {
-            padding: 2rem;
-        }
-
-        .input-container {
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .timer-container {
-            flex-wrap: wrap;
-            gap: 2rem;
-        }
-
-        .timer-value {
-            font-size: 3rem;
-        }
-    }
+  .alert {
+    animation: pulse-border 2s infinite;
+  }
 </style>
 </head>
-<body>
-<div class="container">
-    <h1>Ultra Sleek Workday Timer</h1>
-    <div class="timer-wrapper">
-        <div class="input-container">
-            <div class="input-group">
-                <label for="workday-length">Workday Length (hours)</label>
-                <div id="workday-length" class="drag-input" data-min="1" data-max="24" data-value="8">8</div>
-            </div>
-            <div class="input-group">
-                <label for="hours-worked">Hours worked</label>
-                <div id="hours-worked" class="drag-input" data-min="0" data-max="23" data-value="0">0</div>
-            </div>
-            <div class="input-group">
-                <label for="minutes-worked">Minutes worked</label>
-                <div id="minutes-worked" class="drag-input" data-min="0" data-max="59" data-value="0">0</div>
-            </div>
-            <button onclick="startCountdown()">Start Timer</button>
+
+<body class="p-4 md:p-8" x-data="timerApp()">
+  <div class="max-w-2xl mx-auto">
+    <div class="timer-card p-6 md:p-8">
+      <h1 class="text-2xl md:text-3xl font-semibold text-gray-800 mb-6 text-center">Workday Timer</h1>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="input-group">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Workday Length</label>
+          <div class="time-input-group">
+            <input type="text" 
+                   x-model="workdayHours"
+                   @input="validateHours($event, 'workdayHours')"
+                   placeholder="HH"
+                   maxlength="2"
+                   class="time-input-segment">
+            <input type="text" 
+                   x-model="workdayMinutes"
+                   @input="validateMinutes($event, 'workdayMinutes')"
+                   placeholder="MM"
+                   maxlength="2"
+                   class="time-input-segment">
+          </div>
         </div>
-        <div class="timer-container">
-            <div class="timer-box">
-                <div id="hours" class="timer-value">00</div>
-                <div class="timer-label">Hours</div>
-            </div>
-            <div class="timer-box">
-                <div id="minutes" class="timer-value">00</div>
-                <div class="timer-label">Minutes</div>
-            </div>
-            <div class="timer-box">
-                <div id="seconds" class="timer-value">00</div>
-                <div class="timer-label">Seconds</div>
-            </div>
+        
+        <div class="input-group">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Break Duration</label>
+          <div class="time-input-group">
+            <input type="text" 
+                   x-model="breakHours"
+                   @input="validateHours($event, 'breakHours')"
+                   placeholder="HH"
+                   maxlength="2"
+                   class="time-input-segment">
+            <input type="text" 
+                   x-model="breakMinutes"
+                   @input="validateMinutes($event, 'breakMinutes')"
+                   placeholder="MM"
+                   maxlength="2"
+                   class="time-input-segment">
+          </div>
         </div>
-        <div class="end-time" id="end-time"></div>
+        
+        <div class="input-group">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Time Already Worked</label>
+          <div class="time-input-group">
+            <input type="text" 
+                   x-model="workedHours"
+                   @input="validateHours($event, 'workedHours')"
+                   placeholder="HH"
+                   maxlength="2"
+                   class="time-input-segment">
+            <input type="text" 
+                   x-model="workedMinutes"
+                   @input="validateMinutes($event, 'workedMinutes')"
+                   placeholder="MM"
+                   maxlength="2"
+                   class="time-input-segment">
+          </div>
+        </div>
+      </div>
+
+      <div class="my-8">
+        <div class="countdown" :class="{ 'alert': isNearingEnd }">
+          <span x-text="formatTime(remainingTime)"></span>
+        </div>
+        <p class="text-center text-gray-600 mt-2">
+          End Time: <span x-text="calculateEndTime()"></span>
+        </p>
+      </div>
+
+      <div class="flex justify-center">
+        <button @click="startTimer()"
+                class="start-btn animate__animated"
+                :class="{ 'animate__pulse': isRunning }"
+                x-text="isRunning ? 'Restart Timer' : 'Start Timer'">
+        </button>
+      </div>
     </div>
-</div>
+  </div>
 
-<script>
-let countdown;
+  <script>
+    function timerApp() {
+      return {
+        workdayHours: '',
+        workdayMinutes: '',
+        breakHours: '',
+        breakMinutes: '',
+        workedHours: '',
+        workedMinutes: '',
+        remainingTime: 0,
+        isRunning: false,
+        timerInterval: null,
+        isNearingEnd: false,
 
-function startCountdown() {
-    clearInterval(countdown);
-    
-    const workdayLength = parseInt(document.getElementById('workday-length').textContent) || 8;
-    const hoursWorked = parseInt(document.getElementById('hours-worked').textContent) || 0;
-    const minutesWorked = parseInt(document.getElementById('minutes-worked').textContent) || 0;
-    
-    const totalMinutesInWorkday = workdayLength * 60;
-    const minutesWorkedTotal = hoursWorked * 60 + minutesWorked;
-    const minutesRemaining = totalMinutesInWorkday - minutesWorkedTotal;
-    
-    if (minutesRemaining <= 0) {
-        document.getElementById('hours').textContent = "00";
-        document.getElementById('minutes').textContent = "00";
-        document.getElementById('seconds').textContent = "00";
-        document.getElementById('end-time').textContent = "Your workday is complete!";
-        return;
+        init() {
+          this.loadFromLocalStorage();
+        },
+
+        validateHours(event, field) {
+          let value = event.target.value.replace(/[^\d]/g, '');
+          if (value > 23) value = '23';
+          this[field] = value;
+          this.updateTimeString();
+        },
+
+        validateMinutes(event, field) {
+          let value = event.target.value.replace(/[^\d]/g, '');
+          if (value > 59) value = '59';
+          this[field] = value;
+          this.updateTimeString();
+        },
+
+        updateTimeString() {
+          this.workdayLength = `${this.workdayHours.padStart(2, '0')}:${this.workdayMinutes.padStart(2, '0')}`;
+          this.breakDuration = `${this.breakHours.padStart(2, '0')}:${this.breakMinutes.padStart(2, '0')}`;
+          this.timeWorked = `${this.workedHours.padStart(2, '0')}:${this.workedMinutes.padStart(2, '0')}`;
+        },
+
+        timeToSeconds(hours, minutes) {
+          return (parseInt(hours || 0) * 3600) + (parseInt(minutes || 0) * 60);
+        },
+
+        formatTime(seconds) {
+          if (!seconds) return '00:00:00';
+          const h = Math.floor(seconds / 3600);
+          const m = Math.floor((seconds % 3600) / 60);
+          const s = seconds % 60;
+          return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        },
+
+        calculateEndTime() {
+          if (!this.remainingTime) return '--:--';
+          const now = new Date();
+          const end = new Date(now.getTime() + (this.remainingTime * 1000));
+          return end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        },
+
+        startTimer() {
+          clearInterval(this.timerInterval);
+          
+          const workdaySeconds = this.timeToSeconds(this.workdayHours, this.workdayMinutes);
+          const breakSeconds = this.timeToSeconds(this.breakHours, this.breakMinutes);
+          const workedSeconds = this.timeToSeconds(this.workedHours, this.workedMinutes);
+          
+          this.remainingTime = Math.max(0, workdaySeconds - breakSeconds - workedSeconds);
+          this.isRunning = true;
+          this.isNearingEnd = false;
+          
+          this.saveToLocalStorage();
+
+          this.timerInterval = setInterval(() => {
+            if (this.remainingTime > 0) {
+              this.remainingTime--;
+              if (this.remainingTime <= 300) {
+                this.isNearingEnd = true;
+              }
+            } else {
+              this.isRunning = false;
+              clearInterval(this.timerInterval);
+              this.showNotification();
+            }
+          }, 1000);
+        },
+
+        showNotification() {
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Workday Complete!', {
+              body: 'Your scheduled work time has ended.',
+              icon: 'https://example.com/icon.png'
+            });
+          }
+        },
+
+        saveToLocalStorage() {
+          localStorage.setItem('timerSettings', JSON.stringify({
+            workdayHours: this.workdayHours,
+            workdayMinutes: this.workdayMinutes,
+            breakHours: this.breakHours,
+            breakMinutes: this.breakMinutes,
+            workedHours: this.workedHours,
+            workedMinutes: this.workedMinutes
+          }));
+        },
+
+        loadFromLocalStorage() {
+          const saved = localStorage.getItem('timerSettings');
+          if (saved) {
+            const settings = JSON.parse(saved);
+            Object.assign(this, settings);
+            this.updateTimeString();
+          }
+        }
+      };
     }
-    
-    let totalSeconds = minutesRemaining * 60;
-    
-    updateEndTime(totalSeconds);
-    
-    countdown = setInterval(function() {
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-        
-        document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-        document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
-        
-        if (totalSeconds <= 300) { // Last 5 minutes
-            document.querySelectorAll('.timer-value').forEach(el => el.classList.add('pulse'));
-        } else {
-            document.querySelectorAll('.timer-value').forEach(el => el.classList.remove('pulse'));
-        }
-        
-        if (totalSeconds <= 0) {
-            clearInterval(countdown);
-            document.getElementById('end-time').textContent = "Your workday is complete!";
-            document.querySelectorAll('.timer-value').forEach(el => el.classList.remove('pulse'));
-        }
-        
-        totalSeconds--;
-    }, 1000);
-}
-
-function updateEndTime(secondsRemaining) {
-    const now = new Date();
-    const endTime = new Date(now.getTime() + secondsRemaining * 1000);
-    const formattedTime = endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    document.getElementById('end-time').textContent = `Workday ends at ${formattedTime}`;
-}
-
-// Drag to change value functionality
-document.querySelectorAll('.drag-input').forEach(input => {
-    let isDragging = false;
-    let startY, startValue;
-
-    input.addEventListener('mousedown', e => {
-        isDragging = true;
-        startY = e.clientY;
-        startValue = parseInt(input.textContent);
-        e.preventDefault(); // Prevent text selection
-    });
-
-    document.addEventListener('mousemove', e => {
-        if (!isDragging) return;
-        
-        const deltaY = startY - e.clientY;
-        const min = parseInt(input.dataset.min);
-        const max = parseInt(input.dataset.max);
-        let newValue = startValue + Math.round(deltaY / 5);
-        
-        newValue = Math.max(min, Math.min(max, newValue));
-        input.textContent = newValue;
-        input.dataset.value = newValue;
-    });
-
-    document.addEventListener('mouseup', () => {
-        isDragging = false;
-    });
-
-    // Prevent text selection
-    input.addEventListener('selectstart', e => e.preventDefault());
-});
-</script>
-</body>
-</html>
+  </script>
+</body></html>
