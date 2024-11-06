@@ -1,192 +1,240 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <title>Agar Recipe Calculator</title>
-  </head>
-  <style>
-  .input-field {
-    margin-top: 30px;
-  }
-  </style>
+<!DOCTYPE html><html><head><base href="/"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sit/Stand Reminder App</title>
+<script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer=""></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
-  <body>
-    <div class="container py-5">
-      <!-- Calculator form -->
-      <form id="calculatorForm" class="row justify-content-center">
-        <!-- Dishes Quantity input field -->
-        <div class="form-group col-sm-3 d-flex flex-column align-items-center">
-          <label for="dishesNumber">Dishes Quantity:</label>
-          <input type="number" class="form-control w-75" id="dishesNumber" min="0" step="1" value="30">
-        </div>
-
-        <!-- Water Needed input field -->
-        <div class="form-group col-sm-3 d-flex flex-column align-items-center">
-          <label for="agarAmount">Water Needed (mL):</label>
-          <input type="number" class="form-control w-75" id="agarAmount" min="0" step="0.1" value="500">
-        </div>
-
-        <!-- Milliliters Per Dish input field -->
-        <div class="form-group col-sm-3 d-flex flex-column align-items-center">
-          <label for="mlPerDish">Milliliters Per Dish:</label>
-          <input type="number" class="form-control w-75" id="mlPerDish" min="0" step="1" value="15">
-        </div>
-
-        <!-- Add 10% Buffer checkbox -->
-        <div class="form-group col-sm-3 d-flex align-items-center input-field">
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="spillageBuffer">
-            <label class="form-check-label" for="spillageBuffer">Add 6% Extra</label>
-          </div>
-        </div>
-
-      </form>
-      <!-- Results will be displayed here -->
-      <div id="results" class="mt-3">
-        <div class="row">
-          <div class="col-lg-8 offset-lg-2"></div>
-        </div>
-      </div>
-    </div>
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-// Get references to the form and input elements
-const dishesNumberInput = document.querySelector('#dishesNumber');
-const agarAmountInput = document.querySelector('#agarAmount');
-const mlPerDishInput = document.querySelector('#mlPerDish');
-const spillageBufferInput = document.querySelector('#spillageBuffer');
-const resultsDiv = document.querySelector('#results');
-
-// Add event listeners to the input elements
-dishesNumberInput.addEventListener('input', function() {
-  updateWaterVolume();
-  calculateIngredients();
-});
-agarAmountInput.addEventListener('input', function() {
-  updateDishesNumber();
-  calculateIngredients();
-});
-mlPerDishInput.addEventListener('input', function() {
-  updateWaterVolume();
-  calculateIngredients();
-});
-spillageBufferInput.addEventListener('change', function() {
-  updateWaterVolume();
-  calculateIngredients();
-});
-
-// Function to update the water volume based on the number of dishes and ml per dish
-function updateWaterVolume() {
-  const dishesNumber = dishesNumberInput.value;
-  const mlPerDish = mlPerDishInput.value;
-  let agarAmount = dishesNumber * mlPerDish;
-
-  // If the spillage buffer checkbox is checked, add 10%
-  if (spillageBufferInput.checked) {
-    agarAmount += agarAmount * 0.06;
-  }
-
-  agarAmountInput.value = agarAmount;
+<style>
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 
-// Function to update the number of dishes based on the water volume and ml per dish
-function updateDishesNumber() {
-  const agarAmount = agarAmountInput.value;
-  const mlPerDish = mlPerDishInput.value;
-  dishesNumberInput.value = Math.floor(agarAmount / mlPerDish);
+.gradient-bg {
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
-// Function to calculate and display the ingredients for each recipe
-function calculateIngredients() {
-  // Get the agar amount from the form
-  const agarAmount = agarAmountInput.value;
-  // Convert the agar amount to grams
-  const agarAmountInGrams = agarAmount;
-  // Calculate the ingredients for each recipe
-  const startingSporesAgar = [
-    '<b>Water:</b> ' + agarAmountInGrams + ' ml',
-    '<b>Agar:</b> ' + (agarAmountInGrams * 0.01).toFixed(1) + ' g',
-    '<b>LME:</b> ' + (agarAmountInGrams * 0.01).toFixed(1) + ' g'
-  ].join('&nbsp;&nbsp;&nbsp;');
-  const waterAgar = [
-    '<b>Water:</b> ' + agarAmountInGrams + ' ml',
-    '<b>Agar:</b> ' + (agarAmountInGrams * 0.02).toFixed(1) + ' g'
-  ].join('&nbsp;&nbsp;&nbsp;');
-  const maltYeastAgar = [
-    '<b>Water:</b> ' + agarAmountInGrams + ' ml',
-    '<b>Agar:</b> ' + (agarAmountInGrams * 0.02).toFixed(1) + ' g',
-    '<b>LME:</b> ' + (agarAmountInGrams * 0.015).toFixed(1) + ' g',
-    '<b>Yeast:</b> ' + (agarAmountInGrams * 0.002).toFixed(1) + ' g'
-  ].join('&nbsp;&nbsp;&nbsp;');
-  const maltExtractAgar = [
-    '<b>Water:</b> ' + agarAmountInGrams + ' ml',
-    '<b>Agar:</b> ' + (agarAmountInGrams * 0.018).toFixed(1) + ' g',
-    '<b>LME:</b> ' + (agarAmountInGrams * 0.006).toFixed(1) + ' g'
-  ].join('&nbsp;&nbsp;&nbsp;');
-  const grainWaterAgar = [
-    '<b>Grain Water:</b> ' + agarAmountInGrams + ' ml',
-    '<b>Agar:</b> ' + (agarAmountInGrams * 0.02).toFixed(1) + ' g'
-  ].join('&nbsp;&nbsp;&nbsp;');
-  // Display the calculated ingredients in the results div
-  const resultsHTML = `
-    <h1 class="text-center">AGAR RECIPES:</h1>
-    <p>
-    <h5 class="text-center">Low Nutrition Agar</h5>
-    <p class="text-center">Use low nutrition agar to purify and recover contaminated cultures or spores. Its minimal nutrient environment inhibits contaminants, enabling dominant growth of desired mycelium for a clean culture.</p>
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Starting Spores Agar</h5>
-        <p class="card-text">${startingSporesAgar}</p>
-      </div>
-    </div>
-    <P>
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Water Agar</h5>
-        <p class="card-text">${waterAgar}</p>
-      </div>
-    </div>
-    <p>
-    <h5 class="text-center">Nutritious Agar</h5>
-    <p class="text-center">Use nutritious agar when you're looking to promote robust mycelial growth and development. The enriched nutrient environment provides the necessary resources for the mycelium to thrive, making it ideal for the propagation of a strong and healthy culture.</p>
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Malt Yeast Agar</h5>
-        <p class="card-text">${maltYeastAgar}</p>
-      </div>
-    </div>
-    <p>
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Malt Extract Agar</h5>
-        <p class="card-text">${maltExtractAgar}</p>
-      </div>
-    </div>
-    <p>
-    <h5 class="text-center">Specialized Agar</h5>
-    <p class="text-center">Specialized agar types like Grain Water Agar are utilized when you're exploring different growth conditions, testing new strains or conducting research. These agar recipes may contain unique nutrient sources, such as grain water, that can influence the growth patterns and characteristics of the mycelium. This allows for a greater understanding of the organism's behavior under different conditions.</p>
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Grain Water Agar</h5>
-        <p class="card-text">${grainWaterAgar}</p>
-      </div>
-    </div>`;
-  resultsDiv.querySelector('.col-lg-8').innerHTML = resultsHTML;
+@keyframes gradientBG {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
 }
 
-// Calculate initial ingredients on page load
-window.addEventListener('load', function() {
-  updateWaterVolume();
-  calculateIngredients();
+.glow-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center, 
+    rgba(255,255,255,0.1) 0%, 
+    transparent 70%
+  );
+  animation: glowPulse 5s infinite alternate;
+}
+
+@keyframes glowPulse {
+  0% { opacity: 0.1; }
+  100% { opacity: 0.3; }
+}
+
+.floating-shapes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.floating-shape {
+  position: absolute;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  animation: float 20s linear infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(100%) rotate(0deg); }
+  100% { transform: translateY(-100%) rotate(360deg); }
+}
+</style>
+
+<script>
+document.addEventListener('alpine:init', () => {
+  Alpine.data('sitStandApp', () => ({
+    isStanding: false,
+    isPaused: true,
+    timeRemaining: 3600,
+    sitDuration: 3600,
+    standDuration: 3600,
+    soundEnabled: true,
+    notificationsEnabled: false,
+    workStartHour: 9,
+    workEndHour: 17,
+    customMessage: '',
+    transitionProgress: 0,
+    sound: null,
+    
+    init() {
+      this.checkNotificationPermission();
+      this.sound = new Howl({
+        src: ['https://assets.mixkit.co/sfx/preview/mixkit-simple-countdown-922.mp3'],
+        volume: 0.5
+      });
+      this.startTimer();
+      this.updateBackgroundGradient();
+    },
+
+    updateBackgroundGradient() {
+      const duration = this.isStanding ? this.standDuration : this.sitDuration;
+      this.transitionProgress = (duration - this.timeRemaining) / duration;
+      document.documentElement.style.setProperty('--sitting-opacity', this.isStanding ? 1 - this.transitionProgress : this.transitionProgress);
+      document.documentElement.style.setProperty('--standing-opacity', this.isStanding ? this.transitionProgress : 1 - this.transitionProgress);
+    },
+
+    async checkNotificationPermission() {
+      if ('Notification' in window) {
+        const permission = await Notification.requestPermission();
+        this.notificationsEnabled = permission === 'granted';
+      }
+    },
+
+    async toggleNotifications() {
+      if (!this.notificationsEnabled) {
+        const permission = await this.requestNotificationPermission();
+        this.notificationsEnabled = permission;
+      } else {
+        this.notificationsEnabled = false;
+      }
+    },
+
+    async requestNotificationPermission() {
+      if ('Notification' in window) {
+        const permission = await Notification.requestPermission();
+        return permission === 'granted';
+      }
+      return false;
+    },
+
+    setPosition(standing) {
+      this.isStanding = standing;
+      this.timeRemaining = standing ? this.standDuration : this.sitDuration;
+      this.updateBackgroundGradient();
+    },
+
+    startTimer() {
+      if (!this.timer) {
+        this.timer = setInterval(() => {
+          if (!this.isPaused) {
+            this.timeRemaining--;
+            this.updateBackgroundGradient();
+            if (this.timeRemaining <= 0) {
+              this.togglePosition();
+            }
+          }
+        }, 1000);
+      }
+    },
+
+    togglePosition() {
+      this.isStanding = !this.isStanding;
+      this.timeRemaining = this.isStanding ? this.standDuration : this.sitDuration;
+      
+      if (this.soundEnabled) {
+        this.sound.play();
+      }
+      
+      if (this.notificationsEnabled) {
+        new Notification(this.isStanding ? 'Time to Stand!' : 'Time to Sit!', {
+          body: this.customMessage || `${this.isStanding ? 'Stand' : 'Sit'} for ${Math.floor(this.timeRemaining / 60)} minutes`
+        });
+      }
+    },
+
+    formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    },
+
+    getCircleProgress() {
+      const duration = this.isStanding ? this.standDuration : this.sitDuration;
+      return ((duration - this.timeRemaining) / duration) * 283; // 283 is circumference of circle
+    }
+  }));
 });
+</script>
+</head>
+<body class="min-h-screen font-sans" x-data="sitStandApp">
+<div class="gradient-bg"></div>
+<div class="glow-overlay"></div>
+<div class="floating-shapes">
+  <div class="floating-shape" style="width: 50px; height: 50px; top: 10%; left: 20%;"></div>
+  <div class="floating-shape" style="width: 30px; height: 30px; top: 50%; left: 70%;"></div>
+  <div class="floating-shape" style="width: 70px; height: 70px; top: 80%; left: 40%;"></div>
+</div>
 
-    </script>
-  </body>
-</html>
+<div class="container mx-auto px-4 py-8 relative z-10">
+  <div class="max-w-md mx-auto bg-white bg-opacity-90 rounded-xl shadow-lg p-8">
+    <h1 class="text-3xl font-bold text-center mb-8">Sit Stand Reminder</h1>
+    
+    <div class="flex justify-center space-x-4 mb-8">
+      <button @click="setPosition(false)" :class="{'bg-blue-600': !isStanding, 'bg-gray-400': isStanding}" class="px-4 py-2 rounded-lg text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Start Sitting</button>
+      <button @click="setPosition(true)" :class="{'bg-blue-600': isStanding, 'bg-gray-400': !isStanding}" class="px-4 py-2 rounded-lg text-white hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">Start Standing</button>
+    </div>
+
+    <div class="relative w-64 h-64 mx-auto mb-8">
+      <svg class="w-full h-full" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="45" fill="none" stroke="#eee" stroke-width="5"></circle>
+        <circle class="timer-circle" cx="50" cy="50" r="45" fill="none" :stroke="isStanding ? '#84fab0' : '#8fd3f4'" stroke-width="5" stroke-dasharray="283" :stroke-dashoffset="getCircleProgress()"></circle>
+      </svg>
+      <div class="absolute inset-0 flex items-center justify-center flex-col">
+        <span class="text-4xl font-bold" x-text="formatTime(timeRemaining)"></span>
+        <span class="text-lg" x-text="isStanding ? 'Standing' : 'Sitting'"></span>
+      </div>
+    </div>
+
+    <div class="flex justify-center space-x-4 mb-8">
+      <button @click="isPaused = !isPaused" class="px-6 py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50" x-text="isPaused ? 'Start' : 'Pause'"></button>
+      <button @click="timeRemaining = isStanding ? standDuration : sitDuration" class="px-6 py-2 rounded-lg bg-gray-500 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50">Reset</button>
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Sit Duration (minutes)</label>
+        <input type="number" :value="Math.floor(sitDuration / 60)" @input="sitDuration = $event.target.value * 60" min="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Stand Duration (minutes)</label>
+        <input type="number" :value="Math.floor(standDuration / 60)" @input="standDuration = $event.target.value * 60" min="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+      </div>
+
+      <div class="flex items-center space-x-4">
+        <label class="flex items-center">
+          <input type="checkbox" x-model="soundEnabled" class="rounded text-blue-500">
+          <span class="ml-2">Sound Alerts</span>
+        </label>
+        
+        <label class="flex items-center">
+          <input type="checkbox" x-model="notificationsEnabled" @click.stop="toggleNotifications()" class="rounded text-blue-500" x-on:change="toggleNotifications()">
+          <span class="ml-2">Notifications</span>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>
