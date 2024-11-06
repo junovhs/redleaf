@@ -1,4 +1,5 @@
-<!DOCTYPE html><html><head><base href="/"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html><head><base href="/">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sit/Stand Reminder App</title>
 <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer=""></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
@@ -70,6 +71,24 @@ body, html {
   0% { transform: translateY(100%) rotate(0deg); }
   100% { transform: translateY(-100%) rotate(360deg); }
 }
+
+@keyframes flashingBG {
+  0% { background: black; }
+  50% { background: white; }
+  100% { background: black; }
+}
+
+.flashing-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  animation: flashingBG 0.6s steps(2, end) 8;
+}
 </style>
 
 <script>
@@ -87,6 +106,7 @@ document.addEventListener('alpine:init', () => {
     customMessage: '',
     transitionProgress: 0,
     sound: null,
+    flashingElement: null,
     
     init() {
       this.checkNotificationPermission();
@@ -95,14 +115,10 @@ document.addEventListener('alpine:init', () => {
         volume: 0.5
       });
       this.startTimer();
-      this.updateBackgroundGradient();
-    },
-
-    updateBackgroundGradient() {
-      const duration = this.isStanding ? this.standDuration : this.sitDuration;
-      this.transitionProgress = (duration - this.timeRemaining) / duration;
-      document.documentElement.style.setProperty('--sitting-opacity', this.isStanding ? 1 - this.transitionProgress : this.transitionProgress);
-      document.documentElement.style.setProperty('--standing-opacity', this.isStanding ? this.transitionProgress : 1 - this.transitionProgress);
+      
+      this.flashingElement = document.createElement('div');
+      this.flashingElement.className = 'flashing-bg';
+      document.body.appendChild(this.flashingElement);
     },
 
     async checkNotificationPermission() {
@@ -132,7 +148,6 @@ document.addEventListener('alpine:init', () => {
     setPosition(standing) {
       this.isStanding = standing;
       this.timeRemaining = standing ? this.standDuration : this.sitDuration;
-      this.updateBackgroundGradient();
     },
 
     startTimer() {
@@ -140,7 +155,6 @@ document.addEventListener('alpine:init', () => {
         this.timer = setInterval(() => {
           if (!this.isPaused) {
             this.timeRemaining--;
-            this.updateBackgroundGradient();
             if (this.timeRemaining <= 0) {
               this.togglePosition();
             }
@@ -150,6 +164,15 @@ document.addEventListener('alpine:init', () => {
     },
 
     togglePosition() {
+      this.flashingElement.style.opacity = '0.5';
+      this.flashingElement.style.animation = 'none';
+      this.flashingElement.offsetHeight;
+      this.flashingElement.style.animation = 'flashingBG 0.6s steps(2, end) 8';
+      
+      setTimeout(() => {
+        this.flashingElement.style.opacity = '0';
+      }, 5000);
+
       this.isStanding = !this.isStanding;
       this.timeRemaining = this.isStanding ? this.standDuration : this.sitDuration;
       
@@ -172,7 +195,7 @@ document.addEventListener('alpine:init', () => {
 
     getCircleProgress() {
       const duration = this.isStanding ? this.standDuration : this.sitDuration;
-      return ((duration - this.timeRemaining) / duration) * 283; // 283 is circumference of circle
+      return ((duration - this.timeRemaining) / duration) * 283;
     }
   }));
 });
