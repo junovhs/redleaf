@@ -85,16 +85,17 @@
       color: #94a3b8;
     }
   
-    .start-btn {
+    .start-btn, .calculate-btn, .convert-btn {
       background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
       border-radius: 0.75rem;
       color: white;
       font-weight: 500;
-      padding: 1rem 2rem;
+      padding: 0.75rem 1.5rem;
       transition: all 0.3s ease;
+      cursor: pointer;
     }
   
-    .start-btn:hover {
+    .start-btn:hover, .calculate-btn:hover, .convert-btn:hover {
       transform: translateY(-1px);
       box-shadow: 0 5px 15px rgba(37,99,235,0.3);
     }
@@ -116,62 +117,59 @@
     <div class="timer-card p-6 md:p-8">
       <h1 class="text-2xl md:text-3xl font-semibold text-gray-800 mb-6 text-center">Workday Timer</h1>
       
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Workday Settings -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 justify-center">
         <div class="input-group">
           <label class="block text-sm font-medium text-gray-700 mb-2 text-center">Workday Length</label>
           <div class="time-input-group">
             <input type="text" 
                    x-model="workdayHours" 
                    @input="validateHours($event, 'workdayHours')" 
-                   placeholder="08" 
+                   placeholder="Hours" 
                    maxlength="2" 
                    class="time-input-segment">
             <input type="text" 
                    x-model="workdayMinutes" 
                    @input="validateMinutes($event, 'workdayMinutes')" 
-                   placeholder="00" 
+                   placeholder="Minutes" 
                    maxlength="2" 
                    class="time-input-segment">
           </div>
         </div>
         
         <div class="input-group">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Break Duration</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2 text-center">Break Duration (Minutes)</label>
           <div class="time-input-group">
-            <input type="text" 
-                   x-model="breakHours" 
-                   @input="validateHours($event, 'breakHours')" 
-                   placeholder="00" 
-                   maxlength="2" 
-                   class="time-input-segment">
+            <!-- Only Minutes Input for Break Duration -->
             <input type="text" 
                    x-model="breakMinutes" 
                    @input="validateMinutes($event, 'breakMinutes')" 
-                   placeholder="20" 
+                   placeholder="Minutes" 
                    maxlength="2" 
                    class="time-input-segment">
           </div>
         </div>
         
         <div class="input-group">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Time Already Worked</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2 text-center">Time Already Worked</label>
           <div class="time-input-group">
             <input type="text" 
                    x-model="workedHours" 
-                   @input="validateHours($event, 'workedHours')" 
-                   placeholder="HH" 
+                   @input="validateWorkedAmount($event)" 
+                   placeholder="Hours" 
                    maxlength="2" 
                    class="time-input-segment">
             <input type="text" 
                    x-model="workedMinutes" 
-                   @input="validateMinutes($event, 'workedMinutes')" 
-                   placeholder="MM" 
+                   @input="validateWorkedAmount($event)" 
+                   placeholder="Minutes" 
                    maxlength="2" 
                    class="time-input-segment">
           </div>
         </div>
       </div>
 
+      <!-- Countdown Display -->
       <div class="my-8">
         <div class="countdown" :class="{ 'alert': isNearingEnd }">
           <span x-text="formatTime(remainingTime)"></span>
@@ -181,72 +179,207 @@
         </p>
       </div>
 
+      <!-- Start Timer Button -->
       <div class="flex justify-center">
         <button @click="startTimer()" class="start-btn animate__animated" :class="{ 'animate__pulse': isRunning }" x-text="isRunning ? 'Restart Timer' : 'Start Timer'">
         </button>
       </div>
 
+      <!-- What Time Will It Be Section -->
       <div class="mt-8 pt-6 border-t border-gray-200">
         <div class="input-group">
-          <label class="block text-sm font-medium text-gray-700 mb-2">What time will it be</label>
-          <div class="flex items-center gap-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2 text-center">What Time Will It Be</label>
+          <div class="flex flex-col md:flex-row md:items-center gap-4 justify-center">
+            <!-- Time Input -->
             <div class="time-input-group flex-1">
               <input type="text" 
                      x-model="futureHours" 
                      @input="validateHours($event, 'futureHours')" 
-                     placeholder="HH" 
+                     placeholder="Hours" 
                      maxlength="2" 
                      class="time-input-segment">
               <input type="text" 
                      x-model="futureMinutes" 
                      @input="validateMinutes($event, 'futureMinutes')" 
-                     placeholder="MM" 
+                     placeholder="Minutes" 
                      maxlength="2" 
                      class="time-input-segment">
             </div>
-            <span class="text-gray-600">from now</span>
-            <button @click="calculateFutureTime()" 
-                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
-              Calculate
+            <!-- From Now Checkbox -->
+            <div class="flex items-center">
+              <input type="checkbox" id="fromNow" x-model="fromNow" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+              <label for="fromNow" class="ml-2 block text-sm text-gray-700">From Now</label>
+            </div>
+          </div>
+
+          <!-- Time Zone Selection -->
+          <div class="mt-4 flex justify-center">
+            <label class="block text-sm font-medium text-gray-700 mb-2 mr-4">Select Time Zone</label>
+            <select x-model="selectedFutureTimeZone" class="mt-1 block w-1/2 rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+              <option disabled value="">Select Time Zone</option>
+              <template x-for="tz in timeZones" :key="tz.value">
+                <option :value="tz.value" x-text="tz.label"></option>
+              </template>
+            </select>
+          </div>
+
+          <!-- Isolated "Out Of" Section -->
+          <div class="mt-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2 text-center">Out Of</label>
+            <div class="flex flex-col md:flex-row md:items-center gap-4 justify-center">
+              <!-- Worked Time Inputs -->
+              <div class="flex items-center gap-2">
+                <span>I've worked</span>
+                <input type="number" 
+                       x-model="workedOutHours" 
+                       @input="validateWorkedOutAmount($event)" 
+                       placeholder="Hours" 
+                       min="0" 
+                       class="w-20 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="number" 
+                       x-model="workedOutMinutes" 
+                       @input="validateWorkedOutAmount($event)" 
+                       placeholder="Minutes" 
+                       min="0" 
+                       class="w-20 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+              <!-- Total Goal Time Inputs -->
+              <div class="flex items-center gap-2">
+                <span>out of</span>
+                <input type="number" 
+                       x-model="outOfGoalHours" 
+                       @input="validateOutOfGoalAmount($event)" 
+                       placeholder="Hours" 
+                       min="0" 
+                       class="w-20 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="number" 
+                       x-model="outOfGoalMinutes" 
+                       @input="validateOutOfGoalAmount($event)" 
+                       placeholder="Minutes" 
+                       min="0" 
+                       class="w-20 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              </div>
+            </div>
+            <!-- Calculate Button -->
+            <div class="flex justify-center mt-4">
+              <button @click="calculateOutOfTime()" class="calculate-btn">
+                Calculate
+              </button>
+            </div>
+            <!-- Remaining Time Display -->
+            <p class="mt-4 text-center text-gray-600" x-show="remainingOutTime">
+              You have: <span x-text="formatTime(remainingOutTime, true)"></span> left
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time Zone Conversion Tool -->
+      <div class="mt-8 pt-6 border-t border-gray-200">
+        <div class="input-group">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">Time Zone Conversion Tool</h2>
+          <div class="flex flex-col md:flex-row md:items-center gap-4 justify-center">
+            <!-- Input Time -->
+            <div class="time-input-group flex-1">
+              <input type="text" 
+                     x-model="convertHours" 
+                     @input="validateConvertHours($event)" 
+                     placeholder="Hours" 
+                     maxlength="2" 
+                     class="time-input-segment">
+              <input type="text" 
+                     x-model="convertMinutes" 
+                     @input="validateConvertMinutes($event)" 
+                     placeholder="Minutes" 
+                     maxlength="2" 
+                     class="time-input-segment">
+            </div>
+
+            <!-- From Time Zone -->
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-gray-700 mb-1">From Time Zone</label>
+              <select x-model="convertFromTimeZone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <option disabled value="">Select Time Zone</option>
+                <template x-for="tz in timeZones" :key="tz.value">
+                  <option :value="tz.value" x-text="tz.label"></option>
+                </template>
+              </select>
+            </div>
+
+            <!-- To Time Zone -->
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-gray-700 mb-1">To Time Zone</label>
+              <select x-model="convertToTimeZone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <option disabled value="">Select Time Zone</option>
+                <template x-for="tz in timeZones" :key="tz.value">
+                  <option :value="tz.value" x-text="tz.label"></option>
+                </template>
+              </select>
+            </div>
+          </div>
+
+          <!-- Convert Button -->
+          <div class="flex justify-center mt-4">
+            <button @click="convertTime()" class="convert-btn">
+              Convert
             </button>
           </div>
-          <p class="mt-2 text-center text-gray-600" x-show="futureTimeResult">
-            It will be: <span x-text="futureTimeResult" class="font-semibold"></span>
+
+          <!-- Conversion Result -->
+          <p class="mt-4 text-center text-gray-600" x-show="conversionResult">
+            Converted Time: <span x-text="conversionResult" class="font-semibold"></span>
           </p>
         </div>
       </div>
+
     </div>
   </div>
 
   <script>
     function timerApp() {
       return {
-        workdayHours: '08',
-        workdayMinutes: '00',
-        breakHours: '00',
-        breakMinutes: '20',
+        // Workday Settings Data Properties
+        workdayHours: '',
+        workdayMinutes: '',
+        breakMinutes: '',
         workedHours: '',
         workedMinutes: '',
         futureHours: '',
         futureMinutes: '',
+        fromNow: true, // Determines if calculation is from now
+        selectedFutureTimeZone: 'UTC', // Default to UTC
+        workedOutHours: '',
+        workedOutMinutes: '',
+        outOfGoalHours: '',
+        outOfGoalMinutes: '',
         futureTimeResult: '',
         remainingTime: 0,
         isRunning: false,
         timerInterval: null,
         isNearingEnd: false,
+        remainingOutTime: 0, // Remaining time until total is reached
+
+        // Time Zone Conversion Tool Properties
+        convertHours: '',
+        convertMinutes: '',
+        convertFromTimeZone: '', // Selected source time zone
+        convertToTimeZone: 'UTC', // Selected target time zone
+        conversionResult: '',
+
+        // Shortlist of Time Zones
+        timeZones: [
+          { label: "Pacific Standard Time (PST)", value: "America/Los_Angeles" },
+          { label: "Central Daylight Time (CDT)", value: "America/Chicago" },
+          { label: "Eastern Daylight Time (EDT)", value: "America/New_York" },
+          { label: "Mountain Daylight Time (MDT)", value: "America/Denver" },
+          { label: "Central European Time (CET)", value: "Europe/Paris" },
+          { label: "Greenwich Mean Time (GMT)", value: "Europe/London" },
+          { label: "Coordinated Universal Time (UTC)", value: "UTC" }
+        ],
 
         init() {
-          // Set default values if nothing in localStorage
-          if (!localStorage.getItem('timerSettings')) {
-            this.workdayHours = '08';
-            this.workdayMinutes = '00';
-            this.breakHours = '00';
-            this.breakMinutes = '20';
-            this.workedHours = '';
-            this.workedMinutes = '';
-            this.updateTimeString();
-            this.saveToLocalStorage();
-          } else {
+          // Load from localStorage if available
+          if (localStorage.getItem('timerSettings')) {
             this.loadFromLocalStorage();
           }
           
@@ -254,6 +387,13 @@
             Notification.requestPermission();
           }
           
+          // Automatically detect system time and set convertHours and convertMinutes
+          const now = new Date();
+          this.convertHours = now.getHours().toString().padStart(2, '0');
+          this.convertMinutes = now.getMinutes().toString().padStart(2, '0');
+          this.selectedFutureTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+          this.convertFromTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+
           // Cleanup on page unload
           window.addEventListener('unload', () => {
             if (this.timerInterval) {
@@ -262,45 +402,72 @@
           });
         },
 
+        // Validation Methods
         validateHours(event, field) {
           let value = event.target.value.replace(/[^\d]/g, '');
-          if (value > 23) value = '23';
-          this[field] = value;
+          if (field === 'futureHours') {
+            if (value.length > 2) value = value.slice(0, 2);
+            this[field] = value;
+          } else {
+            if (value.length > 2) value = value.slice(0, 2);
+            if (parseInt(value) > 23) value = '23';
+            this[field] = value;
+          }
           this.updateTimeString();
         },
 
         validateMinutes(event, field) {
           let value = event.target.value.replace(/[^\d]/g, '');
-          if (value > 59) value = '59';
+          if (value.length > 2) value = value.slice(0, 2);
+          if (parseInt(value) > 59) value = '59';
           this[field] = value;
           this.updateTimeString();
         },
 
-        setFutureAsMain() {
-          if (this.futureHours || this.futureMinutes) {
-            const futureSeconds = this.timeToSeconds(this.futureHours, this.futureMinutes);
-            this.breakHours = '0';
-            this.breakMinutes = '0';
-            this.workedHours = '0';
-            this.workedMinutes = '';
-            
-            const hours = Math.floor(futureSeconds / 3600);
-            const minutes = Math.floor((futureSeconds % 3600) / 60);
-            
-            this.workdayHours = hours.toString();
-            this.workdayMinutes = minutes.toString();
-            
-            this.startTimer();
-            
-            this.futureHours = '';
-            this.futureMinutes = '';
-            this.futureTimeResult = '';
-          }
+        validateWorkedAmount(event) {
+          let value = event.target.value.replace(/[^\d]/g, '');
+          this.workedHours = value;
+          this.calculateRemainingOutTime();
         },
 
+        validateWorkedOutAmount(event) {
+          let value = event.target.value.replace(/[^\d]/g, '');
+          if (event.target.placeholder === "Hours") {
+            this.workedOutHours = value;
+          } else {
+            this.workedOutMinutes = value;
+          }
+          this.calculateRemainingOutTime();
+        },
+
+        validateOutOfGoalAmount(event) {
+          let value = event.target.value.replace(/[^\d]/g, '');
+          if (event.target.placeholder === "Hours") {
+            this.outOfGoalHours = value;
+          } else {
+            this.outOfGoalMinutes = value;
+          }
+          this.calculateRemainingOutTime();
+        },
+
+        validateConvertHours(event) {
+          let value = event.target.value.replace(/[^\d]/g, '');
+          if (value.length > 2) value = value.slice(0, 2);
+          if (parseInt(value) > 23) value = '23';
+          this.convertHours = value;
+        },
+
+        validateConvertMinutes(event) {
+          let value = event.target.value.replace(/[^\d]/g, '');
+          if (value.length > 2) value = value.slice(0, 2);
+          if (parseInt(value) > 59) value = '59';
+          this.convertMinutes = value;
+        },
+
+        // Helper Methods
         updateTimeString() {
           this.workdayLength = `${this.workdayHours.padStart(2, '0')}:${this.workdayMinutes.padStart(2, '0')}`;
-          this.breakDuration = `${this.breakHours.padStart(2, '0')}:${this.breakMinutes.padStart(2, '0')}`;
+          this.breakDuration = `${this.breakMinutes.padStart(2, '0')}`;
           this.timeWorked = `${this.workedHours.padStart(2, '0')}:${this.workedMinutes.padStart(2, '0')}`;
         },
 
@@ -308,11 +475,14 @@
           return (parseInt(hours || 0) * 3600) + (parseInt(minutes || 0) * 60);
         },
 
-        formatTime(seconds) {
-          if (!seconds) return '00:00:00';
+        formatTime(seconds, isRemainingOut = false) {
+          if (seconds === undefined || seconds === null) return '00:00:00';
           const h = Math.floor(seconds / 3600);
           const m = Math.floor((seconds % 3600) / 60);
           const s = seconds % 60;
+          if (isRemainingOut) {
+            return `${h.toString().padStart(2, '0')}h ${m.toString().padStart(2, '0')}m`;
+          }
           return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         },
 
@@ -320,7 +490,7 @@
           if (!this.remainingTime) return '--:--';
           const now = new Date();
           const end = new Date(now.getTime() + (this.remainingTime * 1000));
-          return end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          return end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: this.selectedFutureTimeZone });
         },
 
         calculateFutureTime() {
@@ -333,7 +503,7 @@
           }
           
           const workdaySeconds = this.timeToSeconds(this.workdayHours, this.workdayMinutes);
-          const breakSeconds = this.timeToSeconds(this.breakHours, this.breakMinutes);
+          const breakSeconds = this.timeToSeconds('0', this.breakMinutes);
           const workedSeconds = this.timeToSeconds(this.workedHours, this.workedMinutes);
           
           this.remainingTime = Math.max(0, workdaySeconds + breakSeconds - workedSeconds);
@@ -369,7 +539,6 @@
           localStorage.setItem('timerSettings', JSON.stringify({
             workdayHours: this.workdayHours,
             workdayMinutes: this.workdayMinutes,
-            breakHours: this.breakHours,
             breakMinutes: this.breakMinutes,
             workedHours: this.workedHours,
             workedMinutes: this.workedMinutes
@@ -383,6 +552,51 @@
             Object.assign(this, settings);
             this.updateTimeString();
           }
+        },
+
+        // Time Zone Conversion Tool Methods
+        convertTime() {
+          if (this.convertHours === '' && this.convertMinutes === '') {
+            this.conversionResult = 'Please enter a valid time.';
+            return;
+          }
+
+          const hours = parseInt(this.convertHours) || 0;
+          const minutes = parseInt(this.convertMinutes) || 0;
+
+          // Get current date components
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = now.getMonth();
+          const date = now.getDate();
+
+          // Create a date object in the source time zone
+          const sourceTime = new Date(Date.UTC(year, month, date, hours, minutes, 0));
+
+          // Convert to target time zone
+          const targetTimeString = sourceTime.toLocaleString('en-US', { timeZone: this.convertToTimeZone });
+          const targetTime = new Date(targetTimeString);
+
+          const options = {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            timeZone: this.convertToTimeZone
+          };
+          this.conversionResult = targetTime.toLocaleTimeString([], options);
+        },
+
+        // Calculation for "Out Of" Remaining Time
+        calculateOutOfTime() {
+          if (this.workedOutHours === '' && this.workedOutMinutes === '' && this.outOfGoalHours === '' && this.outOfGoalMinutes === '') {
+            this.remainingOutTime = 0;
+            return;
+          }
+
+          const workedSeconds = (parseInt(this.workedOutHours) || 0) * 3600 + (parseInt(this.workedOutMinutes) || 0) * 60;
+          const totalGoalSeconds = (parseInt(this.outOfGoalHours) || 0) * 3600 + (parseInt(this.outOfGoalMinutes) || 0) * 60;
+
+          this.remainingOutTime = Math.max(0, totalGoalSeconds - workedSeconds);
         }
       };
     }
