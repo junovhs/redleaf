@@ -1,22 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-<base href="." />
-<meta charset="UTF-8">
-<title>It's Always Sunny in Philadelphia Episode Randomizer</title>
-<style>
-/* CSS styling remains the same as previously provided */
+<html><head><base href="." /><meta charset="UTF-8"><title>It's Always Sunny in Philadelphia Episode Randomizer</title><meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';"><meta http-equiv="X-Frame-Options" content="SAMEORIGIN"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><style>
 body {
     font-family: 'Helvetica Neue', Arial, sans-serif;
     background: #1a1a1a;
     color: #fff;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+    margin: 0;
+    padding: 0;
     min-height: 100vh;
+    min-height: 100dvh; /* For mobile viewports */
+    width: 100vw;
     transition: background 1s ease;
     position: relative;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 body::after {
@@ -32,18 +29,24 @@ body::after {
 
 .container {
     background: rgba(0, 0, 0, 0.8);
-    padding: 30px;
+    padding: 4vh 4vw;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.7);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255,215,0,0.1);
+    width: 90vw;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 h1 {
     color: #ffd700;
     text-align: center;
-    font-size: 2.8em;
-    margin-bottom: 30px;
+    font-size: min(2.8em, 8vw);
+    margin: 2vh 0;
     text-shadow: 0 0 10px rgba(255,215,0,0.5);
     letter-spacing: 2px;
     position: relative;
@@ -74,8 +77,8 @@ h1::after {
 button {
     background: linear-gradient(45deg, #ffd700, #ffed4a);
     border: none;
-    padding: 18px 35px;
-    font-size: 1.3em;
+    padding: min(18px, 3vh) min(35px, 5vw);
+    font-size: min(1.3em, 5vw);
     border-radius: 50px;
     cursor: pointer;
     display: inline-block;
@@ -164,30 +167,31 @@ button.clicked {
     100% { transform: translateX(0); }
 }
 
-@media (max-width: 600px) {
+@media (max-height: 600px) {
     .container {
-        padding: 20px;
-        margin: 10px;
+        padding: 2vh 4vw;
     }
     
     h1 {
-        font-size: 2em;
+        font-size: min(2em, 6vw);
+        margin: 1vh 0;
     }
     
     button {
-        padding: 15px 25px;
-        font-size: 1.1em;
+        padding: min(12px, 2vh) min(25px, 4vw);
+    }
+    
+    .episode-info {
+        font-size: 1em;
     }
 }
-</style>
-</head>
-<body>
+</style></head><body>
 <div class="container">
     <h1>The Gang Picks a Random Episode</h1>
     <div class="button-container">
-    <button onclick="getRandomEpisode()">Wildcard, bitches!</button>
-    <div class="button-subtitle">(randomize episode)</div>
-</div>
+        <button id="randomizeButton">Wildcard, bitches!</button>
+        <div class="button-subtitle">(randomize episode)</div>
+    </div>
     <div id="result"></div>
 </div>
 
@@ -416,7 +420,16 @@ Object.keys(episodes).forEach(season => {
 });
 
 // Retrieve viewed episodes from localStorage
-let viewedEpisodes = JSON.parse(localStorage.getItem('viewedEpisodes')) || [];
+function getStoredEpisodes() {
+    try {
+        return JSON.parse(localStorage.getItem('viewedEpisodes')) || [];
+    } catch (e) {
+        console.warn('Error accessing localStorage:', e);
+        return [];
+    }
+}
+
+let viewedEpisodes = getStoredEpisodes();
 
 function cycleButtonText() {
     const button = document.querySelector('button');
@@ -436,10 +449,18 @@ function changeBackground() {
     document.body.style.background = randomBackground;
 }
 
+function saveViewedEpisodes() {
+    try {
+        localStorage.setItem('viewedEpisodes', JSON.stringify(viewedEpisodes));
+    } catch (e) {
+        console.warn('Error saving to localStorage:', e);
+    }
+}
+
 function getRandomEpisode() {
     cycleButtonText();
     changeBackground();
-    const button = document.querySelector('button');
+    const button = document.getElementById('randomizeButton');
     button.classList.add('clicked');
     setTimeout(() => {
         button.classList.remove('clicked');
@@ -460,7 +481,7 @@ function getRandomEpisode() {
 
     // Add selected episode to viewed episodes
     viewedEpisodes.push(selectedEpisode.title);
-    localStorage.setItem('viewedEpisodes', JSON.stringify(viewedEpisodes));
+    saveViewedEpisodes();
 
     const resultDiv = document.getElementById('result');
     resultDiv.innerHTML = `
@@ -471,6 +492,20 @@ function getRandomEpisode() {
         </div>
     `;
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    cycleButtonText();
+    
+    // Add click handler to button
+    const button = document.getElementById('randomizeButton');
+    if (button) {
+        button.addEventListener('click', getRandomEpisode);
+    }
+});
+
+// Add window error handler to catch and log any issues
+window.addEventListener('error', function(e) {
+    console.warn('Page Error:', e.message);
+});
 </script>
-</body>
-</html>
+</body></html>
