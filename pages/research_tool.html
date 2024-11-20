@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Research Companion Tool</title>
+
+    <!-- Quill Editor CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #31308B;
+            --secondary-color: #626ADC;
+            --accent-color: #F5F5F7;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #fff;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            border-bottom: 3px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .main-container {
+            background: var(--accent-color);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .question-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            background: white;
+            resize: vertical;
+        }
+
+        .question-card {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .question-header h3 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .answer-container {
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .answer-container.expanded {
+            display: block;
+        }
+
+        .editor-container {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            margin-bottom: 1rem;
+        }
+
+        .formatted-answer {
+            padding: 2rem;
+            margin-top: 1rem;
+            border-left: 4px solid var(--secondary-color);
+            background: #f8f8f8;
+            display: none;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            position: relative;
+        }
+
+        .formatted-answer.visible {
+            display: block;
+        }
+
+        .formatted-answer p {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .citation-pill {
+            display: inline-block;
+            background-color: #e0e0e0;
+            color: #333;
+            border-radius: 12px;
+            padding: 2px 8px;
+            margin-left: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+
+        .citation-pill:hover {
+            background-color: #d5d5d5;
+        }
+
+        .references-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8f8f8;
+            border-radius: 8px;
+        }
+
+        .references-section h4 {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .reference-item {
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            padding-left: 1.5rem;
+            line-height: 1.6;
+            word-wrap: break-word;
+        }
+
+        .reference-item a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            margin-left: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .reference-item a:hover {
+            text-decoration: underline;
+        }
+
+        .reference-item a i {
+            font-size: 0.9rem;
+            margin-left: 0;
+            vertical-align: middle;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background: var(--secondary-color);
+        }
+
+        .edit-button {
+            background: transparent;
+            color: var(--primary-color);
+            padding: 0.4rem;
+            font-size: 0.9rem;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+        }
+
+        .edit-button:hover {
+            background: #eee;
+        }
+
+        .ql-toolbar {
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+        }
+
+        .ql-container {
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+
+        .ql-editor {
+            min-height: 100px;
+            font-size: 1.1rem;
+        }
+
+        .clipboard-warning {
+            color: #ff4444;
+            margin-top: 1rem;
+            display: none;
+            padding: 0.5rem;
+            background: #fff;
+            border-radius: 4px;
+            border-left: 4px solid #ff4444;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Research Companion Tool</h1>
+
+    <div class="main-container">
+        <textarea id="questionInput" class="question-input" placeholder="Paste your questions here (one per line)..."></textarea>
+        <div id="clipboardWarning" class="clipboard-warning">
+            Warning: Rich text formatting could not be preserved from clipboard
+        </div>
+        <div id="questionCards"></div>
+        <div class="action-row">
+            <button onclick="parseQuestions()"><i class="fas fa-parse"></i> Parse Questions</button>
+            <button onclick="copyToClipboard()"><i class="fas fa-clipboard"></i> Copy All to Clipboard</button>
+        </div>
+    </div>
+
+    <!-- Quill Editor JS -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <!-- Font Awesome JS (for icons) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+
+    <!-- Custom JavaScript -->
+<script>
+    let questions = [];
+    let editors = [];
+
+    function parseQuestions() {
+        const input = document.getElementById('questionInput').value;
+        questions = input.split('\n').filter(q => q.trim());
+
+        const cardsContainer = document.getElementById('questionCards');
+        cardsContainer.innerHTML = '';
+        editors = [];
+
+        questions.forEach((question, index) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+
+            card.innerHTML = `
+                <div class="question-header" onclick="toggleAnswer(${index})">
+                    <h3>Q${index + 1}. ${question}</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div id="answer-container-${index}" class="answer-container">
+                    <div class="editor-container" id="editor-container-${index}"></div>
+                    <button onclick="saveAnswer(${index})" class="save-button">
+                        <i class="fas fa-check"></i> Save
+                    </button>
+                </div>
+                <div id="formatted-answer-${index}" class="formatted-answer">
+                    <button class="edit-button" onclick="editAnswer(${index})">
+                        <i class="fas fa-pencil"></i>
+                    </button>
+                </div>
+            `;
+            cardsContainer.appendChild(card);
+
+            const editor = new Quill(`#editor-container-${index}`, {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'link'],
+                        ['clean']
+                    ]
+                }
+            });
+
+            editors.push(editor);
+        });
+    }
+
+    function toggleAnswer(index) {
+        const answerContainer = document.getElementById(`answer-container-${index}`);
+        const formattedAnswer = document.getElementById(`formatted-answer-${index}`);
+        const card = answerContainer.closest('.question-card');
+        const icon = card.querySelector('.fa-chevron-down');
+
+        if (formattedAnswer.classList.contains('visible')) {
+            // If formatted answer is visible, toggle its visibility
+            formattedAnswer.classList.remove('visible');
+        } else if (!answerContainer.classList.contains('expanded')) {
+            // If neither is expanded, show the formatted answer
+            formattedAnswer.classList.add('visible');
+        } else {
+            // Otherwise, toggle the editor visibility
+            answerContainer.classList.toggle('expanded');
+        }
+
+        // Rotate the toggle arrow
+        icon.style.transform = answerContainer.classList.contains('expanded') || formattedAnswer.classList.contains('visible')
+            ? 'rotate(180deg)'
+            : 'rotate(0)';
+    }
+
+
+    function saveAnswer(index) {
+        const editor = editors[index];
+        const content = editor.root.innerHTML;
+        const formattedAnswer = document.getElementById(`formatted-answer-${index}`);
+        const answerContainer = document.getElementById(`answer-container-${index}`);
+
+        // Store the original content in a data attribute for exporting
+        formattedAnswer.setAttribute('data-original-content', content);
+
+        // Process citations to convert links to pills for UI display
+        const { processedContent } = processCitations(content);
+
+        // Set the innerHTML with processed content containing pills
+        formattedAnswer.innerHTML = processedContent;
+
+        // Add edit button if not already present
+        if (!formattedAnswer.querySelector('.edit-button')) {
+            const editButton = document.createElement('button');
+            editButton.className = 'edit-button';
+            editButton.onclick = () => editAnswer(index);
+            editButton.innerHTML = '<i class="fas fa-pencil"></i>';
+            formattedAnswer.appendChild(editButton);
+        }
+
+        // Clear the editor content after saving
+        editor.root.innerHTML = ''; // Clear the editor content after saving
+
+        // Show the formatted answer and hide the editor
+        formattedAnswer.classList.add('visible');
+        answerContainer.classList.remove('expanded');
+    }
+
+
+
+    function editAnswer(index) {
+        const formattedAnswer = document.getElementById(`formatted-answer-${index}`);
+        const answerContainer = document.getElementById(`answer-container-${index}`);
+        const editor = editors[index];
+        const originalContent = formattedAnswer.getAttribute('data-original-content');
+
+        // Load the original content back into the editor
+        editor.root.innerHTML = originalContent;
+
+        // Hide the formatted answer and show the editor
+        formattedAnswer.classList.remove('visible');
+        answerContainer.classList.add('expanded');
+    }
+
+    function processCitations(content) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+
+        const links = tempDiv.getElementsByTagName('a');
+        const references = [];
+
+        Array.from(links).forEach(link => {
+            const text = link.textContent.trim();
+            const url = link.getAttribute('href').trim();
+
+            if (text && url) {
+                references.push({ text, url });
+
+                // Create citation pill for the website version
+                const citation = document.createElement('span');
+                citation.className = 'citation-pill';
+                citation.textContent = text;
+
+                // Add tooltip with URL
+                citation.setAttribute('title', url);
+
+                // Make the pill clickable to open the link
+                citation.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Prevent toggling the answer
+                    window.open(url, '_blank');
+                });
+
+                // Replace the link with the citation pill
+                const parent = link.parentNode;
+                parent.replaceChild(citation, link);
+            } else {
+                // If link is malformed, remove it
+                link.parentNode.removeChild(link);
+            }
+        });
+
+        // Clean up any empty paragraphs resulting from replacements
+        const paragraphs = tempDiv.getElementsByTagName('p');
+        Array.from(paragraphs).forEach(p => {
+            if (p.innerHTML.trim() === '') {
+                p.parentNode.removeChild(p);
+            }
+        });
+
+        return {
+            processedContent: tempDiv.innerHTML,
+            references: references
+        };
+    }
+
+    function copyToClipboard() {
+        let finalText = '';
+
+        questions.forEach((question, index) => {
+            const formattedAnswer = document.getElementById(`formatted-answer-${index}`);
+            const originalContent = formattedAnswer.getAttribute('data-original-content') || editors[index].root.innerHTML;
+
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = originalContent;
+
+            // Extract the text without links and gather links as sources
+            const links = tempDiv.getElementsByTagName('a');
+            const references = [];
+            Array.from(links).forEach(link => {
+                const text = link.textContent.trim();
+                const url = link.getAttribute('href').trim();
+
+                if (text && url) {
+                    references.push({ text, url });
+                }
+
+                // Remove link to keep text clean
+                link.parentNode.replaceChild(document.createTextNode(text), link);
+            });
+
+            // Add question and its corresponding answer to final text
+            finalText += `Q${index + 1}. ${question}\n${tempDiv.textContent.trim()}\n`;
+
+            // Add the corresponding sources for this question
+            if (references.length > 0) {
+                finalText += `\nSources:\n`;
+                references.forEach((ref, refIndex) => {
+                    finalText += `${ref.text} ${refIndex + 1}: ${ref.url}\n`;
+                });
+            }
+
+            finalText += '\n'; // Add a new line after each question section
+        });
+
+        navigator.clipboard.writeText(finalText.trim()).then(() => {
+            alert('Copied to clipboard with organized sources!');
+        }).catch(err => {
+            console.error('Failed to copy:', err);
+            alert('Failed to copy to clipboard');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('questionInput').addEventListener('input', (event) => {
+            if (event.target.value.includes('\n')) {
+                parseQuestions();
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
