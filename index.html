@@ -1,86 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <base href="https://junovhs.github.io/redleaf/" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Redleaf</title>
+    <!-- Link to Google Fonts for 'Press Start 2P' -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         body {
-            background-color: #c0c0c0;
-            font-family: 'MS Sans Serif', 'Segoe UI', Tahoma, sans-serif;
+            background-color: #041317;
+            font-family: 'Press Start 2P', 'Courier New', monospace;
             margin: 0;
             padding: 0;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            color: #CDCCBB;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .navbar {
-            background-color: #c0c0c0;
-            border: 2px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            padding: 4px;
-            box-shadow: inset 1px 1px 0px #dfdfdf, inset -1px -1px 0px #000;
+            background-color: #041317;
+            border: 4px solid #CDCCBB;
+            padding: 8px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 70px;
-            width: 1200px;
+            align-items: flex-start;
+            min-height: 70px;
+            width: 100%;
+            max-width: 1200px;
             margin: 0 auto;
+            image-rendering: pixelated;
+            position: relative;
         }
 
         .navbar-inner {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: flex-start;
             width: 100%;
-            background-color: #c0c0c0;
-        }
-
-        .logo {
-            height: 25px;
-            margin: 0px;
-            padding: 4px;
-            background: #c0c0c0;
-            border: 2px solid;
-            border-color: #dfdfdf #808080 #808080 #dfdfdf;
+            background-color: #041317;
         }
 
         .nav-items {
             display: flex;
-            align-items: center;
-            height: 100%;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: flex-start;
+            min-height: 100%;
             margin: 0px;
-            background: #c0c0c0;
+            background: #041317;
+            flex: 1;
         }
 
         .nav-item {
-            color: #000000;
+            color: #CDCCBB;
             text-decoration: none;
-            padding: 6px 12px;
+            padding: 8px 16px;
             font-size: 14px;
             font-weight: normal;
             position: relative;
             height: auto;
             display: flex;
             align-items: center;
-            background: #c0c0c0;
-            border: 2px solid;
-            border-color: #dfdfdf #808080 #808080 #dfdfdf;
-            margin: 0 4px;
+            background: #041317;
+            border: 4px solid #CDCCBB;
             cursor: pointer;
+            transition: all 0.1s;
+            white-space: nowrap;
+            z-index: 1;
+        }
+
+        .nav-item:hover {
+            background: #B04438;
+            transform: scale(1.05);
         }
 
         .nav-item:active {
-            border-color: #808080 #dfdfdf #dfdfdf #808080;
-            padding: 7px 11px 5px 13px;
+            transform: scale(0.95);
+            background: #B04438;
         }
 
         .nav-item.has-dropdown {
@@ -92,12 +98,13 @@
             position: absolute;
             top: 100%;
             left: 0;
-            background: #c0c0c0;
-            border: 2px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            background: #041317;
+            border: 4px solid #CDCCBB;
             z-index: 1000;
-            min-width: 150px;
+            min-width: 200px;
+            padding: 4px;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .nav-item.has-dropdown:hover .dropdown-content {
@@ -105,30 +112,27 @@
         }
 
         .dropdown-item {
-            color: #000000;
-            padding: 6px 12px;
+            color: #CDCCBB;
+            padding: 8px 16px;
             text-decoration: none;
             display: block;
-            background: #c0c0c0;
+            background: #041317;
             border: none;
-            border-bottom: 1px solid #808080;
+            margin: 4px 0;
             cursor: pointer;
         }
 
         .dropdown-item:hover {
-            background: #000080;
-            color: #ffffff;
+            background: #B04438;
         }
 
         main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: #c0c0c0;
+            background: #041317;
             padding: 20px;
-            border: 2px solid;
-            border-color: #ffffff #808080 #808080 #ffffff;
-            box-shadow: inset 1px 1px 0px #dfdfdf, inset -1px -1px 0px #000;
+            border: 4px solid #CDCCBB;
             margin: 10px;
         }
 
@@ -136,10 +140,9 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: #c0c0c0;
-            border: 2px solid;
-            border-color: #808080 #ffffff #ffffff #808080;
-            padding: 2px;
+            background: #041317;
+            border: 4px solid #CDCCBB;
+            padding: 4px;
         }
 
         #content-frame {
@@ -147,37 +150,77 @@
             width: 100%;
             border: none;
             min-height: 500px;
-            background: #ffffff;
+            background: #041317;
         }
 
         #home-content {
             padding: 20px;
-            font-family: 'MS Sans Serif', sans-serif;
+            color: #CDCCBB;
+            font-family: 'Press Start 2P', monospace;
         }
 
         footer {
-            background: #c0c0c0;
-            color: #000000;
+            background: #041317;
+            color: #CDCCBB;
             text-align: center;
             padding: 1rem;
-            border-top: 2px solid #ffffff;
-            box-shadow: inset 0 1px 0 #808080;
+            border-top: 4px solid #CDCCBB;
         }
 
         #loading {
             text-align: center;
             padding: 1rem;
-            font-family: 'MS Sans Serif', sans-serif;
+            color: #CDCCBB;
         }
 
         .title-bar {
-            background: #000080;
-            color: #ffffff;
-            padding: 4px;
+            background: #B04438;
+            color: #CDCCBB;
+            padding: 8px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 16px;
             text-align: center;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            border: 4px solid #CDCCBB;
+            text-transform: uppercase;
+        }
+
+        .dropdown-content {
+            scrollbar-width: thin;
+            scrollbar-color: #B04438 #041317;
+        }
+
+        .dropdown-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .dropdown-content::-webkit-scrollbar-track {
+            background: #041317;
+        }
+
+        .dropdown-content::-webkit-scrollbar-thumb {
+            background-color: #B04438;
+            border: 2px solid #041317;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 4px;
+            }
+
+            .nav-item {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .logo {
+                height: 25px;
+            }
+
+            .dropdown-content {
+                min-width: 150px;
+            }
         }
     </style>
     <script>
@@ -223,20 +266,18 @@
         const loading = document.getElementById('loading');
         let isLoading = false;
         let availablePages = [];
-    
+
         // Determine the base path based on the environment
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         const basePath = isLocal ? '/' : '/redleaf/';
-    
+
         async function fetchPages() {
             if (isLocal) {
-                // Running locally: Fetch and parse local directory listings
                 try {
                     const response = await fetch('pages/');
                     if (!response.ok) throw new Error('Failed to fetch local pages directory');
                     const text = await response.text();
                     
-                    // Parse the HTML to extract links
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(text, 'text/html');
                     const links = Array.from(doc.querySelectorAll('a'));
@@ -245,7 +286,6 @@
                     for (const link of links) {
                         const href = link.getAttribute('href');
                         if (href.endsWith('.html')) {
-                            // It's a file
                             pages.push({
                                 type: 'file',
                                 name: href.replace('.html', ''),
@@ -253,9 +293,7 @@
                             });
                             availablePages.push(`pages/${href}`);
                         } else if (href.endsWith('/')) {
-                            // It's a folder
                             const folderName = href.replace('/', '');
-                            // Fetch the folder's directory listing
                             const folderResponse = await fetch(`pages/${href}`);
                             if (!folderResponse.ok) throw new Error(`Failed to fetch folder ${href}`);
                             const folderText = await folderResponse.text();
@@ -284,13 +322,12 @@
                     return [];
                 }
             } else {
-                // Running on GitHub Pages: Fetch from GitHub API
                 try {
                     const response = await fetch('https://api.github.com/repos/junovhs/redleaf/contents/pages');
                     if (!response.ok) throw new Error('Failed to fetch pages list');
                     const items = await response.json();
                     const pages = [];
-    
+
                     for (const item of items) {
                         if (item.type === 'file' && item.name.endsWith('.html')) {
                             pages.push({
@@ -327,13 +364,27 @@
                 }
             }
         }
-    
+
         function createNavLinks(pages) {
-            navbar.innerHTML = '<div class="nav-item" data-page="home">Home</div>';
+            navbar.innerHTML = '';
+            const homeButton = document.createElement('div');
+            homeButton.className = 'nav-item';
+            homeButton.setAttribute('data-page', 'home');
+            homeButton.textContent = 'Home';
+            navbar.appendChild(homeButton);
+
+            const sortedPages = [...pages].sort((a, b) => {
+                if (a.type === b.type) return a.name.localeCompare(b.name);
+                return a.type === 'file' ? -1 : 1;
+            });
             
-            pages.forEach(page => {
+            sortedPages.forEach(page => {
                 if (page.type === 'file') {
-                    navbar.innerHTML += `<div class="nav-item" data-page="${page.path}">${page.name}</div>`;
+                    const navItem = document.createElement('div');
+                    navItem.className = 'nav-item';
+                    navItem.setAttribute('data-page', page.path);
+                    navItem.textContent = page.name;
+                    navbar.appendChild(navItem);
                 } else if (page.type === 'folder') {
                     const folderNav = document.createElement('div');
                     folderNav.className = 'nav-item has-dropdown';
@@ -342,7 +393,11 @@
                     const dropdown = document.createElement('div');
                     dropdown.className = 'dropdown-content';
                     
-                    page.files.forEach(file => {
+                    const sortedFiles = [...page.files].sort((a, b) => 
+                        a.name.localeCompare(b.name)
+                    );
+                    
+                    sortedFiles.forEach(file => {
                         const dropdownItem = document.createElement('div');
                         dropdownItem.className = 'dropdown-item';
                         dropdownItem.setAttribute('data-page', file.path);
@@ -356,8 +411,24 @@
             });
             
             navbar.addEventListener('click', handleNavClick);
+            checkNavOverflow();
         }
-    
+
+        function checkNavOverflow() {
+            const navbar = document.querySelector('.navbar');
+            const navItems = navbar.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.style.fontSize = '';
+            });
+            if (navbar.scrollWidth > navbar.clientWidth) {
+                const currentSize = parseInt(window.getComputedStyle(navItems[0]).fontSize);
+                const newSize = Math.max(currentSize * 0.9, 10);
+                navItems.forEach(item => {
+                    item.style.fontSize = `${newSize}px`;
+                });
+            }
+        }
+
         function handleNavClick(event) {
             const target = event.target;
             if (target.classList.contains('nav-item') || target.classList.contains('dropdown-item')) {
@@ -367,19 +438,19 @@
                 }
             }
         }
-    
+
         function navigateTo(pagePath) {
             const isHome = pagePath === 'home';
             const url = isHome ? `${basePath}` : `${basePath}${pagePath}`;
             history.pushState({ pagePath }, '', url);
             loadContent(pagePath);
         }
-    
+
         async function loadContent(pagePath) {
             if (isLoading) return;
             isLoading = true;
             loading.style.display = 'block';
-    
+
             try {
                 if (pagePath === 'home' || !availablePages.includes(pagePath)) {
                     contentFrame.style.display = 'none';
@@ -406,15 +477,15 @@
                 isLoading = false;
             }
         }
-    
+
         function handleRoute() {
             const path = window.location.pathname.replace(basePath, '');
             const fullPath = path === '' ? 'home' : path;
             loadContent(fullPath);
         }
-    
+
         window.addEventListener('popstate', handleRoute);
-    
+
         // Initialize
         (async () => {
             const pages = await fetchPages();
