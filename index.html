@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <base href="https://junovhs.github.io/redleaf/" />
     <meta charset="UTF-8">
@@ -455,9 +456,29 @@
                 if (pagePath === 'home' || !availablePages.includes(pagePath)) {
                     contentFrame.style.display = 'none';
                     homeContent.style.display = 'block';
-                    homeContent.innerHTML = '<h1>Welcome to Redleaf</h1><p>Select a page from the navigation menu.</p>';
+                    homeContent.innerHTML = `
+                        <h1>Welcome to Redleaf OS</h1>
+                        <p>Welcome to my hobby site! Here, you'll find a variety of tools I've developed to assist me in both my professional work and daily life. Whether you're looking for something practical or just for fun, there's something here for everyone.</p>
+                        
+                        <h2>About This Site</h2>
+                        <p>Redleaf OS is a collection of web-based tools and utilities designed to streamline tasks, enhance productivity, and provide entertainment. Explore the navigation menu to discover the tools available.</p>
+                        
+                        <h2>Featured Tools</h2>
+                        <ul>
+                            <li><strong>Cash Counter:</strong> A tool to help cashiers close their drawers.</li>
+                            <p>
+                            <li><strong>Workday Timer:</strong> A timer for hourly workers who need to keep track of their day.</li>
+                            <p>
+                            <li><strong>Research Tool:</strong> Companion app for doing research with AI. I use it when writing articles. I ask AI to give me a list of questions that would inform the article I'm writing, and I gather the answers here, and export an informational doc that I give back to the AI to inform my writing.</li>
+                            <p>
+                        </ul>
+                        
+                        <p>Feel free to navigate through the menu to explore and use the tools. If you encounter any issues or have suggestions, don't hesitate to reach out!</p>
+                    `;
                     if (pagePath !== 'home' && pagePath !== '') {
-                        homeContent.innerHTML += `<p>The requested page "${pagePath}" was not found.</p>`;
+                        homeContent.innerHTML += `
+                            <p>The requested page "${pagePath}" was not found. Please check the navigation menu and try again.</p>
+                        `;
                     }
                 } else {
                     homeContent.style.display = 'none';
@@ -471,7 +492,10 @@
             } catch (error) {
                 console.error('Error loading content:', error);
                 homeContent.style.display = 'block';
-                homeContent.innerHTML = '<h1>Error</h1><p>Failed to load content. Please try again.</p>';
+                homeContent.innerHTML = `
+                    <h1>Error</h1>
+                    <p>Failed to load content. Please try again.</p>
+                `;
             } finally {
                 loading.style.display = 'none';
                 isLoading = false;
