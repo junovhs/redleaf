@@ -29,8 +29,8 @@
     user-select: none;
     margin: 0;
     padding: 0;
-    height: 100vh; /* Changed from 100% to 100vh */
-    width: 100vw; /* Changed from 100% to 100vw */
+    height: 100%;
+    width: 100%;
     font-size: var(--font-size-base);
     font-family: 'Segoe UI', system-ui, sans-serif;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -38,8 +38,6 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    padding: 20px; /* Add padding for breathing room */
-    box-sizing: border-box;
   }
 
   .counter-container {
@@ -53,35 +51,6 @@
     flex-direction: column;
     justify-content: space-between;
     overflow: hidden;
-    transition: transform 0.3s ease; /* Add smooth transition for scaling */
-  }
-
-  @media screen and (min-height: 900px) {
-    .counter-container {
-      transform: scale(calc(100vh/900));
-      transform-origin: center center;
-    }
-  }
-
-  @media screen and (min-width: 768px) {
-    .counter-container {
-      transform: scale(1.2);
-      transform-origin: center center;
-    }
-  }
-
-  @media screen and (min-width: 1200px) {
-    .counter-container {
-      transform: scale(1.4);
-      transform-origin: center center;
-    }
-  }
-
-  @media screen and (min-width: 1600px) {
-    .counter-container {
-      transform: scale(1.6);
-      transform-origin: center center;
-    }
   }
 
   .header {
