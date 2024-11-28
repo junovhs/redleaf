@@ -1,0 +1,367 @@
+<html><head><base href="https://neobrutalist.agar.calculator/">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MYCO MYCO Agar Recipe Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+SC:wght@900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #2D2DFF;
+            --text-color: #000000;
+            --accent-yellow: #FFD43B;
+            --accent-green: #4ADE80;
+            --accent-red: #FF4136;
+            --accent-pink: #FF69B4;
+            --accent-purple: #9333EA;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            border: 4px solid var(--text-color);
+            padding: 20px;
+            position: relative;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='150' viewBox='0 0 300 150'%3E%3Ctext x='0' y='120' font-family='Arial' font-size='120' fill='rgba(0,0,0,0.1)' transform='rotate(-30 150 75)' text-anchor='middle'%3EAGAR%3C/text%3E%3C/svg%3E");
+            background-repeat: repeat;
+        }
+        h1 {
+            font-size: 7rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            color: var(--accent-yellow);
+            text-align: left;
+            letter-spacing: -4px;
+            line-height: 0.9;
+            transform: skew(-5deg);
+            text-shadow: 5px 5px 0 var(--text-color);
+        }
+        .calculator {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .input-group {
+            border: 4px solid var(--text-color);
+            padding: 15px;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .input-group:nth-child(1) { grid-column: span 3; }
+        .input-group:nth-child(2) { grid-column: span 3; }
+        .input-group:nth-child(3) { grid-column: span 3; }
+        .input-group:nth-child(4) { grid-column: span 3; }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 0.8rem;
+            border: 4px solid var(--text-color);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.5rem;
+            background-color: var(--accent-yellow);
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            background: var(--accent-pink);
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.5rem;
+            transform: scale(2);
+        }
+        .results {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1rem;
+        }
+        .recipe-group {
+            border: 4px solid var(--text-color);
+            padding: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .recipe-group:nth-child(1) {
+            grid-column: span 5;
+            background: var(--accent-yellow);
+        }
+        .recipe-group:nth-child(2) {
+            grid-column: span 4;
+            background: var(--accent-green);
+        }
+        .recipe-group:nth-child(3) {
+            grid-column: span 3;
+            background: var(--accent-purple);
+        }
+        .recipe-group h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            color: var(--text-color);
+            transform: rotate(-5deg);
+        }
+        .recipe-card {
+            background: white;
+            border: 4px solid var(--text-color);
+            margin-bottom: 1rem;
+            padding: 1rem;
+            transform: rotate(2deg);
+        }
+        .recipe-card h3 {
+            margin-top: 0;
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+            color: var(--accent-red);
+            font-weight: 900;
+        }
+        .recipe-card ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .recipe-card li {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--text-color);
+            padding-bottom: 0.3rem;
+        }
+        .recipe-card .ingredient {
+            font-weight: 700;
+        }
+        .recipe-card .amount {
+            font-weight: 900;
+            font-size: 1.4rem;
+        }
+        .chinese-text {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-size: 5rem;
+            position: absolute;
+            top: -20px;
+            right: 20px;
+            transform: rotate(15deg);
+            color: var(--accent-red);
+            z-index: 10;
+        }
+        .sticker {
+            position: absolute;
+            background: var(--accent-pink);
+            color: white;
+            padding: 15px 30px;
+            font-weight: 900;
+            font-size: 2.5rem;
+            bottom: 30px;
+            right: -30px;
+            border: 4px solid var(--text-color);
+            transform: rotate(-15deg);
+        }
+        .logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 100px;
+            height: 100px;
+            background: var(--accent-red);
+            border: 4px solid var(--text-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 900;
+            font-size: 1.2rem;
+            color: white;
+            text-transform: uppercase;
+        }
+        .bg-shape {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: var(--accent-pink);
+            border: 4px solid var(--text-color);
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
+            z-index: -1;
+        }
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 4rem;
+            }
+            .recipe-group h2 {
+                font-size: 2rem;
+            }
+            .calculator, .results {
+                grid-template-columns: 1fr;
+            }
+            .input-group, .recipe-group {
+                grid-column: span 1 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">MYCO</div>
+        <h1>MYCO MYCO<br>AGAR RECIPE</h1>
+        <div class="chinese-text">琼脂</div>
+        <div class="bg-shape"></div>
+        <div class="calculator">
+            <div class="input-group">
+                <label for="dishesNumber">DISHES QUANTITY:</label>
+                <input type="number" id="dishesNumber" min="0" step="1" value="30">
+            </div>
+            <div class="input-group">
+                <label for="agarAmount">WATER NEEDED (mL):</label>
+                <input type="number" id="agarAmount" min="0" step="0.1" value="500">
+            </div>
+            <div class="input-group">
+                <label for="mlPerDish">mL PER DISH:</label>
+                <input type="number" id="mlPerDish" min="0" step="1" value="15">
+                <div class="vertical-text">MILLILITERS PER DISH</div>
+            </div>
+            <div class="input-group checkbox-group">
+                <input type="checkbox" id="spillageBuffer">
+                <label for="spillageBuffer">ADD 6% EXTRA</label>
+            </div>
+        </div>
+        <div id="results" class="results">
+            <!-- Results will be inserted here by JavaScript -->
+        </div>
+        <div class="sticker">MYCO!</div>
+    </div>
+
+    <script>
+        const dishesNumberInput = document.querySelector('#dishesNumber');
+        const agarAmountInput = document.querySelector('#agarAmount');
+        const mlPerDishInput = document.querySelector('#mlPerDish');
+        const spillageBufferInput = document.querySelector('#spillageBuffer');
+        const resultsDiv = document.querySelector('#results');
+
+        dishesNumberInput.addEventListener('input', updateCalculations);
+        agarAmountInput.addEventListener('input', updateCalculations);
+        mlPerDishInput.addEventListener('input', updateCalculations);
+        spillageBufferInput.addEventListener('change', updateCalculations);
+
+        function updateWaterVolume() {
+            const dishesNumber = dishesNumberInput.value;
+            const mlPerDish = mlPerDishInput.value;
+            let agarAmount = dishesNumber * mlPerDish;
+
+            if (spillageBufferInput.checked) {
+                agarAmount += agarAmount * 0.06;
+            }
+
+            agarAmountInput.value = agarAmount;
+        }
+
+        function updateDishesNumber() {
+            const agarAmount = agarAmountInput.value;
+            const mlPerDish = mlPerDishInput.value;
+            dishesNumberInput.value = Math.floor(agarAmount / mlPerDish);
+        }
+
+        function calculateIngredients() {
+            const agarAmount = agarAmountInput.value;
+            const agarAmountInGrams = agarAmount;
+            return {
+                startingSporesAgar: [
+                    `Water: ${agarAmountInGrams} ml`,
+                    `Agar: ${(agarAmountInGrams * 0.01).toFixed(1)} g`,
+                    `LME: ${(agarAmountInGrams * 0.01).toFixed(1)} g`
+                ],
+                waterAgar: [
+                    `Water: ${agarAmountInGrams} ml`,
+                    `Agar: ${(agarAmountInGrams * 0.02).toFixed(1)} g`
+                ],
+                maltYeastAgar: [
+                    `Water: ${agarAmountInGrams} ml`,
+                    `Agar: ${(agarAmountInGrams * 0.02).toFixed(1)} g`,
+                    `LME: ${(agarAmountInGrams * 0.015).toFixed(1)} g`,
+                    `Yeast: ${(agarAmountInGrams * 0.002).toFixed(1)} g`
+                ],
+                maltExtractAgar: [
+                    `Water: ${agarAmountInGrams} ml`,
+                    `Agar: ${(agarAmountInGrams * 0.018).toFixed(1)} g`,
+                    `LME: ${(agarAmountInGrams * 0.006).toFixed(1)} g`
+                ],
+                grainWaterAgar: [
+                    `Grain Water: ${agarAmountInGrams} ml`,
+                    `Agar: ${(agarAmountInGrams * 0.02).toFixed(1)} g`
+                ]
+            };
+        }
+
+        function updateCalculations() {
+            updateWaterVolume();
+            const recipes = calculateIngredients();
+            const resultsHTML = `
+                <div class="recipe-group">
+                    <h2>LOW NUTRITION agar</h2>
+                    <div class="recipe-card">
+                        <h3>STARTING SPORES AGAR</h3>
+                        <ul>${recipes.startingSporesAgar.map(item => `<li><span class="ingredient">${item.split(':')[0]}:</span> <span class="amount">${item.split(':')[1]}</span></li>`).join('')}</ul>
+                    </div>
+                    <div class="recipe-card">
+                        <h3>water AGAR</h3>
+                        <ul>${recipes.waterAgar.map(item => `<li><span class="ingredient">${item.split(':')[0]}:</span> <span class="amount">${item.split(':')[1]}</span></li>`).join('')}</ul>
+                    </div>
+                </div>
+                <div class="recipe-group">
+                    <h2>NUTRITIOUS AGAR</h2>
+                    <div class="recipe-card">
+                        <h3>MALT YEAST AGAR</h3>
+                        <ul>${recipes.maltYeastAgar.map(item => `<li><span class="ingredient">${item.split(':')[0]}:</span> <span class="amount">${item.split(':')[1]}</span></li>`).join('')}</ul>
+                    </div>
+                    <div class="recipe-card">
+                        <h3>MALT EXTRACT AGAR</h3>
+                        <ul>${recipes.maltExtractAgar.map(item => `<li><span class="ingredient">${item.split(':')[0]}:</span> <span class="amount">${item.split(':')[1]}</span></li>`).join('')}</ul>
+                    </div>
+                </div>
+                <div class="recipe-group">
+                    <h2>SPECIALIZED AGAR</h2>
+                    <div class="recipe-card">
+                        <h3>GRAIN WATER AGAR</h3>
+                        <ul>${recipes.grainWaterAgar.map(item => `<li><span class="ingredient">${item.split(':')[0]}:</span> <span class="amount">${item.split(':')[1]}</span></li>`).join('')}</ul>
+                    </div>
+                </div>
+            `;
+            resultsDiv.innerHTML = resultsHTML;
+        }
+
+        window.addEventListener('load', updateCalculations);
+    </script>
+</body>
+</html>
