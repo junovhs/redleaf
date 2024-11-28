@@ -156,29 +156,37 @@
       background: #B04438;
     }
 
-    .nav-item.has-dropdown {
-      position: relative;
-    }
+	.nav-item.has-dropdown {
+	    position: relative;
+	    z-index: 10; /* Ensure this item and its dropdown are above others */
+	}
 
-    .dropdown-content {
-      display: none; /* Changed from flex to block */
-      position: absolute;
-      top: 100%;
-      left: 0;
-      background: #041317;
-      border: 4px solid #CDCCBB;
-      z-index: 1000;
-      min-width: 200px;
-      padding: 4px;
-      max-height: 400px;
-      overflow-y: auto;
-      /* Removed flex-direction: column; */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
+	.dropdown-content {
+	    display: none;
+	    position: absolute;
+	    top: 100%;
+	    left: 0;
+	    background: #041317;
+	    border: 4px solid #CDCCBB;
+	    z-index: 1000; /* Very high z-index to stay above everything else */
+	    min-width: 200px;
+	    padding: 4px;
+	    max-height: 400px;
+	    overflow-y: auto;
+	    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); /* Adding more shadow for better visibility */
+	    transition: visibility 0.3s ease-in-out, opacity 0.3s ease-in-out;
+	    opacity: 0; /* Initially hidden */
+	    visibility: hidden; /* Initially hidden */
+	}
 
-    .nav-item.has-dropdown:hover .dropdown-content {
-      display: block; /* Changed from flex to block */
-    }
+	.nav-item.has-dropdown:hover .dropdown-content,
+	.nav-item.has-dropdown.open .dropdown-content {
+	    display: block; /* Ensure dropdown is shown when open */
+	    opacity: 1; /* Fully visible when active */
+	    visibility: visible;
+	    z-index: 1001; /* This ensures the dropdown content is on top when it is active */
+	}
+
 
     .dropdown-item {
       color: #CDCCBB;
@@ -434,51 +442,50 @@
       }
     }
     
-    function createNavLinks(pages) {
-      navbar.innerHTML = '';
-      const homeButton = document.createElement('div');
-      homeButton.className = 'nav-item';
-      homeButton.setAttribute('data-page', 'home');
-      homeButton.textContent = 'Home';
-      navbar.appendChild(homeButton);
-      
-      const sortedPages = [...pages].sort((a, b) => {
-        if (a.type === b.type) return a.name.localeCompare(b.name);
-        return a.type === 'file' ? -1 : 1;
-      });
-      
-      sortedPages.forEach(page => {
-        if (page.type === 'file') {
-          const navItem = document.createElement('div');
-          navItem.className = 'nav-item';
-          navItem.setAttribute('data-page', page.path);
-          navItem.textContent = page.name;
-          navbar.appendChild(navItem);
-        } else if (page.type === 'folder') {
-          const folderNav = document.createElement('div');
-          folderNav.className = 'nav-item has-dropdown';
-          folderNav.textContent = page.name;
-          
-          const dropdown = document.createElement('div');
-          dropdown.className = 'dropdown-content';
-          
-          const sortedFiles = [...page.files].sort((a, b) => a.name.localeCompare(b.name));
-          sortedFiles.forEach(file => {
-            const dropdownItem = document.createElement('div');
-            dropdownItem.className = 'dropdown-item';
-            dropdownItem.setAttribute('data-page', file.path);
-            dropdownItem.textContent = file.name;
-            dropdown.appendChild(dropdownItem);
-          });
-          
-          folderNav.appendChild(dropdown);
-          navbar.appendChild(folderNav);
-        }
-      });
-      
-      navbar.addEventListener('click', handleNavClick);
-      checkNavOverflow();
-    }
+	function createNavLinks(pages) {
+	    const navbar = document.getElementById('navbar');
+	    navbar.innerHTML = '';
+
+	    pages.forEach(page => {
+	        if (page.type === 'file') {
+	            const navItem = document.createElement('div');
+	            navItem.className = 'nav-item';
+	            navItem.textContent = page.name;
+	            navItem.setAttribute('data-page', page.path);
+	            navItem.addEventListener('click', () => navigateTo(page.path));
+	            navbar.appendChild(navItem);
+	        } else if (page.type === 'folder') {
+	            const folderNav = document.createElement('div');
+	            folderNav.className = 'nav-item has-dropdown';
+	            folderNav.textContent = page.name;
+
+	            const dropdown = document.createElement('div');
+	            dropdown.className = 'dropdown-content';
+
+	            page.files.forEach(file => {
+	                const dropdownItem = document.createElement('div');
+	                dropdownItem.className = 'dropdown-item';
+	                dropdownItem.textContent = file.name;
+	                dropdownItem.setAttribute('data-page', file.path);
+	                dropdownItem.addEventListener('click', () => navigateTo(file.path));
+	                dropdown.appendChild(dropdownItem);
+	            });
+
+	            folderNav.appendChild(dropdown);
+
+	            // Add event listeners for hover to open/close the dropdown
+	            folderNav.addEventListener('mouseenter', () => {
+	                dropdown.style.display = 'block'; // Show dropdown on hover
+	            });
+	            folderNav.addEventListener('mouseleave', () => {
+	                dropdown.style.display = 'none'; // Hide dropdown when the mouse leaves
+	            });
+
+	            navbar.appendChild(folderNav);
+	        }
+	    });
+	}
+
     
     function checkNavOverflow() {
       const navbarElement = document.querySelector('.navbar-inner');
