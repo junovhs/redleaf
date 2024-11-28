@@ -31,6 +31,7 @@
       margin: 0 auto;
       padding: 20px;
       width: 100%;
+      box-sizing: border-box;
     }
 
     .title-bar {
@@ -81,8 +82,10 @@
       align-items: center;
       justify-content: center;
       position: relative;
+      image-rendering: pixelated;
     }
 
+    /* Pixel-Style Arrow using CSS */
     .nav-expand-toggle::before {
       content: "";
       display: block;
@@ -91,11 +94,12 @@
       border-left: 6px solid transparent;
       border-right: 6px solid transparent;
       border-top: 8px solid #CDCCBB;
-      image-rendering: pixelated;
       transition: transform 0.3s ease;
     }
 
     .nav-expand-toggle.expanded::before {
+      border-top: none;
+      border-bottom: 8px solid #CDCCBB;
       transform: rotate(180deg);
     }
 
@@ -152,13 +156,12 @@
       background: #B04438;
     }
 
-    /* Dropdown Styles */
     .nav-item.has-dropdown {
       position: relative;
     }
 
     .dropdown-content {
-      display: none;
+      display: none; /* Changed from flex to block */
       position: absolute;
       top: 100%;
       left: 0;
@@ -169,12 +172,12 @@
       padding: 4px;
       max-height: 400px;
       overflow-y: auto;
-      flex-direction: column;
+      /* Removed flex-direction: column; */
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
-    .dropdown-content.show {
-      display: flex;
+    .nav-item.has-dropdown:hover .dropdown-content {
+      display: block; /* Changed from flex to block */
     }
 
     .dropdown-item {
@@ -208,8 +211,7 @@
       flex-direction: column;
       background: #041317;
       border: 4px solid #CDCCBB;
-      padding: 4px;
-      overflow: hidden;
+      padding: 20px; /* Increased padding for better whitespace */
     }
 
     #content-frame {
@@ -224,32 +226,7 @@
       padding: 20px;
       color: #CDCCBB;
       font-family: 'Press Start 2P', monospace;
-      line-height: 1.5; /* Increased line-height for better readability */
-    }
-
-    #home-content h1 {
-      margin-bottom: 20px;
-      font-size: 24px;
-    }
-
-    #home-content h2 {
-      margin-top: 20px;
-      margin-bottom: 10px;
-      font-size: 18px;
-    }
-
-    #home-content p {
-      margin-bottom: 15px;
-      line-height: 1.6;
-    }
-
-    #home-content ul {
-      margin-bottom: 15px;
-      padding-left: 20px;
-    }
-
-    #home-content li {
-      margin-bottom: 10px;
+      line-height: 1.6; /* Increased line-height for better readability */
     }
 
     /* Footer Styles */
@@ -315,6 +292,11 @@
         margin-left: 8px;
       }
     }
+
+    /* Prevent Navigation Overflow */
+    .navbar-inner {
+      width: 100%;
+    }
   </style>
   
   <script>
@@ -342,7 +324,7 @@
         
         <!-- Expand/Collapse Toggle Button -->
         <button class="nav-expand-toggle" aria-label="Expand/Collapse Navigation">
-          <!-- The arrow is created using CSS ::before and ::after pseudo-elements -->
+          <!-- The arrow is created using CSS pseudo-element ::before -->
         </button>
         
         <div class="navbar-inner">
@@ -356,9 +338,7 @@
   
   <main>
     <div id="content-container">
-      <div id="home-content">
-        <!-- Main content will be dynamically inserted here -->
-      </div>
+      <div id="home-content"></div>
       <iframe id="content-frame" sandbox="allow-scripts allow-same-origin" style="display:none;"></iframe>
     </div>
     <div id="loading" style="display:none;">Loading...</div>
@@ -374,7 +354,7 @@
     const homeContent = document.getElementById('home-content');
     const loading = document.getElementById('loading');
     const navbarToggle = document.querySelector('.navbar-toggle');
-    const navExpandToggle = document.querySelector('.nav-expand-toggle'); // Expand/Collapse Toggle Button
+    const navExpandToggle = document.querySelector('.nav-expand-toggle'); // New Toggle Button
     let isLoading = false;
     let availablePages = [];
     
@@ -405,7 +385,10 @@
               const folderLinks = Array.from(folderDoc.querySelectorAll('a'));
               const htmlFiles = Array.from(folderLinks)
                 .filter(a => a.getAttribute('href').endsWith('.html'))
-                .map(a => ({name: a.getAttribute('href').replace('.html', ''), path: `pages/${href}${a.getAttribute('href')}`} ));
+                .map(a => ({
+                  name: a.getAttribute('href').replace('.html', ''),
+                  path: `pages/${href}${a.getAttribute('href')}`
+                }));
               if (htmlFiles.length > 0) {
                 pages.push({type: 'folder', name: folderName, files: htmlFiles});
                 htmlFiles.forEach(file => availablePages.push(file.path));
@@ -433,7 +416,10 @@
               const folderContents = await folderResponse.json();
               const htmlFiles = folderContents
                 .filter(file => file.name.endsWith('.html'))
-                .map(file => ({name: file.name.replace('.html', ''), path: `pages/${item.name}/${file.name}`} ));
+                .map(file => ({
+                  name: file.name.replace('.html', ''),
+                  path: `pages/${item.name}/${file.name}`
+                }));
               if (htmlFiles.length > 0) {
                 pages.push({type: 'folder', name: item.name, files: htmlFiles});
                 htmlFiles.forEach(file => availablePages.push(file.path));
@@ -533,13 +519,6 @@
       } else if (target.parentElement.classList.contains('has-dropdown')) {
         if (window.innerWidth <= 768) {
           target.parentElement.classList.toggle('open');
-          // Toggle dropdown visibility
-          const dropdown = target.parentElement.querySelector('.dropdown-content');
-          if (target.parentElement.classList.contains('open')) {
-            dropdown.classList.add('show');
-          } else {
-            dropdown.classList.remove('show');
-          }
         }
       }
     }
@@ -605,7 +584,6 @@
     navbarToggle.addEventListener('click', () => {
       const navbarInner = document.querySelector('.navbar-inner');
       navbarInner.classList.toggle('open');
-      // Optionally, toggle dropdowns when mobile menu is opened/closed
     });
     
     // Expand/Collapse Toggle for Lower Navigation
@@ -619,10 +597,8 @@
     document.addEventListener('click', function(event) {
       const isClickInsideNavbar = navbar.contains(event.target) || navExpandToggle.contains(event.target);
       if (!isClickInsideNavbar) {
-        const dropdowns = document.querySelectorAll('.dropdown-content.show');
-        dropdowns.forEach(dropdown => dropdown.classList.remove('show'));
-        const dropdownParents = document.querySelectorAll('.nav-item.has-dropdown.open');
-        dropdownParents.forEach(parent => parent.classList.remove('open'));
+        const dropdowns = document.querySelectorAll('.nav-item.has-dropdown.open');
+        dropdowns.forEach(dropdown => dropdown.classList.remove('open'));
       }
     });
     
