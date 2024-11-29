@@ -1,10 +1,4 @@
-<html><head><base href="/">
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Redleaf</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html><head><base href="https://junovhs.github.io/redleaf/"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Redleaf</title>
   
   <!-- Link to Google Fonts for 'Press Start 2P' -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet">
@@ -104,7 +98,7 @@
       gap: 8px;
       align-items: flex-start;
       width: 100%;
-      background-color: #041317; /* Changed to match main background */
+      background-color: #B04438;
       transition: max-height 0.3s ease-in-out;
       overflow: hidden;
       max-height: 0; /* Collapsed by default */
@@ -121,8 +115,6 @@
       gap: 8px;
       align-items: flex-start;
       width: 100%;
-      background-color: #041317; /* Changed to match main background */
-      padding: 8px;
     }
 
     .nav-item {
@@ -135,16 +127,15 @@
       cursor: pointer;
       transition: all 0.1s;
       white-space: nowrap;
-      flex: 1 1 auto;
+      flex: 1 1 calc(33.333% - 16px);
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      margin: 4px; /* Added margin to prevent clipping on hover */
     }
 
     .nav-item.has-dropdown {
-      background: #041317; /* Fill with main background color */
+      background: #B04438; /* Make dropdown items red by default */
       position: relative;
       padding-right: 30px; /* Make room for the arrow */
     }
@@ -165,7 +156,7 @@
     /* Change arrow to V when dropdown is open */
     .nav-item.has-dropdown.open::after {
       content: "V";
-      transform: translateY(-50%) rotate(0deg);
+      transform: translateY(-50%);
     }
 
     /* Adjust hover state for dropdown items */
@@ -266,26 +257,6 @@
       color: #CDCCBB;
       font-family: 'Press Start 2P', monospace;
       line-height: 1.6; /* Increased line-height for better readability */
-      max-width: 800px;
-      margin: 0 auto;
-      position: relative;
-      overflow: hidden; /* Needed for typewriter effect */
-    }
-
-    /* Typewriter Animation */
-    .cursor {
-      display: inline-block;
-      background-color: #CDCCBB;
-      width: 10px;
-      margin-left: 2px;
-      animation: blink 1s steps(5, start) infinite;
-      height: 1em; /* Adjust to match text height */
-    }
-
-    @keyframes blink {
-      50% {
-        opacity: 0;
-      }
     }
 
     /* Footer Styles */
@@ -344,7 +315,7 @@
 
     @media (min-width: 769px) {
       .nav-item {
-        flex: 1 1 auto;
+        flex: 1 1 calc(33.333% - 16px);
       }
 
       .nav-expand-toggle {
@@ -357,6 +328,16 @@
       width: 100%;
     }
   </style>
+  
+  <script>
+    (function() {
+      var redirect = sessionStorage.redirect;
+      delete sessionStorage.redirect;
+      if (redirect && redirect != location.href) {
+        history.replaceState(null, null, redirect);
+      }
+    })();
+  </script>
 </head>
 <body>
   <header>
@@ -377,9 +358,9 @@
         </button>
       </nav>
       <div class="navbar-inner">
-        <div class="nav-items" id="navbar">
-          <!-- Dynamic nav items will be inserted here -->
-        </div>
+        <div class="nav-items" id="navbar" style="background-color: black; padding: 8px;">
+    <!-- Dynamic nav items will be inserted here -->
+</div>
       </div>
     </div>
   </header>
@@ -409,62 +390,6 @@
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const basePath = isLocal ? '/' : '/redleaf/';
     
-    // Define the content to type for the home page
-    const typewriterContent = `
-      <p>Welcome to Redleaf OS!</p>
-      <p>Here, you'll find a variety of tools designed to assist you in both professional and daily tasks. Whether you're looking for productivity enhancers or just something fun, there's something here for everyone.</p>
-      <h2>Featured Tools</h2>
-      <ul>
-        <li><strong>Cash Counter:</strong> A tool to help cashiers close their drawers.</li>
-        <li><strong>Workday Timer:</strong> A timer for hourly workers to keep track of their day.</li>
-        <li><strong>Research Tool:</strong> A companion app for doing research with AI. Gather answers to inform your writing and export informational documents.</li>
-      </ul>
-      <p>Feel free to navigate through the menu to explore and use the tools. If you encounter any issues or have suggestions, don't hesitate to reach out!</p>
-    `;
-    
-    // Updated Typing effect function
-    function typeWriter(text, element, speed) {
-      let i = 0;
-      const length = text.length;
-      element.innerHTML = ''; // Clear initial content
-
-      function type() {
-        if (i < length) {
-          // Handle HTML tags
-          if (text.charAt(i) === '<') {
-            const endTag = text.indexOf('>', i);
-            if (endTag !== -1) {
-              const tag = text.substring(i, endTag + 1);
-              element.innerHTML += tag;
-              i = endTag + 1;
-              type();
-              return;
-            }
-          }
-          
-          // Remove cursor if it exists
-          element.innerHTML = element.innerHTML.replace('<span class="cursor">\u2588</span>', '');
-          
-          // Add new character and cursor
-          element.innerHTML += text.charAt(i);
-          
-          // Only add cursor after actual text, not after HTML tags
-          if (text.charAt(i) !== '>') {
-            element.innerHTML += '<span class="cursor">\u2588</span>';
-          }
-          
-          i++;
-          setTimeout(type, speed);
-        } else {
-          // Remove cursor after typing is complete
-          element.innerHTML = element.innerHTML.replace('<span class="cursor">\u2588</span>', '');
-        }
-      }
-
-      type();
-    }
-    
-    // Fetch pages from GitHub API or local directory
     async function fetchPages() {
       if (isLocal) {
         try {
@@ -478,8 +403,7 @@
           for (const link of links) {
             const href = link.getAttribute('href');
             if (href.endsWith('.html')) {
-              const pageName = href.replace('.html', '');
-              pages.push({type: 'file', name: pageName, path: `pages/${href}`});
+              pages.push({type: 'file', name: href.replace('.html', ''), path: `pages/${href}`});
               availablePages.push(`pages/${href}`);
             } else if (href.endsWith('/')) {
               const folderName = href.replace('/', '');
@@ -513,8 +437,7 @@
           const pages = [];
           for (const item of items) {
             if (item.type === 'file' && item.name.endsWith('.html')) {
-              const pageName = item.name.replace('.html', '');
-              pages.push({type: 'file', name: pageName, path: `pages/${item.name}`});
+              pages.push({type: 'file', name: item.name.replace('.html', ''), path: `pages/${item.name}`});
               availablePages.push(`pages/${item.name}`);
             } else if (item.type === 'dir') {
               const folderResponse = await fetch(item.url);
@@ -540,7 +463,6 @@
       }
     }
     
-    // Create navigation links based on fetched pages
     function createNavLinks(pages) {
       const navbar = document.getElementById('navbar');
       navbar.innerHTML = '';
@@ -550,9 +472,8 @@
           const navItem = document.createElement('div');
           navItem.className = 'nav-item';
           navItem.textContent = page.name;
-          navItem.setAttribute('data-page', page.name); // Set to page name
-          navItem.setAttribute('href', `#${page.name}`); // Set href to hash
-          navItem.addEventListener('click', () => navigateTo(page.name));
+          navItem.setAttribute('data-page', page.path);
+          navItem.addEventListener('click', () => navigateTo(page.path));
           navbar.appendChild(navItem);
         } else if (page.type === 'folder') {
           const folderNav = document.createElement('div');
@@ -566,9 +487,8 @@
             const dropdownItem = document.createElement('div');
             dropdownItem.className = 'dropdown-item';
             dropdownItem.textContent = file.name;
-            dropdownItem.setAttribute('data-page', file.name); // Set to page name
-            dropdownItem.setAttribute('href', `#${file.name}`); // Set href to hash
-            dropdownItem.addEventListener('click', () => navigateTo(file.name));
+            dropdownItem.setAttribute('data-page', file.path);
+            dropdownItem.addEventListener('click', () => navigateTo(file.path));
             dropdown.appendChild(dropdownItem);
           });
 
@@ -587,38 +507,84 @@
       });
     }
     
-    // Navigate to a specific page by updating the hash
-    function navigateTo(pageName) {
-      // Update the URL hash
-      window.location.hash = pageName;
-      // The hashchange event will handle loading the content
+    function checkNavOverflow() {
+      const navbarElement = document.querySelector('.navbar-inner');
+      const navItems = navbarElement.querySelectorAll('.nav-item');
+      navItems.forEach(item => {
+        item.style.fontSize = '';
+      });
+      
+      if (navbarElement.scrollWidth > navbarElement.clientWidth) {
+        const currentSize = parseInt(window.getComputedStyle(navItems[0]).fontSize);
+        const newSize = Math.max(currentSize * 0.9, 10);
+        navItems.forEach(item => {
+          item.style.fontSize = `${newSize}px`;
+        });
+      }
     }
     
-    // Load content based on the current page
-    async function loadContent(pageName) {
+    function handleNavClick(event) {
+      const target = event.target;
+      if (target.classList.contains('nav-item') && !target.classList.contains('has-dropdown')) {
+        const pagePath = target.getAttribute('data-page');
+        if (pagePath) {
+          navigateTo(pagePath);
+          if (window.innerWidth <= 768) {
+            navbarToggle.classList.remove('active');
+            document.querySelector('.navbar-inner').classList.remove('open');
+          }
+        }
+      } else if (target.classList.contains('dropdown-item')) {
+        const pagePath = target.getAttribute('data-page');
+        if (pagePath) {
+          navigateTo(pagePath);
+          if (window.innerWidth <= 768) {
+            navbarToggle.classList.remove('active');
+            document.querySelector('.navbar-inner').classList.remove('open');
+          }
+        }
+      } else if (target.parentElement.classList.contains('has-dropdown')) {
+        if (window.innerWidth <= 768) {
+          target.parentElement.classList.toggle('open');
+        }
+      }
+    }
+    
+    function navigateTo(pagePath) {
+      const isHome = pagePath === 'home';
+      const url = isHome ? `${basePath}` : `${basePath}${pagePath}`;
+      history.pushState({ pagePath }, '', url);
+      loadContent(pagePath);
+    }
+    
+    async function loadContent(pagePath) {
       if (isLoading) return;
       isLoading = true;
       loading.style.display = 'block';
       try {
-        if (pageName === 'home' || !availablePages.includes(`pages/${pageName}.html`)) {
+        if (pagePath === 'home' || !availablePages.includes(pagePath)) {
           contentFrame.style.display = 'none';
           homeContent.style.display = 'block';
-
-          if (pageName === 'home' || pageName === '') {
-            // Clear existing content
-            homeContent.innerHTML = '';
-
-            // Start the typewriter effect
-            typeWriter(typewriterContent, homeContent, 40); // Adjust speed as necessary (40ms per character)
-          } else {
-            // Display error message with typewriter effect
-            const errorContent = `<p>The requested page "${pageName}" was not found. Please check the navigation menu and try again.</p>`;
-            typeWriter(errorContent, homeContent, 25); // Faster speed for error messages
+          homeContent.innerHTML = `
+            <h1>Welcome to Redleaf OS</h1>
+            <p>Welcome to my hobby site! Here, you'll find a variety of tools I've developed to assist me in both my professional work and daily life. Whether you're looking for something practical or just for fun, there's something here for everyone.</p>
+            <h2>About This Site</h2>
+            <p>Redleaf OS is a collection of web-based tools and utilities designed to streamline tasks, enhance productivity, and provide entertainment. Explore the navigation menu to discover the tools available.</p>
+            <h2>Featured Tools</h2>
+            <ul>
+              <li><strong>Cash Counter:</strong> A tool to help cashiers close their drawers.</li>
+              <li><strong>Workday Timer:</strong> A timer for hourly workers who need to keep track of their day.</li>
+              <li><strong>Research Tool:</strong> Companion app for doing research with AI. I use it when writing articles. I ask AI to give me a list of questions that would inform the article I'm writing, and I gather the answers here, and export an informational doc that I give back to the AI to inform my writing.</li>
+            </ul>
+            <p>Feel free to navigate through the menu to explore and use the tools. If you encounter any issues or have suggestions, don't hesitate to reach out!</p>
+          `;
+          if (pagePath !== 'home' && pagePath !== '') {
+            homeContent.innerHTML += `<p>The requested page "${pagePath}" was not found. Please check the navigation menu and try again.</p>`;
           }
         } else {
           homeContent.style.display = 'none';
           contentFrame.style.display = 'block';
-          const response = await fetch(`pages/${pageName}.html`);
+          const response = await fetch(pagePath);
           if (!response.ok) throw new Error('Failed to fetch page content');
           const html = await response.text();
           contentFrame.srcdoc = html;
@@ -626,25 +592,25 @@
       } catch (error) {
         console.error('Error loading content:', error);
         homeContent.style.display = 'block';
-        homeContent.innerHTML = `<p>Failed to load content. Please try again.</p>`;
+        homeContent.innerHTML = `<h1>Error</h1><p>Failed to load content. Please try again.</p>`;
       } finally {
         loading.style.display = 'none';
         isLoading = false;
       }
     }
     
-    // Handle hash changes to load appropriate content
-    function handleHashChange() {
-      const hash = window.location.hash.substring(1); // Remove the '#' character
-      const pageName = hash || 'home';
-      loadContent(pageName);
+    function handleRoute() {
+      const path = window.location.pathname.replace(basePath, '');
+      const fullPath = path === '' ? 'home' : path;
+      loadContent(fullPath);
     }
+    
+    window.addEventListener('popstate', handleRoute);
     
     // Mobile Navbar Toggle
     navbarToggle.addEventListener('click', () => {
       const navbarInner = document.querySelector('.navbar-inner');
-      navbarInner.classList.toggle('expanded');
-      navExpandToggle.classList.toggle('expanded');
+      navbarInner.classList.toggle('open');
     });
     
     // Expand/Collapse Toggle for Lower Navigation
@@ -663,20 +629,12 @@
       }
     });
     
-    // Listen for hash changes
-    window.addEventListener('hashchange', handleHashChange);
-    
-    // Handle initial load based on the current hash
-    window.addEventListener('DOMContentLoaded', () => {
-      handleHashChange();
-    });
-    
-    // Initialize Navigation Links
+    // Initialize Navigation Links and Route
     (async () => {
       const pages = await fetchPages();
       createNavLinks(pages);
+      handleRoute();
     })();
   </script>
 
-</body>
-</html>
+</body></html>
