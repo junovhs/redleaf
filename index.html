@@ -1,12 +1,27 @@
-<html><head><base href="/">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="/">
   <meta charset="UTF-8">
-  <title>Redleaf</title>
+  <title>Redleaf OS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- Link to Google Fonts for 'Press Start 2P' -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet">
   
   <style>
+    /* CSS Variables for Maintainability */
+    :root {
+      --background-color: #041317;
+      --primary-color: #B04438;
+      --text-color: #CDCCBB;
+      --border-color: #CDCCBB;
+      --font-family: 'Press Start 2P', 'Courier New', monospace;
+      --cursor-color: #CDCCBB;
+      --hover-background: #B04438;
+      --focus-outline: 2px solid #FFFFFF;
+    }
+
     /* Reset and Base Styles */
     * {
       box-sizing: border-box;
@@ -15,12 +30,12 @@
     }
 
     body {
-      background-color: #041317;
-      font-family: 'Press Start 2P', 'Courier New', monospace;
+      background-color: var(--background-color);
+      font-family: var(--font-family);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
-      color: #CDCCBB;
+      color: var(--text-color);
     }
 
     .container {
@@ -31,27 +46,45 @@
       box-sizing: border-box;
     }
 
+    /* Skip Link Styles */
+    .skip-link {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: var(--primary-color);
+      color: #FFFFFF;
+      padding: 8px;
+      transform: translateY(-100%);
+      transition: transform 0.3s ease-in-out;
+      z-index: 1000;
+      text-decoration: none;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
     /* Navbar Styles */
     .navbar {
-      background: #B04438;
-      color: #CDCCBB;
+      background: var(--primary-color);
+      color: var(--text-color);
       padding: 8px;
       font-weight: bold;
       font-size: 16px;
       text-align: center;
       margin-bottom: 8px;
-      border: 4px solid #CDCCBB;
+      border: 4px solid var(--border-color);
       text-transform: uppercase;
       display: flex;
       align-items: center;
       position: relative;
       width: 100%;
-      cursor: pointer; /* Add cursor pointer to show it's clickable */
+      cursor: pointer; /* Indicates it's clickable */
     }
 
-    /* Remove the hamburger button styles */
+    /* Hide the hamburger button */
     .navbar-toggle {
-      display: none; /* Hide it completely */
+      display: none;
     }
 
     .nav-expand-toggle {
@@ -65,7 +98,7 @@
       justify-content: center;
       position: relative;
       image-rendering: pixelated;
-      pointer-events: none; /* Make the button not interfere with clicks */
+      pointer-events: none; /* Does not interfere with clicks */
     }
 
     /* Pixel-Style Arrow using CSS */
@@ -76,13 +109,13 @@
       height: 0;
       border-left: 6px solid transparent;
       border-right: 6px solid transparent;
-      border-top: 8px solid #CDCCBB;
+      border-top: 8px solid var(--text-color);
       transition: transform 0.3s ease;
     }
 
     .nav-expand-toggle.expanded::before {
       border-top: none;
-      border-bottom: 8px solid #CDCCBB;
+      border-bottom: 8px solid var(--text-color);
       transform: rotate(180deg);
     }
 
@@ -93,14 +126,14 @@
       gap: 8px;
       align-items: flex-start;
       width: 100%;
-      background-color: #041317; /* Changed to match main background */
+      background-color: var(--background-color); /* Match main background */
       transition: max-height 0.3s ease-in-out;
       overflow: hidden;
       max-height: 0; /* Collapsed by default */
     }
 
     .navbar-inner.expanded {
-      max-height: 1000px; /* Large enough to display all items */
+      max-height: 1000px; /* Sufficient to display all items */
     }
 
     /* Navigation Items */
@@ -110,17 +143,17 @@
       gap: 8px;
       align-items: flex-start;
       width: 100%;
-      background-color: #041317; /* Changed to match main background */
+      background-color: var(--background-color); /* Match main background */
       padding: 8px;
     }
 
     .nav-item {
-      color: #CDCCBB;
+      color: var(--text-color);
       text-decoration: none;
       padding: 8px 16px;
       font-size: 14px;
-      background: #041317;
-      border: 4px solid #CDCCBB;
+      background: var(--background-color);
+      border: 4px solid var(--border-color);
       cursor: pointer;
       transition: all 0.1s;
       white-space: nowrap;
@@ -129,24 +162,24 @@
       align-items: center;
       justify-content: center;
       position: relative;
-      margin: 4px; /* Added margin to prevent clipping on hover */
+      margin: 4px; /* Prevent clipping on hover */
     }
 
     .nav-item.has-dropdown {
-      background: #041317; /* Fill with main background color */
+      background: var(--background-color); /* Match main background */
       position: relative;
-      padding-right: 30px; /* Make room for the arrow */
+      padding-right: 30px; /* Space for the arrow */
     }
 
-    /* Add dropdown arrow indicator */
+    /* Dropdown Arrow Indicator */
     .nav-item.has-dropdown::after {
       content: ">";
       position: absolute;
       right: 10px;
       top: 50%;
       transform: translateY(-50%);
-      color: #CDCCBB;
-      font-family: 'Press Start 2P', monospace;
+      color: var(--text-color);
+      font-family: var(--font-family);
       font-size: 12px;
       transition: transform 0.3s ease;
     }
@@ -157,29 +190,32 @@
       transform: translateY(-50%) rotate(0deg);
     }
 
-    /* Adjust hover state for dropdown items */
-    .nav-item.has-dropdown:hover {
-      background: #B04438;
+    /* Hover and Focus States */
+    .nav-item.has-dropdown:hover,
+    .nav-item.has-dropdown:focus {
+      background: var(--hover-background);
     }
 
-    /* Make the arrow more prominent on hover */
-    .nav-item.has-dropdown:hover::after {
+    .nav-item.has-dropdown:hover::after,
+    .nav-item.has-dropdown:focus::after {
       color: #FFFFFF;
     }
 
-    .nav-item:hover {
-      background: #B04438;
+    .nav-item:hover,
+    .nav-item:focus {
+      background: var(--hover-background);
       transform: scale(1.05);
+      outline: none;
     }
 
     .nav-item:active {
       transform: scale(0.95);
-      background: #B04438;
+      background: var(--hover-background);
     }
 
     .nav-item.has-dropdown {
       position: relative;
-      z-index: 10; /* Ensure this item and its dropdown are above others */
+      z-index: 10; /* Ensure dropdown is above others */
     }
 
     .dropdown-content {
@@ -187,14 +223,14 @@
       position: absolute;
       top: 100%;
       left: 0;
-      background: #041317;
-      border: 4px solid #CDCCBB;
-      z-index: 1000; /* Very high z-index to stay above everything else */
+      background: var(--background-color);
+      border: 4px solid var(--border-color);
+      z-index: 1000; /* Stay above everything else */
       min-width: 200px;
       padding: 4px;
       max-height: 400px;
       overflow-y: auto;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); /* Adding more shadow for better visibility */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); /* Better visibility */
       transition: visibility 0.3s ease-in-out, opacity 0.3s ease-in-out;
       opacity: 0; /* Initially hidden */
       visibility: hidden; /* Initially hidden */
@@ -202,24 +238,27 @@
 
     .nav-item.has-dropdown:hover .dropdown-content,
     .nav-item.has-dropdown.open .dropdown-content {
-      display: block; /* Ensure dropdown is shown when open */
-      opacity: 1; /* Fully visible when active */
+      display: block; /* Show when active */
+      opacity: 1; /* Fully visible */
       visibility: visible;
-      z-index: 1001; /* This ensures the dropdown content is on top when it is active */
+      z-index: 1001; /* Ensure dropdown is on top */
     }
 
     .dropdown-item {
-      color: #CDCCBB;
+      color: var(--text-color);
       padding: 8px 16px;
       text-decoration: none;
-      background: #041317;
+      background: var(--background-color);
       border: none;
       cursor: pointer;
       font-size: 14px;
+      display: block;
     }
 
-    .dropdown-item:hover {
-      background: #B04438;
+    .dropdown-item:hover,
+    .dropdown-item:focus {
+      background: var(--hover-background);
+      outline: none;
     }
 
     /* Main Content Styles */
@@ -227,9 +266,9 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: #041317;
+      background: var(--background-color);
       padding: 20px;
-      border: 4px solid #CDCCBB;
+      border: 4px solid var(--border-color);
       margin: 10px;
     }
 
@@ -237,9 +276,9 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: #041317;
-      border: 4px solid #CDCCBB;
-      padding: 20px; /* Increased padding for better whitespace */
+      background: var(--background-color);
+      border: 4px solid var(--border-color);
+      padding: 20px; /* Better whitespace */
     }
 
     #content-frame {
@@ -247,28 +286,31 @@
       width: 100%;
       border: none;
       min-height: 500px;
-      background: #041317;
+      background: var(--background-color);
+      loading: lazy; /* Optimize loading */
+      display: none;
     }
 
     #home-content {
       padding: 20px;
-      color: #CDCCBB;
-      font-family: 'Press Start 2P', monospace;
-      line-height: 1.6; /* Increased line-height for better readability */
+      color: var(--text-color);
+      font-family: var(--font-family);
+      line-height: 1.6; /* Better readability */
       max-width: 800px;
       margin: 0 auto;
       position: relative;
       overflow: hidden; /* Needed for typewriter effect */
     }
 
-    /* Typewriter Animation */
+    /* Typewriter Cursor */
     .cursor {
       display: inline-block;
-      background-color: #CDCCBB;
+      background-color: var(--cursor-color);
       width: 10px;
       margin-left: 2px;
       animation: blink 1s steps(5, start) infinite;
-      height: 1em; /* Adjust to match text height */
+      height: 1em; /* Match text height */
+      vertical-align: bottom;
     }
 
     @keyframes blink {
@@ -279,17 +321,18 @@
 
     /* Footer Styles */
     footer {
-      background: #041317;
-      color: #CDCCBB;
+      background: var(--background-color);
+      color: var(--text-color);
       text-align: center;
       padding: 1rem;
-      border-top: 4px solid #CDCCBB;
+      border-top: 4px solid var(--border-color);
     }
 
     #loading {
       text-align: center;
       padding: 1rem;
-      color: #CDCCBB;
+      color: var(--text-color);
+      display: none;
     }
 
     /* Responsive Styles */
@@ -300,7 +343,7 @@
         top: 50%;
         right: 16px;
         transform: translateY(-50%);
-        display: block; /* Ensure it's always visible */
+        display: block; /* Always visible */
       }
 
       .navbar-inner {
@@ -346,6 +389,9 @@
   </style>
 </head>
 <body>
+  <!-- Skip to Main Content Link -->
+  <a href="#content-container" class="skip-link">Skip to main content</a>
+
   <header>
     <div class="container">
       <nav class="navbar">
@@ -363,10 +409,12 @@
   
   <main>
     <div id="content-container">
-      <div id="home-content"></div>
-      <iframe id="content-frame" sandbox="allow-scripts allow-same-origin" style="display:none;"></iframe>
+      <div id="home-content">
+        <span id="typewriter-text"></span><span class="cursor"></span>
+      </div>
+      <iframe id="content-frame" sandbox="allow-scripts allow-same-origin"></iframe>
     </div>
-    <div id="loading" style="display:none;">Loading...</div>
+    <div id="loading">Loading...</div>
   </main>
   
   <footer>
@@ -374,26 +422,34 @@
   </footer>
   
   <script>
+    // JavaScript Code for Dynamic Navigation and Content Loading
+
+    // DOM Elements
     const navbar = document.getElementById('navbar');
     const contentFrame = document.getElementById('content-frame');
     const homeContent = document.getElementById('home-content');
     const loading = document.getElementById('loading');
     const navExpandToggle = document.querySelector('.nav-expand-toggle');
+
+    // State Variables
     let isLoading = false;
     let availablePages = [];
-    
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const basePath = isLocal ? '/' : '/redleaf/';
-    
-    // Define the content to type for the home page
-    const typewriterContent = `
-        <p>Welcome to Redleaf OS!</p>
-  <p>A creative space by Spencer Nunamaker, where innovation meets functionality. This site is all about sharing tools, coding projects, and fun ideas designed to make life easier and more enjoyable. Whether you're here to streamline your workflow or explore new possibilities, there's plenty to discover.</p>
-  </p>
 
+    // Determine Hosting Environment
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const repoName = 'redleaf'; // Replace with your repository name if different
+    const basePath = isLocal ? '/' : `/${repoName}/`;
+
+    // Set base href dynamically
+    document.querySelector('base').setAttribute('href', basePath);
+
+    // Typewriter Content for Home Page
+    const typewriterContent = `
+      <p>Welcome to Redleaf OS!</p>
+      <p>A creative space by Spencer Nunamaker, where innovation meets functionality. This site is all about sharing tools, coding projects, and fun ideas designed to make life easier and more enjoyable. Whether you're here to streamline your workflow or explore new possibilities, there's plenty to discover.</p>
     `;
-    
-    // Updated Typing effect function
+
+    // Typewriter Effect Function
     function typeWriter(text, element, speed) {
       let i = 0;
       const length = text.length;
@@ -412,84 +468,60 @@
               return;
             }
           }
-          
-          // Remove cursor if it exists
-          element.innerHTML = element.innerHTML.replace('<span class="cursor">\u2588</span>', '');
-          
-          // Add new character and cursor
+
+          // Add new character
           element.innerHTML += text.charAt(i);
-          
-          // Only add cursor after actual text, not after HTML tags
-          if (text.charAt(i) !== '>') {
-            element.innerHTML += '<span class="cursor">\u2588</span>';
-          }
-          
           i++;
           setTimeout(type, speed);
         } else {
-          // Remove cursor after typing is complete
-          element.innerHTML = element.innerHTML.replace('<span class="cursor">\u2588</span>', '');
+          // Hide cursor after typing is complete
+          document.querySelector('.cursor').style.display = 'none';
         }
       }
 
       type();
     }
-    
-    // Fetch pages from GitHub API or local directory
+
+    // Fetch Pages from GitHub API
     async function fetchPages() {
       if (isLocal) {
-        try {
-          const response = await fetch('pages/');
-          if (!response.ok) throw new Error('Failed to fetch local pages directory');
-          const text = await response.text();
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(text, 'text/html');
-          const links = Array.from(doc.querySelectorAll('a'));
-          const pages = [];
-          for (const link of links) {
-            const href = link.getAttribute('href');
-            if (href.endsWith('.html')) {
-              const pageName = href.replace('.html', '');
-              pages.push({type: 'file', name: pageName, path: `pages/${href}`});
-              availablePages.push(`pages/${href}`);
-            } else if (href.endsWith('/')) {
-              const folderName = href.replace('/', '');
-              const folderResponse = await fetch(`pages/${href}`);
-              if (!folderResponse.ok) throw new Error(`Failed to fetch folder ${href}`);
-              const folderText = await folderResponse.text();
-              const folderDoc = parser.parseFromString(folderText, 'text/html');
-              const folderLinks = Array.from(folderDoc.querySelectorAll('a'));
-              const htmlFiles = Array.from(folderLinks)
-                .filter(a => a.getAttribute('href').endsWith('.html'))
-                .map(a => ({
-                  name: a.getAttribute('href').replace('.html', ''),
-                  path: `pages/${href}${a.getAttribute('href')}`
-                }));
-              if (htmlFiles.length > 0) {
-                pages.push({type: 'folder', name: folderName, files: htmlFiles});
-                htmlFiles.forEach(file => availablePages.push(file.path));
-              }
-            }
-          }
-          return pages;
-        } catch (error) {
-          console.error('Error fetching local pages:', error);
-          return [];
-        }
+        console.warn('Local fetching is not implemented.');
+        return [];
       } else {
         try {
-          const response = await fetch('https://api.github.com/repos/junovhs/redleaf/contents/pages');
+          // Check if pages are cached
+          const cachedPages = localStorage.getItem('pagesList');
+          if (cachedPages) {
+            const cacheData = JSON.parse(cachedPages);
+            const oneHour = 60 * 60 * 1000;
+            if (Date.now() - cacheData.timestamp < oneHour) {
+              cacheData.pages.forEach(page => {
+                if (page.type === 'file') {
+                  availablePages.push(`pages/${page.name}.html`);
+                } else if (page.type === 'folder') {
+                  page.files.forEach(file => availablePages.push(`pages/${page.name}/${file.name}.html`));
+                }
+              });
+              return cacheData.pages;
+            }
+          }
+
+          // Fetch pages from GitHub API
+          const apiUrl = `https://api.github.com/repos/${getRepoOwner()}/${repoName}/contents/pages`;
+          const response = await fetch(apiUrl);
           if (!response.ok) throw new Error('Failed to fetch pages list');
+
           const items = await response.json();
           const pages = [];
+
           for (const item of items) {
             if (item.type === 'file' && item.name.endsWith('.html')) {
               const pageName = item.name.replace('.html', '');
-              pages.push({type: 'file', name: pageName, path: `pages/${item.name}`});
+              pages.push({ type: 'file', name: pageName, path: `pages/${item.name}` });
               availablePages.push(`pages/${item.name}`);
             } else if (item.type === 'dir') {
               const folderResponse = await fetch(item.url);
-              if (!folderResponse.ok) throw new Error('Failed to fetch folder contents');
+              if (!folderResponse.ok) throw new Error(`Failed to fetch folder ${item.name}`);
               const folderContents = await folderResponse.json();
               const htmlFiles = folderContents
                 .filter(file => file.name.endsWith('.html'))
@@ -498,78 +530,121 @@
                   path: `pages/${item.name}/${file.name}`
                 }));
               if (htmlFiles.length > 0) {
-                pages.push({type: 'folder', name: item.name, files: htmlFiles});
+                pages.push({ type: 'folder', name: item.name, files: htmlFiles });
                 htmlFiles.forEach(file => availablePages.push(file.path));
               }
             }
           }
+
+          // Cache the pages list with a timestamp
+          const cacheData = {
+            timestamp: Date.now(),
+            pages: pages
+          };
+          localStorage.setItem('pagesList', JSON.stringify(cacheData));
+
           return pages;
         } catch (error) {
           console.error('Error fetching pages:', error);
+          // Attempt to use cached pages if available despite being expired
+          const cachedPages = localStorage.getItem('pagesList');
+          if (cachedPages) {
+            const cacheData = JSON.parse(cachedPages);
+            cacheData.pages.forEach(page => {
+              if (page.type === 'file') {
+                availablePages.push(`pages/${page.name}.html`);
+              } else if (page.type === 'folder') {
+                page.files.forEach(file => availablePages.push(`pages/${page.name}/${file.name}.html`));
+              }
+            });
+            return cacheData.pages;
+          }
           return [];
         }
       }
     }
-    
-    // Create navigation links based on fetched pages
+
+    // Helper Function to Get Repository Owner
+    function getRepoOwner() {
+      // Extract repository owner from GitHub Pages URL
+      // Assumes the site is hosted at https://<owner>.github.io/<repo>/
+      const pathParts = window.location.pathname.split('/').filter(part => part);
+      return pathParts[0] || 'your-github-username'; // Replace with your GitHub username if necessary
+    }
+
+    // Create Navigation Links Based on Fetched Pages
     function createNavLinks(pages) {
       const navbar = document.getElementById('navbar');
       navbar.innerHTML = '';
 
       pages.forEach(page => {
         if (page.type === 'file') {
-          const navItem = document.createElement('div');
+          const navItem = document.createElement('a');
           navItem.className = 'nav-item';
           navItem.textContent = page.name;
-          navItem.setAttribute('data-page', page.name); // Set to page name
-          navItem.setAttribute('href', `#${page.name}`); // Set href to hash
-          navItem.addEventListener('click', () => navigateTo(page.name));
+          navItem.href = `#${page.name}`;
+          navItem.setAttribute('aria-label', `Navigate to ${page.name}`);
           navbar.appendChild(navItem);
         } else if (page.type === 'folder') {
           const folderNav = document.createElement('div');
           folderNav.className = 'nav-item has-dropdown';
           folderNav.textContent = page.name;
+          folderNav.setAttribute('aria-haspopup', 'true');
+          folderNav.setAttribute('aria-expanded', 'false');
+          folderNav.tabIndex = 0; // Make focusable
 
           const dropdown = document.createElement('div');
           dropdown.className = 'dropdown-content';
+          dropdown.setAttribute('role', 'menu');
 
           page.files.forEach(file => {
-            const dropdownItem = document.createElement('div');
+            const dropdownItem = document.createElement('a');
             dropdownItem.className = 'dropdown-item';
             dropdownItem.textContent = file.name;
-            dropdownItem.setAttribute('data-page', file.name); // Set to page name
-            dropdownItem.setAttribute('href', `#${file.name}`); // Set href to hash
-            dropdownItem.addEventListener('click', () => navigateTo(file.name));
+            dropdownItem.href = `#${file.name}`;
+            dropdownItem.setAttribute('role', 'menuitem');
+            dropdownItem.setAttribute('aria-label', `Navigate to ${file.name}`);
             dropdown.appendChild(dropdownItem);
           });
 
           folderNav.appendChild(dropdown);
 
-          // Add event listeners for hover to open/close the dropdown
-          folderNav.addEventListener('mouseenter', () => {
-            dropdown.style.display = 'block'; // Show dropdown on hover
+          // Event Listeners for Accessibility (Keyboard)
+          folderNav.addEventListener('click', (event) => {
+            event.preventDefault();
+            toggleDropdown(folderNav);
           });
-          folderNav.addEventListener('mouseleave', () => {
-            dropdown.style.display = 'none'; // Hide dropdown when the mouse leaves
+
+          folderNav.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              toggleDropdown(folderNav);
+            }
           });
 
           navbar.appendChild(folderNav);
         }
       });
     }
-    
-    // Navigate to a specific page by updating the hash
+
+    // Toggle Dropdown Function
+    function toggleDropdown(folderNav) {
+      const isOpen = folderNav.classList.toggle('open');
+      folderNav.setAttribute('aria-expanded', isOpen);
+    }
+
+    // Navigate to a Specific Page by Updating the Hash
     function navigateTo(pageName) {
-      // Update the URL hash
       window.location.hash = pageName;
       // The hashchange event will handle loading the content
     }
-    
-    // Load content based on the current page
+
+    // Load Content Based on the Current Page
     async function loadContent(pageName) {
       if (isLoading) return;
       isLoading = true;
       loading.style.display = 'block';
+
       try {
         if (pageName === 'home' || !availablePages.includes(`pages/${pageName}.html`)) {
           contentFrame.style.display = 'none';
@@ -603,43 +678,47 @@
         isLoading = false;
       }
     }
-    
-    // Handle hash changes to load appropriate content
+
+    // Handle Hash Changes to Load Appropriate Content
     function handleHashChange() {
       const hash = window.location.hash.substring(1); // Remove the '#' character
       const pageName = hash || 'home';
       loadContent(pageName);
     }
-    
-    // Expand/Collapse Toggle for Lower Navigation
+
+    // Expand/Collapse Toggle for Navigation (for mobile)
     document.querySelector('.navbar').addEventListener('click', () => {
       const navbarInner = document.querySelector('.navbar-inner');
       const navExpandToggle = document.querySelector('.nav-expand-toggle');
       navbarInner.classList.toggle('expanded');
       navExpandToggle.classList.toggle('expanded');
     });
-    
+
     // Close Dropdowns When Clicking Outside
     document.addEventListener('click', function(event) {
       const isClickInsideNavbar = navbar.contains(event.target) || navExpandToggle.contains(event.target);
       if (!isClickInsideNavbar) {
         const dropdowns = document.querySelectorAll('.nav-item.has-dropdown.open');
-        dropdowns.forEach(dropdown => dropdown.classList.remove('open'));
+        dropdowns.forEach(dropdown => {
+          dropdown.classList.remove('open');
+          dropdown.setAttribute('aria-expanded', 'false');
+        });
       }
     });
-    
-    // Listen for hash changes
+
+    // Listen for Hash Changes
     window.addEventListener('hashchange', handleHashChange);
-    
-    // Handle initial load based on the current hash
+
+    // Handle Initial Load Based on the Current Hash
     window.addEventListener('DOMContentLoaded', () => {
       handleHashChange();
     });
-    
-    // Initialize Navigation Links
+
+    // Initialize Navigation Links with Fetched Pages
     (async () => {
       const pages = await fetchPages();
       createNavLinks(pages);
     })();
   </script>
-</body></html>
+</body>
+</html>
