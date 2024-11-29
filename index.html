@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html><head><base href="/">
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Redleaf</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- Link to Google Fonts for 'Press Start 2P' -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet">
@@ -48,23 +46,14 @@
       align-items: center;
       position: relative;
       width: 100%;
+      cursor: pointer; /* Add cursor pointer to show it's clickable */
     }
 
+    /* Remove the hamburger button styles */
     .navbar-toggle {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 8px;
-      display: none; /* Hidden by default, shown on mobile */
+      display: none; /* Hide it completely */
     }
 
-    .navbar-toggle svg {
-      fill: #CDCCBB;
-      width: 24px;
-      height: 24px;
-    }
-
-    /* Expand/Collapse Toggle Button */
     .nav-expand-toggle {
       background: none;
       border: none;
@@ -76,6 +65,7 @@
       justify-content: center;
       position: relative;
       image-rendering: pixelated;
+      pointer-events: none; /* Make the button not interfere with clicks */
     }
 
     /* Pixel-Style Arrow using CSS */
@@ -103,7 +93,7 @@
       gap: 8px;
       align-items: flex-start;
       width: 100%;
-      background-color: #B04438;
+      background-color: #041317; /* Changed to match main background */
       transition: max-height 0.3s ease-in-out;
       overflow: hidden;
       max-height: 0; /* Collapsed by default */
@@ -120,6 +110,8 @@
       gap: 8px;
       align-items: flex-start;
       width: 100%;
+      background-color: #041317; /* Changed to match main background */
+      padding: 8px;
     }
 
     .nav-item {
@@ -132,15 +124,16 @@
       cursor: pointer;
       transition: all 0.1s;
       white-space: nowrap;
-      flex: 1 1 calc(33.333% - 16px);
+      flex: 1 1 auto;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
+      margin: 4px; /* Added margin to prevent clipping on hover */
     }
 
     .nav-item.has-dropdown {
-      background: #B04438; /* Make dropdown items red by default */
+      background: #041317; /* Fill with main background color */
       position: relative;
       padding-right: 30px; /* Make room for the arrow */
     }
@@ -161,7 +154,7 @@
     /* Change arrow to V when dropdown is open */
     .nav-item.has-dropdown.open::after {
       content: "V";
-      transform: translateY(-50%);
+      transform: translateY(-50%) rotate(0deg);
     }
 
     /* Adjust hover state for dropdown items */
@@ -262,6 +255,26 @@
       color: #CDCCBB;
       font-family: 'Press Start 2P', monospace;
       line-height: 1.6; /* Increased line-height for better readability */
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden; /* Needed for typewriter effect */
+    }
+
+    /* Typewriter Animation */
+    .cursor {
+      display: inline-block;
+      background-color: #CDCCBB;
+      width: 10px;
+      margin-left: 2px;
+      animation: blink 1s steps(5, start) infinite;
+      height: 1em; /* Adjust to match text height */
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
     }
 
     /* Footer Styles */
@@ -281,8 +294,13 @@
 
     /* Responsive Styles */
     @media (max-width: 768px) {
-      .navbar-toggle {
-        display: block;
+      /* Adjust the nav-expand-toggle for mobile */
+      .nav-expand-toggle {
+        position: absolute;
+        top: 50%;
+        right: 16px;
+        transform: translateY(-50%);
+        display: block; /* Ensure it's always visible */
       }
 
       .navbar-inner {
@@ -303,13 +321,6 @@
         flex: 1 1 100%;
       }
 
-      .nav-expand-toggle {
-        position: absolute;
-        top: 50%;
-        right: 16px;
-        transform: translateY(-50%);
-      }
-
       .dropdown-content {
         position: relative;
         top: auto;
@@ -320,7 +331,7 @@
 
     @media (min-width: 769px) {
       .nav-item {
-        flex: 1 1 calc(33.333% - 16px);
+        flex: 1 1 auto;
       }
 
       .nav-expand-toggle {
@@ -339,21 +350,11 @@
     <div class="container">
       <nav class="navbar">
         <span>Redleaf OS - Tools Initialized</span>
-        <button class="navbar-toggle" aria-label="Toggle Navigation">
-          <svg viewBox="0 0 100 80" width="24" height="24">
-            <rect width="100" height="15"></rect>
-            <rect y="30" width="100" height="15"></rect>
-            <rect y="60" width="100" height="15"></rect>
-          </svg>
-        </button>
-        
-        <!-- Expand/Collapse Toggle Button -->
         <button class="nav-expand-toggle" aria-label="Expand/Collapse Navigation">
-          <!-- The arrow is created using CSS pseudo-element ::before -->
         </button>
       </nav>
       <div class="navbar-inner">
-        <div class="nav-items" id="navbar" style="background-color: black; padding: 8px;">
+        <div class="nav-items" id="navbar">
           <!-- Dynamic nav items will be inserted here -->
         </div>
       </div>
@@ -377,7 +378,6 @@
     const contentFrame = document.getElementById('content-frame');
     const homeContent = document.getElementById('home-content');
     const loading = document.getElementById('loading');
-    const navbarToggle = document.querySelector('.navbar-toggle');
     const navExpandToggle = document.querySelector('.nav-expand-toggle');
     let isLoading = false;
     let availablePages = [];
@@ -385,6 +385,57 @@
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const basePath = isLocal ? '/' : '/redleaf/';
     
+    // Define the content to type for the home page
+    const typewriterContent = `
+        <p>Welcome to Redleaf OS!</p>
+  <p>A creative space by Spencer Nunamaker, where innovation meets functionality. This site is all about sharing tools, coding projects, and fun ideas designed to make life easier and more enjoyable. Whether you're here to streamline your workflow or explore new possibilities, there's plenty to discover.</p>
+  </p>
+
+    `;
+    
+    // Updated Typing effect function
+    function typeWriter(text, element, speed) {
+      let i = 0;
+      const length = text.length;
+      element.innerHTML = ''; // Clear initial content
+
+      function type() {
+        if (i < length) {
+          // Handle HTML tags
+          if (text.charAt(i) === '<') {
+            const endTag = text.indexOf('>', i);
+            if (endTag !== -1) {
+              const tag = text.substring(i, endTag + 1);
+              element.innerHTML += tag;
+              i = endTag + 1;
+              type();
+              return;
+            }
+          }
+          
+          // Remove cursor if it exists
+          element.innerHTML = element.innerHTML.replace('<span class="cursor">\u2588</span>', '');
+          
+          // Add new character and cursor
+          element.innerHTML += text.charAt(i);
+          
+          // Only add cursor after actual text, not after HTML tags
+          if (text.charAt(i) !== '>') {
+            element.innerHTML += '<span class="cursor">\u2588</span>';
+          }
+          
+          i++;
+          setTimeout(type, speed);
+        } else {
+          // Remove cursor after typing is complete
+          element.innerHTML = element.innerHTML.replace('<span class="cursor">\u2588</span>', '');
+        }
+      }
+
+      type();
+    }
+    
+    // Fetch pages from GitHub API or local directory
     async function fetchPages() {
       if (isLocal) {
         try {
@@ -460,6 +511,7 @@
       }
     }
     
+    // Create navigation links based on fetched pages
     function createNavLinks(pages) {
       const navbar = document.getElementById('navbar');
       navbar.innerHTML = '';
@@ -470,6 +522,7 @@
           navItem.className = 'nav-item';
           navItem.textContent = page.name;
           navItem.setAttribute('data-page', page.name); // Set to page name
+          navItem.setAttribute('href', `#${page.name}`); // Set href to hash
           navItem.addEventListener('click', () => navigateTo(page.name));
           navbar.appendChild(navItem);
         } else if (page.type === 'folder') {
@@ -485,6 +538,7 @@
             dropdownItem.className = 'dropdown-item';
             dropdownItem.textContent = file.name;
             dropdownItem.setAttribute('data-page', file.name); // Set to page name
+            dropdownItem.setAttribute('href', `#${file.name}`); // Set href to hash
             dropdownItem.addEventListener('click', () => navigateTo(file.name));
             dropdown.appendChild(dropdownItem);
           });
@@ -504,28 +558,14 @@
       });
     }
     
-    function checkNavOverflow() {
-      const navbarElement = document.querySelector('.navbar-inner');
-      const navItems = navbarElement.querySelectorAll('.nav-item');
-      navItems.forEach(item => {
-        item.style.fontSize = '';
-      });
-      
-      if (navbarElement.scrollWidth > navbarElement.clientWidth) {
-        const currentSize = parseInt(window.getComputedStyle(navItems[0]).fontSize);
-        const newSize = Math.max(currentSize * 0.9, 10);
-        navItems.forEach(item => {
-          item.style.fontSize = `${newSize}px`;
-        });
-      }
-    }
-    
+    // Navigate to a specific page by updating the hash
     function navigateTo(pageName) {
       // Update the URL hash
       window.location.hash = pageName;
       // The hashchange event will handle loading the content
     }
     
+    // Load content based on the current page
     async function loadContent(pageName) {
       if (isLoading) return;
       isLoading = true;
@@ -534,21 +574,17 @@
         if (pageName === 'home' || !availablePages.includes(`pages/${pageName}.html`)) {
           contentFrame.style.display = 'none';
           homeContent.style.display = 'block';
-          homeContent.innerHTML = `
-            <h1>Welcome to Redleaf OS</h1>
-            <p>Welcome to my hobby site! Here, you'll find a variety of tools I've developed to assist me in both my professional work and daily life. Whether you're looking for something practical or just for fun, there's something here for everyone.</p>
-            <h2>About This Site</h2>
-            <p>Redleaf OS is a collection of web-based tools and utilities designed to streamline tasks, enhance productivity, and provide entertainment. Explore the navigation menu to discover the tools available.</p>
-            <h2>Featured Tools</h2>
-            <ul>
-              <li><strong>Cash Counter:</strong> A tool to help cashiers close their drawers.</li>
-              <li><strong>Workday Timer:</strong> A timer for hourly workers who need to keep track of their day.</li>
-              <li><strong>Research Tool:</strong> Companion app for doing research with AI. I use it when writing articles. I ask AI to give me a list of questions that would inform the article I'm writing, and I gather the answers here, and export an informational doc that I give back to the AI to inform my writing.</li>
-            </ul>
-            <p>Feel free to navigate through the menu to explore and use the tools. If you encounter any issues or have suggestions, don't hesitate to reach out!</p>
-          `;
-          if (pageName !== 'home' && pageName !== '') {
-            homeContent.innerHTML += `<p>The requested page "${pageName}" was not found. Please check the navigation menu and try again.</p>`;
+
+          if (pageName === 'home' || pageName === '') {
+            // Clear existing content
+            homeContent.innerHTML = '';
+
+            // Start the typewriter effect
+            typeWriter(typewriterContent, homeContent, 40); // Adjust speed as necessary (40ms per character)
+          } else {
+            // Display error message with typewriter effect
+            const errorContent = `<p>The requested page "${pageName}" was not found. Please check the navigation menu and try again.</p>`;
+            typeWriter(errorContent, homeContent, 25); // Faster speed for error messages
           }
         } else {
           homeContent.style.display = 'none';
@@ -561,28 +597,24 @@
       } catch (error) {
         console.error('Error loading content:', error);
         homeContent.style.display = 'block';
-        homeContent.innerHTML = `<h1>Error</h1><p>Failed to load content. Please try again.</p>`;
+        homeContent.innerHTML = `<p>Failed to load content. Please try again.</p>`;
       } finally {
         loading.style.display = 'none';
         isLoading = false;
       }
     }
     
+    // Handle hash changes to load appropriate content
     function handleHashChange() {
       const hash = window.location.hash.substring(1); // Remove the '#' character
       const pageName = hash || 'home';
       loadContent(pageName);
     }
     
-    // Mobile Navbar Toggle
-    navbarToggle.addEventListener('click', () => {
-      const navbarInner = document.querySelector('.navbar-inner');
-      navbarInner.classList.toggle('open');
-    });
-    
     // Expand/Collapse Toggle for Lower Navigation
-    navExpandToggle.addEventListener('click', () => {
+    document.querySelector('.navbar').addEventListener('click', () => {
       const navbarInner = document.querySelector('.navbar-inner');
+      const navExpandToggle = document.querySelector('.nav-expand-toggle');
       navbarInner.classList.toggle('expanded');
       navExpandToggle.classList.toggle('expanded');
     });
@@ -610,6 +642,4 @@
       createNavLinks(pages);
     })();
   </script>
-
-</body>
-</html>
+</body></html>
