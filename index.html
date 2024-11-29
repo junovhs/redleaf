@@ -1,4 +1,9 @@
-<html><head><base href="https://junovhs.github.io/redleaf/"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Redleaf</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redleaf</title>
   
   <!-- Link to Google Fonts for 'Press Start 2P' -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet">
@@ -328,16 +333,6 @@
       width: 100%;
     }
   </style>
-  
-  <script>
-    (function() {
-      var redirect = sessionStorage.redirect;
-      delete sessionStorage.redirect;
-      if (redirect && redirect != location.href) {
-        history.replaceState(null, null, redirect);
-      }
-    })();
-  </script>
 </head>
 <body>
   <header>
@@ -359,8 +354,8 @@
       </nav>
       <div class="navbar-inner">
         <div class="nav-items" id="navbar" style="background-color: black; padding: 8px;">
-    <!-- Dynamic nav items will be inserted here -->
-</div>
+          <!-- Dynamic nav items will be inserted here -->
+        </div>
       </div>
     </div>
   </header>
@@ -403,7 +398,8 @@
           for (const link of links) {
             const href = link.getAttribute('href');
             if (href.endsWith('.html')) {
-              pages.push({type: 'file', name: href.replace('.html', ''), path: `pages/${href}`});
+              const pageName = href.replace('.html', '');
+              pages.push({type: 'file', name: pageName, path: `pages/${href}`});
               availablePages.push(`pages/${href}`);
             } else if (href.endsWith('/')) {
               const folderName = href.replace('/', '');
@@ -437,7 +433,8 @@
           const pages = [];
           for (const item of items) {
             if (item.type === 'file' && item.name.endsWith('.html')) {
-              pages.push({type: 'file', name: item.name.replace('.html', ''), path: `pages/${item.name}`});
+              const pageName = item.name.replace('.html', '');
+              pages.push({type: 'file', name: pageName, path: `pages/${item.name}`});
               availablePages.push(`pages/${item.name}`);
             } else if (item.type === 'dir') {
               const folderResponse = await fetch(item.url);
@@ -472,8 +469,8 @@
           const navItem = document.createElement('div');
           navItem.className = 'nav-item';
           navItem.textContent = page.name;
-          navItem.setAttribute('data-page', page.path);
-          navItem.addEventListener('click', () => navigateTo(page.path));
+          navItem.setAttribute('data-page', page.name); // Set to page name
+          navItem.addEventListener('click', () => navigateTo(page.name));
           navbar.appendChild(navItem);
         } else if (page.type === 'folder') {
           const folderNav = document.createElement('div');
@@ -487,8 +484,8 @@
             const dropdownItem = document.createElement('div');
             dropdownItem.className = 'dropdown-item';
             dropdownItem.textContent = file.name;
-            dropdownItem.setAttribute('data-page', file.path);
-            dropdownItem.addEventListener('click', () => navigateTo(file.path));
+            dropdownItem.setAttribute('data-page', file.name); // Set to page name
+            dropdownItem.addEventListener('click', () => navigateTo(file.name));
             dropdown.appendChild(dropdownItem);
           });
 
@@ -523,46 +520,18 @@
       }
     }
     
-    function handleNavClick(event) {
-      const target = event.target;
-      if (target.classList.contains('nav-item') && !target.classList.contains('has-dropdown')) {
-        const pagePath = target.getAttribute('data-page');
-        if (pagePath) {
-          navigateTo(pagePath);
-          if (window.innerWidth <= 768) {
-            navbarToggle.classList.remove('active');
-            document.querySelector('.navbar-inner').classList.remove('open');
-          }
-        }
-      } else if (target.classList.contains('dropdown-item')) {
-        const pagePath = target.getAttribute('data-page');
-        if (pagePath) {
-          navigateTo(pagePath);
-          if (window.innerWidth <= 768) {
-            navbarToggle.classList.remove('active');
-            document.querySelector('.navbar-inner').classList.remove('open');
-          }
-        }
-      } else if (target.parentElement.classList.contains('has-dropdown')) {
-        if (window.innerWidth <= 768) {
-          target.parentElement.classList.toggle('open');
-        }
-      }
+    function navigateTo(pageName) {
+      // Update the URL hash
+      window.location.hash = pageName;
+      // The hashchange event will handle loading the content
     }
     
-    function navigateTo(pagePath) {
-      const isHome = pagePath === 'home';
-      const url = isHome ? `${basePath}` : `${basePath}${pagePath}`;
-      history.pushState({ pagePath }, '', url);
-      loadContent(pagePath);
-    }
-    
-    async function loadContent(pagePath) {
+    async function loadContent(pageName) {
       if (isLoading) return;
       isLoading = true;
       loading.style.display = 'block';
       try {
-        if (pagePath === 'home' || !availablePages.includes(pagePath)) {
+        if (pageName === 'home' || !availablePages.includes(`pages/${pageName}.html`)) {
           contentFrame.style.display = 'none';
           homeContent.style.display = 'block';
           homeContent.innerHTML = `
@@ -578,13 +547,13 @@
             </ul>
             <p>Feel free to navigate through the menu to explore and use the tools. If you encounter any issues or have suggestions, don't hesitate to reach out!</p>
           `;
-          if (pagePath !== 'home' && pagePath !== '') {
-            homeContent.innerHTML += `<p>The requested page "${pagePath}" was not found. Please check the navigation menu and try again.</p>`;
+          if (pageName !== 'home' && pageName !== '') {
+            homeContent.innerHTML += `<p>The requested page "${pageName}" was not found. Please check the navigation menu and try again.</p>`;
           }
         } else {
           homeContent.style.display = 'none';
           contentFrame.style.display = 'block';
-          const response = await fetch(pagePath);
+          const response = await fetch(`pages/${pageName}.html`);
           if (!response.ok) throw new Error('Failed to fetch page content');
           const html = await response.text();
           contentFrame.srcdoc = html;
@@ -599,13 +568,11 @@
       }
     }
     
-    function handleRoute() {
-      const path = window.location.pathname.replace(basePath, '');
-      const fullPath = path === '' ? 'home' : path;
-      loadContent(fullPath);
+    function handleHashChange() {
+      const hash = window.location.hash.substring(1); // Remove the '#' character
+      const pageName = hash || 'home';
+      loadContent(pageName);
     }
-    
-    window.addEventListener('popstate', handleRoute);
     
     // Mobile Navbar Toggle
     navbarToggle.addEventListener('click', () => {
@@ -629,12 +596,20 @@
       }
     });
     
-    // Initialize Navigation Links and Route
+    // Listen for hash changes
+    window.addEventListener('hashchange', handleHashChange);
+    
+    // Handle initial load based on the current hash
+    window.addEventListener('DOMContentLoaded', () => {
+      handleHashChange();
+    });
+    
+    // Initialize Navigation Links
     (async () => {
       const pages = await fetchPages();
       createNavLinks(pages);
-      handleRoute();
     })();
   </script>
 
-</body></html>
+</body>
+</html>
