@@ -1,7 +1,7 @@
-<!DOCTYPE html><html><head><base href="https://example.com/">
+<html><head><base href="https://example.com/">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>8-bit Workday Timer</title>
+  <title>Workday Timer</title>
   
   <!-- Alpine.js for interactivity -->
   <script defer="" src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -158,7 +158,7 @@
 </head>
 <body x-data="timerApp()" x-init="init()">
   <div class="container">
-    <h1>8-bit Workday Timer</h1>
+    <h1>Workday Timer</h1>
     
     <!-- Workday Timer Section -->
     <div class="section" style="border: none;">
@@ -197,37 +197,15 @@
       <div class="countdown-container">
         <!-- Clock-out Time Display -->
         <div class="clock-out-time" style="border-top: none;">
-  <span>CLOCK-OUT TIME</span>
-  <span x-text="clockOutTime"></span>
-</div>
+          <span>CLOCK-OUT TIME</span>
+          <span x-text="clockOutTime"></span>
+        </div>
 
         <!-- Countdown Timer Display -->
         <div class="countdown" :class="{ 'alert': isNearingEnd }">
           <span style="display: block; font-size: 14px; margin-bottom: 10px; color: #B04438;">TIME REMAINING</span>
           <span x-text="formatTime(remainingTime)"></span>
         </div>
-      </div>
-    </div>
-
-    <!-- Weekly Work Calculation Section -->
-    <div class="section">
-      <h2>Weekly Work Calculation</h2>
-      
-      <!-- Total Weekly Goal Input -->
-      <div class="input-group">
-        <label for="weeklyGoal">Weekly Goal</label>
-        <div class="time-input-group">
-          <input type="text" id="goalHours" x-model="goalHours" @input="validateHours($event, 'goalHours')" placeholder="HH" maxlength="2" class="time-input-segment">
-          <input type="text" id="goalMinutes" x-model="goalMinutes" @input="validateMinutes($event, 'goalMinutes')" placeholder="MM" maxlength="2" class="time-input-segment">
-        </div>
-      </div>
-
-      <!-- Calculate Button -->
-      <button @click="calculateWeekly" class="button" style="font-family: 'Press Start 2P', 'Courier New', monospace;">Calculate</button>
-
-      <!-- Weekly Calculation Result -->
-      <div class="weekly-result" x-show="weeklyResult">
-        <div class="result" x-text="weeklyResult"></div>
       </div>
     </div>
   </div>
@@ -250,11 +228,6 @@
         isRunning: false,
         timerInterval: null,
         isNearingEnd: false,
-
-        // Weekly Calculation Data
-        goalHours: '40', // Default weekly goal
-        goalMinutes: '00',
-        weeklyResult: '',
 
         // Initialization
         init() {
@@ -366,57 +339,6 @@
             workedMinutes: this.workedMinutes
           };
           localStorage.setItem('timerSettings', JSON.stringify(settings));
-        },
-
-        // Weekly Calculation Method
-        calculateWeekly() {
-          // Get current day of the week (0=Sunday, 6=Saturday)
-          const today = new Date().getDay();
-          // Assuming workweek is Monday (1) to Friday (5)
-          const workweekDays = [1, 2, 3, 4, 5];
-          const todayIndex = workweekDays.indexOf(today);
-          if (todayIndex === -1) {
-            // Today is weekend
-            this.weeklyResult = 'Today is weekend. No work today.';
-            return;
-          }
-
-          const remainingDays = workweekDays.length - (todayIndex + 1);
-          // Calculate remaining workdays including today
-          const totalRemainingWorkdays = remainingDays + 1;
-
-          // Calculate total weekly goal in seconds
-          const goalSeconds = (parseInt(this.goalHours) || 0) * 3600 + (parseInt(this.goalMinutes) || 0) * 60;
-
-          // Calculate already worked seconds in the week
-          const workedSeconds = (parseInt(this.workedHours) || 0) * 3600 + (parseInt(this.workedMinutes) || 0) * 60;
-
-          // Calculate remaining seconds to reach the goal
-          const remainingSeconds = goalSeconds - workedSeconds;
-
-          if (remainingSeconds <= 0) {
-            this.weeklyResult = `Congratulations! You've met your weekly goal.`;
-            return;
-          }
-
-          // Calculate how much to work today
-          const workSeconds = (parseInt(this.workdayHours) || 0) * 3600 + (parseInt(this.workdayMinutes) || 0) * 60;
-          const adjustedWorkSecondsToday = Math.max(0, workSeconds - ((parseInt(this.workedHours) || 0) * 3600 + (parseInt(this.workedMinutes) || 0) * 60));
-
-          // Calculate remaining seconds after today
-          const remainingAfterToday = remainingSeconds - adjustedWorkSecondsToday;
-
-          // Calculate per day for remaining days
-          let perDaySeconds = 0;
-          if (totalRemainingWorkdays - 1 > 0) {
-            perDaySeconds = Math.ceil(Math.max(0, remainingAfterToday) / (totalRemainingWorkdays - 1));
-          }
-
-          // Format times
-          const todayWork = this.formatTime(adjustedWorkSecondsToday);
-          const perDayWork = this.formatTime(perDaySeconds);
-
-          this.weeklyResult = `Today: Work ${todayWork}. \nRemaining days: Work ${perDayWork} each.`;
         }
       };
     }
