@@ -1,8 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <base href=".">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<html><head><base href=".">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Enhanced Bill and Coin Counter</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -28,11 +25,11 @@
       user-select: none;
     }
     body {
+      min-height: -webkit-fill-available;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
       background: #041317;
       color: #CDCCBB;
-      min-height: 100vh;
       margin: 0;
-      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -48,6 +45,9 @@
       max-width: 800px;
       position: relative;
       overflow: hidden;
+      padding-left: max(1rem, env(safe-area-inset-left));
+      padding-right: max(1rem, env(safe-area-inset-right));
+      padding-bottom: max(1rem, env(safe-area-inset-bottom));
     }
     .header {
       display: flex;
@@ -340,8 +340,139 @@
       }
     }
     @media (max-width: 480px) {
+      .counter-container {
+        padding: 0.5rem;
+        margin: 0.5rem;
+        border-width: 2px;
+      }
+
+      .page-title {
+        font-size: 16px;
+        margin-bottom: 0.5rem;
+      }
+
+      .counter-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .section-title {
+        font-size: 12px;
+        margin-bottom: 10px;
+      }
+
+      .denomination-row {
+        margin-bottom: 5px;
+        padding: 4px;
+      }
+
+      .bill-icon {
+        width: 35px;
+        height: 30px;
+        font-size: 0.7rem;
+      }
+
+      .coin-icon {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+      }
+
+      .coin-label {
+        font-size: 0.7rem;
+      }
+
+      input {
+        font-size: 8px;
+        padding: 6px;
+      }
+
+      .bit-arrow {
+        width: 20px;
+        height: 20px;
+        font-size: 6px;
+      }
+
+      .total, .combined-total {
+        padding: 0.5rem;
+        font-size: 12px;
+      }
+
       .drawer {
+        flex: 1 1 100%;
         max-width: 100%;
+        height: 100px;
+      }
+
+      .drawer-title {
+        font-size: 10px;
+      }
+
+      .drawer-amount {
+        font-size: 1rem;
+      }
+
+      .clear-btn {
+        padding: 6px 12px;
+        font-size: 10px;
+      }
+
+      .close-drawer-btn {
+        font-size: 10px;
+        padding: 4px 8px;
+      }
+    }
+    @media (max-width: 360px) {
+      .page-title {
+        font-size: 14px;
+      }
+
+      .input-container {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .bit-arrows {
+        display: flex;
+        flex-direction: row;
+        gap: 2px;
+      }
+
+      .bit-arrow {
+        width: 18px;
+        height: 18px;
+      }
+
+      input {
+        max-width: 60px;
+      }
+
+      .drawer {
+        height: 80px;
+      }
+    }
+    /* Improve touch targets for mobile */
+    @media (hover: none) {
+      .bit-arrow {
+        min-width: 30px;
+        min-height: 30px;
+      }
+
+      .close-drawer-btn, 
+      .clear-btn {
+        min-height: 44px;
+      }
+
+      .drawer {
+        min-height: 100px;
+      }
+    }
+    /* Add safe area insets for notched devices */
+    @supports (padding: max(0px)) {
+      .counter-container {
+        padding-left: max(1rem, env(safe-area-inset-left));
+        padding-right: max(1rem, env(safe-area-inset-right));
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
       }
     }
     @keyframes saveFlash {
@@ -557,6 +688,12 @@
     </div>
   </div>
   <script>
+    function setAppHeight() {
+      document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+    }
+    window.addEventListener('resize', setAppHeight);
+    setAppHeight();
+    
     document.addEventListener('DOMContentLoaded', function() {
       const inputs = document.querySelectorAll('input');
       const totalElement = document.querySelector('.total');
