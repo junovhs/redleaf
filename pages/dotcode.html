@@ -1,0 +1,177 @@
+<html><head><base href="." />
+  <meta charset="utf-8"/>
+  <title>Graphviz Live Editor</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #1e1e1e;
+      color: #fff;
+    }
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+    .editor-pane {
+      flex: 1;
+      border-right: 2px solid #333;
+      position: relative;
+    }
+    .render-pane {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    #editor {
+      width: 100%;
+      height: calc(100% - 50px);
+    }
+    #graph-container {
+      flex: 1;
+      background: #fff;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .toolbar {
+      padding: 10px;
+      background: #2d2d2d;
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      background: #4a4a4a;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #666;
+    }
+    #error-display {
+      color: #ff6b6b;
+      padding: 10px;
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.14.0/ace.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/viz.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/full.render.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/svg-pan-zoom/3.6.1/svg-pan-zoom.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="editor-pane">
+      <div class="toolbar">
+        <button id="render-btn">Render</button>
+        <button id="download-btn">Download SVG</button>
+      </div>
+      <div id="editor"></div>
+    </div>
+    <div class="render-pane">
+      <div id="graph-container"></div>
+      <div id="error-display"></div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Ace Editor
+    const editor = ace.edit("editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/dot");
+    
+    // Default sample graph
+    const defaultGraph = `digraph G {
+  rankdir=LR;
+  node [shape=box, style=filled, fillcolor=lightblue];
+  A -> B -> C;
+  B -> D;
+}`;
+    
+    editor.setValue(defaultGraph);
+
+    // Initialize Viz instance
+    let viz = new Viz();
+    
+    // Debounce function
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Render function
+    async function renderGraph() {
+      const dotSource = editor.getValue();
+      const container = document.getElementById('graph-container');
+      const errorDisplay = document.getElementById('error-display');
+      
+      try {
+        errorDisplay.style.display = 'none';
+        const result = await viz.renderString(dotSource);
+        container.innerHTML = result;
+        
+        // Initialize pan-zoom
+        const panZoom = svgPanZoom(container.querySelector('svg'), {
+          zoomEnabled: true,
+          controlIconsEnabled: true,
+          fit: true,
+          center: true,
+          minZoom: 0.1
+        });
+        
+        // Adjust SVG size
+        const svg = container.querySelector('svg');
+        svg.style.width = '100%';
+        svg.style.height = '100%';
+        
+      } catch (error) {
+        errorDisplay.style.display = 'block';
+        errorDisplay.textContent = `Error: ${error.message}`;
+        
+        // Reset Viz instance on error
+        viz = new Viz();
+      }
+    }
+
+    // Debounced render function for real-time updates
+    const debouncedRender = debounce(renderGraph, 300);
+
+    // Event listeners
+    editor.session.on('change', debouncedRender);
+    
+    document.getElementById('render-btn').addEventListener('click', renderGraph);
+    
+    document.getElementById('download-btn').addEventListener('click', () => {
+      const svg = document.querySelector('#graph-container svg');
+      if (!svg) return;
+      
+      const serializer = new XMLSerializer();
+      const source = serializer.serializeToString(svg);
+      
+      const blob = new Blob([source], { type: 'image/svg+xml' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'graph.svg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    });
+
+    // Initial render
+    renderGraph();
+  </script>
+</body></html>
