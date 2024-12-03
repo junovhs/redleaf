@@ -19,6 +19,9 @@
             box-sizing: border-box;
             color: #CDCCBB;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         #sidebar h2 {
@@ -48,9 +51,57 @@
         }
 
         #level-description {
-            margin-top: 20px;
             font-size: 14px;
             color: #CDCCBB;
+        }
+
+        /* Falling Speed Slider */
+        #falling-speed-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #falling-speed-label {
+            font-size: 16px;
+            color: #CDCCBB;
+        }
+
+        #falling-speed-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #03363c;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        #falling-speed-slider:hover {
+            opacity: 1;
+        }
+
+        #falling-speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #B04438;
+            cursor: pointer;
+            border: 2px solid #CDCCBB;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        #falling-speed-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #B04438;
+            cursor: pointer;
+            border: 2px solid #CDCCBB;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
         }
 
         #game-container {
@@ -59,17 +110,35 @@
             width: calc(100vw - 250px);
             height: 100vh;
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #inner-zone {
+            position: relative;
+            width: 80%;
+            height: calc(100vh - 200px);
+            margin: 0 auto;
+            overflow: hidden;
+            background: transparent;
+            box-sizing: border-box;
+            padding: 0 20px;
         }
 
         .word {
             position: absolute;
-            font-size: var(--word-size, 64px);
+            font-size: var(--word-size, 48px);
             color: #CDCCBB;
             text-shadow: 0 0 10px rgba(205, 204, 187, 0.5);
             transition: color 0.3s;
             user-select: none;
             display: flex;
-            gap: var(--letter-gap, 32px);
+            gap: var(--letter-gap, 24px);
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .word.active {
@@ -80,29 +149,24 @@
         .finger-info {
             display: none; /* Hide all finger info by default */
             position: absolute;
-            top: calc(100% + 8px); /* Move below the word with 8px gap */
+            top: 100%; /* Move below the letter */
             left: 50%;
             transform: translateX(-50%);
-            font-size: 24px;
+            font-size: 12px;
             color: #CDCCBB;
             white-space: nowrap;
             text-shadow: none; /* Remove glow */
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 8px;
+            margin-top: 4px;
         }
 
         .finger-info span {
             display: block;
             text-align: center;
-        }
-
-        .red-square {
-            width: 8px;
-            height: 8px;
-            background: #B04438;
-            margin-bottom: 4px;
+            font-size: 10px; /* Smaller font for 8-bit style */
+            color: #CDCCBB;
         }
 
         .letter {
@@ -270,7 +334,7 @@
             border-radius: 4px;
             cursor: pointer;
             text-align: center;
-            font-size: calc(24px * (1 - 0.25 * (parseInt(this.getAttribute('data-level')) >= 4 ? 1 : 0)));
+            font-size: 14px;
         }
 
         #pause-level-select li.active {
@@ -308,6 +372,7 @@
                 flex-direction: row;
                 overflow-x: scroll;
                 overflow-y: hidden;
+                gap: 10px;
             }
 
             #game-container {
@@ -348,14 +413,19 @@
         <h2>Level Select</h2>
         <ul id="level-select">
             <li data-level="1" class="active">Level 1: Master the Home Row</li>
-            <li data-level="2">Level 2: Expand to Top & Bottom Rows</li>
-            <li data-level="3">Level 3: Shift Keys & Capitalization</li>
-            <li data-level="4">Level 4: Speed & Accuracy</li>
+            <li data-level="2">Level 2: Expand to Top &amp; Bottom Rows</li>
+            <li data-level="3">Level 3: Shift Keys &amp; Capitalization</li>
+            <li data-level="4">Level 4: Speed &amp; Accuracy</li>
             <li data-level="5">Free Play Mode</li>
         </ul>
         <div id="level-description">Master the Home Row: Learn proper finger placement and type your first words.</div>
+        <div id="falling-speed-container">
+            <label for="falling-speed-slider" id="falling-speed-label">Falling Speed:</label>
+            <input type="range" id="falling-speed-slider" min="1" max="5" value="3">
+        </div>
     </div>
     <div id="game-container">
+        <div id="inner-zone"></div>
     </div>
     <div id="score">Score: <span id="score-value">0</span></div>
     <div id="level">Level: <span id="level-value">1</span></div>
@@ -366,9 +436,9 @@
         <h2>Paused</h2>
         <ul id="pause-level-select">
             <li data-level="1" class="active">Level 1: Master the Home Row</li>
-            <li data-level="2">Level 2: Expand to Top & Bottom Rows</li>
-            <li data-level="3">Level 3: Shift Keys & Capitalization</li>
-            <li data-level="4">Level 4: Speed & Accuracy</li>
+            <li data-level="2">Level 2: Expand to Top &amp; Bottom Rows</li>
+            <li data-level="3">Level 3: Shift Keys &amp; Capitalization</li>
+            <li data-level="4">Level 4: Speed &amp; Accuracy</li>
             <li data-level="5">Free Play Mode</li>
         </ul>
         <button id="resume-button">Resume</button>
@@ -379,10 +449,31 @@
         <p>Type the words as they appear on the screen to "shoot" them down. Complete 10 words to advance to the next level. Good luck and have fun!</p>
         <button id="start-button">Press Spacebar with Thumb to Start Game</button>
     </div>
-    <button id="pause-button">Pause</button>
+    <button id="pause-button" style="
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 40px;
+        padding: 5px;
+        font-size: 12px;
+        border-radius: 50%;
+        background: #B04438;
+        border: 2px solid #CDCCBB;
+        color: #CDCCBB;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        transition: background 0.3s, transform 0.2s;
+    ">
+        ❚❚
+    </button>
     <div id="sound-controls" style="position: fixed; bottom: 20px; right: 270px; color: #CDCCBB;">
         <label for="sound-toggle">Sound:</label>
-        <input type="checkbox" id="sound-toggle" checked>
+        <input type="checkbox" id="sound-toggle" checked="">
     </div>
     <script>
         const defaultWords = [
@@ -406,31 +497,31 @@
         };
 
         const fingerMap = {
-            'a': { hand: 'Left', finger: 'Pinky' },
-            's': { hand: 'Left', finger: 'Ring' },
-            'd': { hand: 'Left', finger: 'Middle' },
-            'f': { hand: 'Left', finger: 'Index' },
-            'j': { hand: 'Right', finger: 'Index' },
-            'k': { hand: 'Right', finger: 'Middle' },
-            'l': { hand: 'Right', finger: 'Ring' },
-            ';': { hand: 'Right', finger: 'Pinky' },
-            'q': { hand: 'Left', finger: 'Pinky' },
-            'w': { hand: 'Left', finger: 'Ring' },
-            'e': { hand: 'Left', finger: 'Middle' },
-            'r': { hand: 'Left', finger: 'Index' },
-            't': { hand: 'Left', finger: 'Index' },
-            'y': { hand: 'Right', finger: 'Index' },
-            'u': { hand: 'Right', finger: 'Index' },
-            'i': { hand: 'Right', finger: 'Middle' },
-            'o': { hand: 'Right', finger: 'Ring' },
-            'p': { hand: 'Right', finger: 'Pinky' },
-            'z': { hand: 'Left', finger: 'Pinky' },
-            'x': { hand: 'Left', finger: 'Ring' },
-            'c': { hand: 'Left', finger: 'Middle' },
-            'v': { hand: 'Left', finger: 'Index' },
-            'b': { hand: 'Left', finger: 'Index' },
-            'n': { hand: 'Right', finger: 'Index' },
-            'm': { hand: 'Right', finger: 'Index' },
+            'a': { hand: 'LEFT', finger: 'PINKY' },
+            's': { hand: 'LEFT', finger: 'RING' },
+            'd': { hand: 'LEFT', finger: 'MIDDLE' },
+            'f': { hand: 'LEFT', finger: 'INDEX' },
+            'j': { hand: 'RIGHT', finger: 'INDEX' },
+            'k': { hand: 'RIGHT', finger: 'MIDDLE' },
+            'l': { hand: 'RIGHT', finger: 'RING' },
+            ';': { hand: 'RIGHT', finger: 'PINKY' },
+            'q': { hand: 'LEFT', finger: 'PINKY' },
+            'w': { hand: 'LEFT', finger: 'RING' },
+            'e': { hand: 'LEFT', finger: 'MIDDLE' },
+            'r': { hand: 'LEFT', finger: 'INDEX' },
+            't': { hand: 'LEFT', finger: 'INDEX' },
+            'y': { hand: 'RIGHT', finger: 'INDEX' },
+            'u': { hand: 'RIGHT', finger: 'INDEX' },
+            'i': { hand: 'RIGHT', finger: 'MIDDLE' },
+            'o': { hand: 'RIGHT', finger: 'RING' },
+            'p': { hand: 'RIGHT', finger: 'PINKY' },
+            'z': { hand: 'LEFT', finger: 'PINKY' },
+            'x': { hand: 'LEFT', finger: 'RING' },
+            'c': { hand: 'LEFT', finger: 'MIDDLE' },
+            'v': { hand: 'LEFT', finger: 'INDEX' },
+            'b': { hand: 'LEFT', finger: 'INDEX' },
+            'n': { hand: 'RIGHT', finger: 'INDEX' },
+            'm': { hand: 'RIGHT', finger: 'INDEX' },
             ' ': { hand: 'Both', finger: 'Thumb' }
         };
 
@@ -442,7 +533,7 @@
                 this.level = 1;
                 this.wordsPerLevel = 10;
                 this.correctCount = 0;
-                this.gameContainer = document.getElementById('game-container');
+                this.gameContainer = document.getElementById('inner-zone');
                 this.scoreElement = document.getElementById('score-value');
                 this.levelElement = document.getElementById('level-value');
                 this.highScoreElement = document.getElementById('high-score-value');
@@ -457,6 +548,7 @@
                 this.levelSelect = document.getElementById('level-select');
                 this.pauseLevelSelect = document.getElementById('pause-level-select');
                 this.levelDescription = document.getElementById('level-description');
+                this.fallingSpeedSlider = document.getElementById('falling-speed-slider');
 
                 this.currentWords = [...levelWords[1]];
                 this.currentInput = '';
@@ -466,8 +558,13 @@
                 this.startTime = null;
                 this.elapsedTime = 0;
                 this.soundEnabled = true;
-                this.availablePositions = [10, 30, 50, 70, 90];
+                this.availablePositions = [10, 30, 50, 70];
                 this.occupiedPositions = new Set();
+
+                this.totalTypingTime = 0;
+                this.typingStartTime = null;
+
+                this.fallSpeedMultiplier = 1; // Default multiplier
 
                 this.loadHighScore();
                 this.updateHighScoreUI();
@@ -496,6 +593,11 @@
                     }
 
                     if (this.isGameStarted && !this.isPaused) {
+                        if (e.key === 'Shift') {
+                            e.preventDefault();
+                            this.resetTyping();
+                            return;
+                        }
                         if (e.code === 'Space') {
                             e.preventDefault();
                         }
@@ -509,7 +611,7 @@
 
                 this.pauseButton.addEventListener('click', () => this.togglePause());
 
-                // Modified to allow clicking any level
+                // Allow clicking any level
                 this.levelSelect.addEventListener('click', (e) => {
                     if (e.target && e.target.nodeName === 'LI') {
                         const selectedLevel = parseInt(e.target.getAttribute('data-level'));
@@ -527,6 +629,11 @@
 
                 this.soundToggle.addEventListener('change', () => {
                     this.soundEnabled = this.soundToggle.checked;
+                });
+
+                // Falling Speed Slider
+                this.fallingSpeedSlider.addEventListener('input', () => {
+                    this.fallSpeedMultiplier = parseFloat(this.fallingSpeedSlider.value);
                 });
             }
 
@@ -546,43 +653,56 @@
             }
 
             updateTypingSpeed() {
-                if (!this.startTime) return;
-                const currentTime = Date.now();
-                const minutes = (currentTime - this.startTime) / 60000;
+                const minutes = this.totalTypingTime / 60000;
                 const wpm = minutes > 0 ? Math.round(this.correctCount / minutes) : 0;
                 this.typingSpeedElement.textContent = wpm;
             }
 
             handleKeyPress(key) {
+                if (key === 'shift') {
+                    this.resetTyping();
+                    return;
+                }
                 if (!key) return;
-                const lastLetter = this.currentInput.slice(-1);
-                this.currentInput += key;
                 let correct = false;
 
-                this.words.forEach(wordObj => {
-                    const wordLetters = wordObj.element.querySelectorAll('.letter');
-
-                    // Check if current input matches the word at current position
-                    if (wordObj.word.startsWith(this.currentInput)) {
+                // Iterate through words in front to back
+                for (let wordObj of this.words) {
+                    if (wordObj.word.startsWith(this.currentInput + key)) {
+                        if (this.currentInput === '') {
+                            this.typingStartTime = Date.now();
+                        }
                         correct = true;
+                        this.currentInput += key;
 
-                        // First, hide all finger-info
-                        document.querySelectorAll('.finger-info').forEach(info => {
-                            info.style.display = 'none';
-                        });
-
-                        const currentLetterElement = wordLetters[this.currentInput.length - 1];
+                        // Highlight the current letter
+                        const letterIndex = this.currentInput.length - 1;
+                        const wordLetters = wordObj.element.querySelectorAll('.letter');
+                        const currentLetterElement = wordLetters[letterIndex];
                         if (currentLetterElement) {
                             currentLetterElement.classList.add('poofing');
+                            currentLetterElement.classList.add('highlight-letter');
                             this.createParticles(
                                 currentLetterElement.getBoundingClientRect().left + currentLetterElement.offsetWidth / 2,
                                 currentLetterElement.getBoundingClientRect().top + currentLetterElement.offsetHeight / 2
                             );
-                            currentLetterElement.classList.add('highlight-letter');
+                        }
+
+                        // Play correct key sound
+                        if (this.soundEnabled && this.correctKeySound) {
+                            this.correctKeySound.play().catch((e) => {
+                                console.error('Error playing correct key sound:', e);
+                            });
                         }
 
                         // Check for complete word match
                         if (this.currentInput === wordObj.word) {
+                            const typingEndTime = Date.now();
+                            if (this.typingStartTime) {
+                                this.totalTypingTime += (typingEndTime - this.typingStartTime);
+                                this.typingStartTime = null;
+                                this.updateTypingSpeed();
+                            }
                             setTimeout(() => {
                                 wordObj.element.remove();
                                 this.words = this.words.filter(w => w !== wordObj);
@@ -604,50 +724,67 @@
                                     });
                                 }
 
+                                // Update high score if needed
+                                if (this.score > this.highScore) {
+                                    this.highScore = this.score;
+                                    this.updateHighScoreUI();
+                                    this.saveHighScore();
+                                    this.showHighScoreNotification();
+                                }
+
                             }, 300);
                         } else {
                             // Show finger-info for next letter
                             if (this.currentInput.length < wordObj.word.length) {
                                 const nextLetterElement = wordLetters[this.currentInput.length];
                                 if (nextLetterElement) {
+                                    this.clearFingerInfos();
                                     nextLetterElement.classList.add('highlight-letter');
                                     const fingerInfo = nextLetterElement.querySelector('.finger-info');
                                     if (fingerInfo) {
                                         fingerInfo.style.display = 'flex';
+                                        fingerInfo.style.top = `${nextLetterElement.offsetHeight + 4}px`;
                                     }
                                 }
                             }
                         }
+                        break; // Only handle one word at a time
                     } else {
-                        // Incorrect input
-                        this.currentInput = '';
-                        // Reset all letter states when input doesn't match
-                        wordLetters.forEach(letter => {
-                            letter.classList.remove('highlight-letter', 'poofing');
-                            letter.style.visibility = 'visible';
-                        });
+                        // Incorrect input for this word, try next
+                        continue;
                     }
-                });
+                }
 
-                if (correct) {
-                    // Sound effect for correct key press
-                    if (this.soundEnabled && this.correctKeySound) {
-                        this.correctKeySound.play().catch((e) => {
-                            console.error('Error playing correct key sound:', e);
-                        });
-                    }
-                } else {
-                    // Sound effect for incorrect key press
+                if (!correct) {
+                    this.resetTyping();
+
+                    // Play incorrect key sound
                     if (this.soundEnabled && this.incorrectKeySound) {
                         this.incorrectKeySound.play().catch((e) => {
                             console.error('Error playing incorrect key sound:', e);
                         });
                     }
                 }
+            }
 
-                if (this.startTime) {
-                    this.updateTypingSpeed();
+            clearFingerInfos() {
+                document.querySelectorAll('.finger-info').forEach(info => {
+                    info.style.display = 'none';
+                });
+            }
+
+            resetTyping() {
+                this.currentInput = '';
+                if (this.typingStartTime) {
+                    this.typingStartTime = null;
                 }
+                // Remove all highlights and finger-info
+                document.querySelectorAll('.highlight-letter').forEach(el => {
+                    el.classList.remove('highlight-letter', 'poofing');
+                });
+                this.clearFingerInfos();
+                // Reset typing speed
+                this.updateTypingSpeed();
             }
 
             startGame() {
@@ -669,7 +806,7 @@
                     this.pauseButton.textContent = 'Resume';
                 } else {
                     this.pauseOverlay.style.display = 'none';
-                    this.pauseButton.textContent = 'Pause';
+                    this.pauseButton.textContent = '❚❚';
                     this.gameLoop();
                 }
             }
@@ -721,24 +858,9 @@
                 if (this.level < 4) {
                     this.level += 1;
                     this.levelElement.textContent = this.level;
-
-                    // Removed unlocking next level as all levels are selectable
-
                 } else if (this.level === 4) {
                     this.level = 5; // Free Play Mode
                     this.levelElement.textContent = this.level;
-
-                    const freePlayItem = this.levelSelect.querySelector(`li[data-level="5"]`);
-                    if (freePlayItem) {
-                        freePlayItem.classList.remove('locked');
-                        freePlayItem.classList.add('active');
-                    }
-
-                    const freePlayPauseItem = this.pauseLevelSelect.querySelector(`li[data-level="5"]`);
-                    if (freePlayPauseItem) {
-                        freePlayPauseItem.classList.remove('locked');
-                        freePlayPauseItem.classList.add('active');
-                    }
                 }
 
                 this.currentWords = this.level < 5 ? [...levelWords[this.level]] : [];
@@ -757,68 +879,99 @@
                 const wordElement = document.createElement('div');
                 wordElement.className = 'word';
 
-                // Assign a unique left position
-                const leftPosition = this.getAvailablePosition();
-                if (leftPosition === null) return; // No available positions
+                // Temporarily set left to 0 to measure width
+                wordElement.style.left = '0px';
+                wordElement.style.visibility = 'hidden';
+                wordElement.innerHTML = this.decorateWord(word);
+                this.gameContainer.appendChild(wordElement);
+                const wordWidth = wordElement.offsetWidth;
+                this.gameContainer.removeChild(wordElement);
 
-                wordElement.style.left = `${leftPosition}%`;
+                // Calculate available space
+                const containerWidth = this.gameContainer.clientWidth;
+                const maxLeft = containerWidth - wordWidth - 40; // 40px padding
+
+                if (maxLeft <= 0) return; // Word too long to fit
+
+                // Assign a unique left position in pixels
+                let leftPosition;
+                let attempts = 0;
+                do {
+                    leftPosition = Math.random() * maxLeft + 20; // 20px padding
+                    attempts++;
+                    if (attempts > 100) break; // Prevent infinite loop
+                } while (this.isOverlapping(leftPosition, wordWidth));
+
+                // If overlapping after attempts, skip adding this word
+                if (this.isOverlapping(leftPosition, wordWidth)) return;
+
+                wordElement.style.left = `${leftPosition}px`;
                 wordElement.style.top = '-50px';
 
                 // Adjust font size based on level
                 let fontSize;
                 if (this.level === 1) {
-                    fontSize = 64;
-                } else if (this.level === 2) {
                     fontSize = 48;
+                } else if (this.level === 2) {
+                    fontSize = 36;
                 } else if (this.level === 3) {
-                    fontSize = 32;
+                    fontSize = 24;
                 } else if (this.level === 4) {
-                    fontSize = 16;
+                    fontSize = 12; // 25% of level 1
                 } else if (this.level === 5) {
-                    fontSize = 40; // Free Play Mode
+                    fontSize = 30; // Free Play Mode
                 }
                 wordElement.style.fontSize = `${fontSize}px`;
 
                 // Adjust letter gap based on level
                 if (this.level >= 2 && this.level < 5) {
-                    wordElement.style.setProperty('--letter-gap', '24px');
+                    wordElement.style.setProperty('--letter-gap', '16px');
                 } else {
-                    wordElement.style.setProperty('--letter-gap', '32px');
+                    wordElement.style.setProperty('--letter-gap', '24px');
                 }
 
                 wordElement.innerHTML = this.decorateWord(word);
+                wordElement.style.visibility = 'visible';
+                this.innerZoneAppend(wordElement);
 
-                this.gameContainer.appendChild(wordElement);
                 this.words.push({
                     element: wordElement,
                     word: word.toLowerCase(),
                     position: -50,
-                    speed: this.level === 1 ? 0.5 : (Math.random() * 0.5 + 0.5 + this.level * 0.1),
-                    leftPosition: leftPosition
+                    speed: (this.level === 1 ? 0.5 : (Math.random() * 0.5 + 0.5 + this.level * 0.1)) * this.fallSpeedMultiplier,
+                    leftPosition: leftPosition,
+                    width: wordWidth
                 });
 
-                // Add the 'highlight-letter' class to the first letter
+                // Highlight the first letter
                 setTimeout(() => {
-                    // Hide all finger-info first
-                    document.querySelectorAll('.finger-info').forEach(info => {
-                        info.style.display = 'none';
-                    });
+                    this.clearFingerInfos();
                     const firstLetter = wordElement.querySelector('.letter');
                     if (firstLetter) {
                         firstLetter.classList.add('highlight-letter');
                         const fingerInfo = firstLetter.querySelector('.finger-info');
                         if (fingerInfo) {
                             fingerInfo.style.display = 'flex';
+                            fingerInfo.style.top = `${firstLetter.offsetHeight + 4}px`;
                         }
                     }
                 }, 0);
+            }
+
+            isOverlapping(left, width) {
+                for (let wordObj of this.words) {
+                    if (Math.abs(wordObj.leftPosition - left) < (wordObj.width + width) / 2 + 20) { // Added buffer of 20px
+                        return true;
+                    }
+                }
+                return false;
             }
 
             decorateWord(word) {
                 return word.split('').map(letter => {
                     const lower = letter.toLowerCase();
                     const mapping = fingerMap[lower] || { hand: 'None', finger: 'None' };
-                    return `<span class="letter">${letter}<span class="finger-info"><div class="red-square"></div><span>${mapping.hand}</span><span>${mapping.finger}</span></span></span>`;
+                    return `<span class="letter">${letter}<span class="finger-info"><span>${mapping.hand}</span><span>${mapping.finger}</span></span></span>`;
                 }).join('');
             }
 
@@ -849,13 +1002,18 @@
             gameLoop() {
                 if (this.isPaused || !this.isGameStarted) return;
 
+                // Adjust speed of existing words based on slider
+                this.words.forEach(wordObj => {
+                    wordObj.speed = (this.level === 1 ? 0.5 : (Math.random() * 0.5 + 0.5 + this.level * 0.1)) * this.fallSpeedMultiplier;
+                });
+
                 if (Math.random() < (this.level === 1 ? 0.01 : 0.02) + this.level * (this.level === 1 ? 0 : 0.005)) this.createWord();
 
                 this.words.forEach(wordObj => {
                     wordObj.position += wordObj.speed;
                     wordObj.element.style.top = `${wordObj.position}px`;
 
-                    if (wordObj.position > window.innerHeight) {
+                    if (wordObj.position > this.gameContainer.clientHeight) {
                         wordObj.element.remove();
                         this.words = this.words.filter(w => w !== wordObj);
                         this.releasePosition(wordObj.leftPosition);
@@ -868,6 +1026,8 @@
                                 console.error('Error playing missed sound:', e);
                             });
                         }
+
+                        this.clearFingerInfos();
                     }
                 });
 
@@ -888,6 +1048,17 @@
 
             releaseAllPositions() {
                 this.occupiedPositions.clear();
+            }
+
+            innerZoneAppend(element) {
+                this.gameContainer.appendChild(element);
+            }
+
+            showHighScoreNotification() {
+                this.highScoreNotification.style.display = 'block';
+                setTimeout(() => {
+                    this.highScoreNotification.style.display = 'none';
+                }, 2000);
             }
         }
 
