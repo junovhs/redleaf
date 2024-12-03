@@ -338,19 +338,25 @@
     })();
 
     async function fetchPages() {
-      // Function remains unchanged for now
+        const pages = [
+          { name: 'suppliers', path: 'pages/suppliers.html' },
+          { name: 'contact', path: 'pages/contact.html' },
+          { name: 'about', path: 'pages/about.html' }
+        ];
+        return pages;
     }
 
     function createNavLinks(pages) {
-      // Function remains unchanged for now
-    }
-
-    function checkNavOverflow() {
-      // Function remains unchanged for now
-    }
-
-    function handleNavClick(event) {
-      // Function remains unchanged for now
+      const navbar = document.getElementById('navbar');
+      navbar.innerHTML = '';
+      pages.forEach(page => {
+        const navItem = document.createElement('div');
+        navItem.className = 'nav-item';
+        navItem.textContent = page.name;
+        navItem.setAttribute('data-page', page.path);
+        navItem.addEventListener('click', () => navigateTo(page.path));
+        navbar.appendChild(navItem);
+      });
     }
 
     function navigateTo(pagePath) {
@@ -361,20 +367,29 @@
     }
     
     async function loadContent(pagePath) {
-      const isLoading = true;
       const loading = document.getElementById('loading');
+      const homeContent = document.getElementById('home-content');
+      const contentFrame = document.getElementById('content-frame');
       loading.style.display = 'block';
       try {
         if (pagePath === 'home') {
-          // Load default content
+          contentFrame.style.display = 'none';
+          homeContent.style.display = 'block';
+          homeContent.innerHTML = '<h1>Welcome to Redleaf OS</h1><p>Select a page from the navigation menu.</p>';
         } else {
-          // Load specific content based on path
+          homeContent.style.display = 'none';
+          contentFrame.style.display = 'block';
+          const response = await fetch(pagePath);
+          if (!response.ok) throw new Error('Failed to fetch page content');
+          const html = await response.text();
+          contentFrame.srcdoc = html;
         }
       } catch (error) {
         console.error('Error loading content:', error);
+        homeContent.style.display = 'block';
+        homeContent.innerHTML = `<h1>Error</h1><p>Failed to load content. Please try again.</p>`;
       } finally {
         loading.style.display = 'none';
-        isLoading = false;
       }
     }
     
