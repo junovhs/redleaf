@@ -1,4 +1,6 @@
-<html><head><base href=".">
+<html>
+<head>
+  <base href=".">
   <meta charset="utf-8">
   <title>Graphviz Live Editor</title>
   <style>
@@ -97,7 +99,7 @@
       padding: 15px;
       border-radius: 8px;
       display: none;
-      z-index: 2;
+      z-index: 3;
       max-width: 300px;
     }
     #control-panel h3 {
@@ -122,13 +124,19 @@
       height: 100%;
       cursor: pointer;
       display: none;
-      z-index: 1;
+      z-index: 2;
+    }
+    /* Highlight selected element */
+    .selected {
+      stroke: #ff0000;
+      stroke-width: 2px;
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.14.0/ace.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/viz.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/viz.js/2.1.2/full.render.js"></script>
   <script src="https://unpkg.com/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/interact.js/1.10.11/interact.min.js"></script>
 </head>
 <body>
   <div class="container no-select">
@@ -144,20 +152,7 @@
     <div class="render-pane">
       <div id="graph-container" style="position: relative;">
         <!-- Existing SVG content will be rendered here -->
-        <a href="https://example.com/download.svg" download="graph.svg" style="
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          background: rgba(0, 0, 0, 0.7);
-          color: #fff;
-          padding: 8px 12px;
-          border-radius: 4px;
-          text-decoration: none;
-          font-size: 14px;
-          cursor: pointer;
-        ">
-          Download SVG
-        </a>
+        <!-- Removed the broken Download SVG link to fix the download functionality -->
         <div id="control-panel">
           <h3>Element Properties</h3>
           <label for="elem-color">Color:</label>
@@ -334,8 +329,12 @@
       };
     }
 
+    // Flag to prevent recursive updates
+    let isUpdating = false;
+
     // Render function
     async function renderGraph() {
+      if (isUpdating) return;
       const dotSource = editor.getValue();
       const container = document.getElementById('graph-container');
       const errorDisplay = document.getElementById('error-display');
@@ -351,7 +350,10 @@
           svg.style.width = '100%';
           svg.style.height = '100%';
 
-          svgPanZoom(svg, {
+          if (window.svgPanZoomInstance) {
+            window.svgPanZoomInstance.destroy();
+          }
+          window.svgPanZoomInstance = svgPanZoom(svg, {
             zoomEnabled: true,
             controlIconsEnabled: true,
             fit: true,
@@ -366,6 +368,9 @@
             if (title) {
               const id = 'node-' + index;
               node.setAttribute('data-node-id', id);
+              node.setAttribute('id', id);
+              // Make nodes draggable
+              makeDraggable(node);
             }
           });
 
@@ -376,6 +381,7 @@
             if (title) {
               const id = 'edge-' + index;
               edge.setAttribute('data-edge-id', id);
+              edge.setAttribute('id', id);
             }
           });
         }
@@ -397,9 +403,14 @@
     const debouncedRender = debounce(renderGraph, 300);
 
     // Event listeners
-    editor.session.on('change', debouncedRender);
+    editor.session.on('change', () => {
+      if (isUpdating) return;
+      debouncedRender();
+    });
 
-    document.getElementById('render-btn').addEventListener('click', renderGraph);
+    document.getElementById('render-btn').addEventListener('click', () => {
+      renderGraph();
+    });
 
     document.getElementById('download-btn').addEventListener('click', () => {
       const svg = document.querySelector('#graph-container svg');
@@ -422,7 +433,7 @@
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'linux_kernel_diagram.svg';
+      a.download = 'graph.svg'; // Changed the filename to 'graph.svg'
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -507,6 +518,7 @@
       controlPanel.style.display = 'none';
       selectedElement = null;
       selectedElementType = null;
+      removeSelectionHighlight();
     }
 
     function svgClickHandler(event) {
@@ -518,6 +530,7 @@
         selectedElementType = target.classList.contains('node') ? 'node' : 'edge';
         showControlPanel(event.pageX, event.pageY);
         populateControlPanel();
+        highlightSelectedElement();
       }
     }
 
@@ -531,6 +544,7 @@
       controlPanel.style.display = 'none';
       selectedElement = null;
       selectedElementType = null;
+      removeSelectionHighlight();
     }
 
     document.getElementById('close-panel').addEventListener('click', () => {
@@ -543,7 +557,9 @@
 
     function populateControlPanel() {
       if (!selectedElement) return;
-      const label = selectedElement.querySelector('text').textContent;
+      const textElement = selectedElement.querySelector('text');
+      if (!textElement) return;
+      const label = textElement.textContent;
 
       // Extract current styles
       const style = selectedElement.querySelector('path, rect, ellipse, polygon, polyline, circle');
@@ -552,7 +568,10 @@
       let currentFontSize = 10;
 
       if (style) {
-        currentColor = rgbToHex(style.getAttribute('fill') || '#ffffff');
+        const fill = style.getAttribute('fill');
+        if (fill) {
+          currentColor = rgbToHex(fill);
+        }
       }
 
       const text = selectedElement.querySelector('text');
@@ -563,9 +582,13 @@
         if (fontSize) currentFontSize = parseInt(fontSize);
       }
 
-      document.getElementById('elem-color').value = currentColor;
-      document.getElementById('elem-font').value = currentFont;
-      document.getElementById('elem-font-size').value = currentFontSize;
+      const elemColor = document.getElementById('elem-color');
+      const elemFont = document.getElementById('elem-font');
+      const elemFontSize = document.getElementById('elem-font-size');
+
+      if (elemColor) elemColor.value = currentColor;
+      if (elemFont) elemFont.value = currentFont;
+      if (elemFontSize) elemFontSize.value = currentFontSize;
     }
 
     function rgbToHex(rgb) {
@@ -611,31 +634,54 @@
       let updatedDot = editor.getValue().split('\n');
 
       // Find the label
-      const label = element.querySelector('text').textContent.replace(/\\n/g, '\n');
+      const textElement = element.querySelector('text');
+      if (!textElement) return;
+      const label = textElement.textContent.replace(/\\n/g, '\\n');
 
       for (let i = 0; i < updatedDot.length; i++) {
-        if (updatedDot[i].includes(`[label="${label}"]`) || updatedDot[i].includes(`[label="${label.replace('\n', '\\n')}"]`)) {
-          if (selectedElementType === 'node') {
-            // Update node attributes
-            if (updatedDot[i].includes('[')) {
-              // Modify existing attributes
-              updatedDot[i] = updatedDot[i].replace(/fillcolor\s*=\s*"[^"]*"/, `fillcolor="${color}"`);
-              updatedDot[i] = updatedDot[i].replace(/fontname\s*=\s*"[^"]*"/, `fontname="${font}"`);
-              updatedDot[i] = updatedDot[i].replace(/fontsize\s*=\s*\d+/, `fontsize=${fontSize}`);
+        const nodeMatch = updatedDot[i].match(/^(\s*)(\w+)\s+\[label="([^"]*)"(.*)\];?$/);
+        const edgeMatch = updatedDot[i].match(/^(\s*)(\w+)\s*->\s*(\w+)(\s*\[.*\])?;?$/);
+
+        if (nodeMatch && selectedElementType === 'node') {
+          const nodeLabel = nodeMatch[3];
+          if (nodeLabel === label) {
+            let attributes = nodeMatch[4];
+            // Update fillcolor
+            if (attributes.includes('fillcolor=')) {
+              attributes = attributes.replace(/fillcolor\s*=\s*"[^"]*"/, `fillcolor="${color}"`);
             } else {
-              // Add attributes
-              updatedDot[i] = updatedDot[i].replace(']', `, fillcolor="${color}", fontname="${font}", fontsize=${fontSize}]`);
+              attributes += `, fillcolor="${color}"`;
             }
+            // Update fontname
+            if (attributes.includes('fontname=')) {
+              attributes = attributes.replace(/fontname\s*=\s*"[^"]*"/, `fontname="${font}"`);
+            } else {
+              attributes += `, fontname="${font}"`;
+            }
+            // Update fontsize
+            if (attributes.includes('fontsize=')) {
+              attributes = attributes.replace(/fontsize\s*=\s*\d+/, `fontsize=${fontSize}`);
+            } else {
+              attributes += `, fontsize=${fontSize}`;
+            }
+            // Update the line
+            updatedDot[i] = `${nodeMatch[1]}${nodeMatch[2]} [label="${nodeMatch[3]}"${attributes}];`;
             updated = true;
             break;
-          } else if (selectedElementType === 'edge') {
-            // Update edge attributes if needed
-            // For simplicity, only color is updated for edges
-            if (updatedDot[i].includes('[')) {
-              updatedDot[i] = updatedDot[i].replace(/color\s*=\s*"[^"]*"/, `color="${color}"`);
+          }
+        }
+
+        if (edgeMatch && selectedElementType === 'edge') {
+          if (updatedDot[i].includes(label)) {
+            let attributes = edgeMatch[4] || '';
+            // Update color
+            if (attributes.includes('color=')) {
+              attributes = attributes.replace(/color\s*=\s*"[^"]*"/, `color="${color}"`);
             } else {
-              updatedDot[i] = updatedDot[i].replace(']', `, color="${color}"]`);
+              attributes += `, color="${color}"`;
             }
+            // Update the line
+            updatedDot[i] = `${edgeMatch[1]}${edgeMatch[2]} -> ${edgeMatch[3]}${attributes};`;
             updated = true;
             break;
           }
@@ -643,8 +689,10 @@
       }
 
       if (updated) {
+        isUpdating = true;
         editor.setValue(updatedDot.join('\n'), -1);
-        debouncedRender();
+        isUpdating = false;
+        renderGraph();
       }
     }
 
@@ -656,5 +704,100 @@
         }
       }
     });
+
+    // Highlight selected element
+    function highlightSelectedElement() {
+      removeSelectionHighlight();
+      if (selectedElement) {
+        selectedElement.classList.add('selected');
+      }
+    }
+
+    function removeSelectionHighlight() {
+      const previouslySelected = document.querySelectorAll('.selected');
+      previouslySelected.forEach(elem => elem.classList.remove('selected'));
+    }
+
+    // Make nodes draggable using interact.js
+    function makeDraggable(node) {
+      interact(node)
+        .draggable({
+          listeners: {
+            move(event) {
+              const target = event.target;
+              const transform = target.getAttribute('transform') || 'translate(0,0)';
+              const translate = getTranslate(transform);
+              const dx = event.dx;
+              const dy = event.dy;
+              const newX = translate.x + dx;
+              const newY = translate.y + dy;
+              target.setAttribute('transform', `translate(${newX},${newY})`);
+            },
+            end(event) {
+              const target = event.target;
+              const transform = target.getAttribute('transform') || 'translate(0,0)';
+              const translate = getTranslate(transform);
+              updateNodePositionInDot(target, translate.x, translate.y);
+            }
+          }
+        });
+    }
+
+    function getTranslate(transform) {
+      const match = /translate\(([-\d.]+),?([-\d.]*)\)/.exec(transform);
+      return {
+        x: match && match[1] ? parseFloat(match[1]) : 0,
+        y: match && match[2] ? parseFloat(match[2]) : 0
+      };
+    }
+
+    function updateNodePositionInDot(node, x, y) {
+      const svg = document.querySelector('#graph-container svg');
+      const nodeId = node.getAttribute('id');
+      const nodes = svg.querySelectorAll('g.node');
+      let label = '';
+      nodes.forEach(n => {
+        if (n.getAttribute('id') === nodeId) {
+          const textElement = n.querySelector('text');
+          if (textElement) {
+            label = textElement.textContent;
+          }
+        }
+      });
+
+      if (!label) return;
+
+      const dotLines = editor.getValue().split('\n');
+      let updated = false;
+
+      for (let i = 0; i < dotLines.length; i++) {
+        const nodeMatch = dotLines[i].match(/^(\s*)(\w+)\s+\[label="([^"]*)"(.*)\];?$/);
+        if (nodeMatch && nodeMatch[3] === label) {
+          let attributes = nodeMatch[4];
+          // Update or add pos attribute
+          if (attributes.includes('pos=')) {
+            attributes = attributes.replace(/pos\s*=\s*"[^"]*"/, `pos="${x},${y}!"`);
+          } else {
+            attributes += `, pos="${x},${y}!"`;
+          }
+          // Ensure graph uses 'neato' layout for pos to take effect
+          if (!dotLines.some(line => line.trim().startsWith('layout='))) {
+            dotLines.unshift(`  layout = "neato";`);
+          }
+          // Update the line
+          dotLines[i] = `${nodeMatch[1]}${nodeMatch[2]} [label="${nodeMatch[3]}"${attributes}];`;
+          updated = true;
+          break;
+        }
+      }
+
+      if (updated) {
+        isUpdating = true;
+        editor.setValue(dotLines.join('\n'), -1);
+        isUpdating = false;
+        renderGraph();
+      }
+    }
   </script>
-</body></html>
+</body>
+</html>
