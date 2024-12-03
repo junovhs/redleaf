@@ -1,4 +1,4 @@
-<html><head><base href="https://example.com"><title>Celestial Word Shooter</title><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet"><style>
+<html><head><base href="https://example.com"><title>Celestial Word Shooter</title><meta name="viewport" content="width=device-width, initial-scale=1.0"><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet"><style>
         body {
             margin: 0;
             padding: 0;
@@ -13,19 +13,19 @@
         }
 
         #sidebar {
-            width: 250px;
+            width: 180px;
             background: #022426;
-            padding: 20px;
+            padding: 15px;
             box-sizing: border-box;
             color: #CDCCBB;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
         #sidebar h2 {
-            font-size: 24px;
+            font-size: 20px;
             margin-top: 0;
             color: #B04438;
         }
@@ -37,12 +37,17 @@
         }
 
         #level-select li {
-            padding: 10px;
-            margin-bottom: 10px;
+            padding: 8px;
+            margin-bottom: 8px;
             background: #03363c;
             border: 2px solid #CDCCBB;
             border-radius: 4px;
             cursor: pointer;
+            font-size: 12px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         #level-select li.active {
@@ -51,7 +56,7 @@
         }
 
         #level-description {
-            font-size: 14px;
+            font-size: 12px;
             color: #CDCCBB;
         }
 
@@ -59,19 +64,19 @@
         #falling-speed-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         #falling-speed-label {
-            font-size: 16px;
+            font-size: 14px;
             color: #CDCCBB;
         }
 
         #falling-speed-slider {
             -webkit-appearance: none;
             width: 100%;
-            height: 8px;
-            border-radius: 4px;
+            height: 6px;
+            border-radius: 3px;
             background: #03363c;
             outline: none;
             opacity: 0.7;
@@ -85,29 +90,29 @@
         #falling-speed-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background: #B04438;
             cursor: pointer;
             border: 2px solid #CDCCBB;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
         }
 
         #falling-speed-slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background: #B04438;
             cursor: pointer;
             border: 2px solid #CDCCBB;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
         }
 
         #game-container {
             position: relative;
             flex: 1;
-            width: calc(100vw - 250px);
+            width: calc(100vw - 180px);
             height: 100vh;
             overflow: hidden;
             display: flex;
@@ -117,24 +122,24 @@
 
         #inner-zone {
             position: relative;
-            width: 80%;
-            height: calc(100vh - 200px);
+            width: 90%;
+            height: calc(100vh - 160px);
             margin: 0 auto;
             overflow: hidden;
             background: transparent;
             box-sizing: border-box;
-            padding: 0 20px;
+            padding: 0 10px;
         }
 
         .word {
             position: absolute;
-            font-size: var(--word-size, 48px);
+            font-size: var(--word-size, 24px);
             color: #CDCCBB;
-            text-shadow: 0 0 10px rgba(205, 204, 187, 0.5);
+            text-shadow: 0 0 5px rgba(205, 204, 187, 0.5);
             transition: color 0.3s;
             user-select: none;
             display: flex;
-            gap: var(--letter-gap, 24px);
+            gap: var(--letter-gap, 12px);
             max-width: 100%;
             white-space: nowrap;
             overflow: hidden;
@@ -143,40 +148,41 @@
 
         .word.active {
             color: #B04438;
-            text-shadow: 0 0 20px #B04438;
+            text-shadow: 0 0 10px #B04438;
         }
 
         .finger-info {
-            display: none; /* Hide all finger info by default */
+            display: none;
             position: absolute;
-            top: 100%; /* Move below the letter */
+            top: 100%;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 12px;
+            font-size: 8px;
             color: #CDCCBB;
             white-space: nowrap;
-            text-shadow: none; /* Remove glow */
+            text-shadow: none;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .finger-info span {
             display: block;
             text-align: center;
-            font-size: 10px; /* Smaller font for 8-bit style */
+            font-size: 6px;
             color: #CDCCBB;
         }
 
         .letter {
             position: relative;
             display: inline-block;
+            text-align: center;
         }
 
         .highlight-letter {
             color: #B04438;
-            text-shadow: 0 0 10px #B04438;
+            text-shadow: 0 0 5px #B04438;
         }
 
         .letter.poofing {
@@ -185,26 +191,27 @@
 
         #score, #level, #high-score, #typing-speed {
             position: fixed;
-            top: 20px;
-            font-size: 24px;
+            top: 10px;
+            font-size: 16px;
             color: #CDCCBB;
         }
 
         #score {
-            right: 20px;
+            right: 10px;
         }
 
         #level {
-            left: 270px;
+            left: 190px;
         }
 
         #high-score {
-            right: 270px;
+            right: 190px;
         }
 
         #typing-speed {
-            right: 20px;
-            top: 60px;
+            right: 10px;
+            top: 30px;
+            font-size: 14px;
         }
 
         .particle {
@@ -219,12 +226,12 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80%;
-            max-width: 600px;
+            width: 90%;
+            max-width: 500px;
             background: #041317;
-            border: 4px solid #CDCCBB;
-            border-radius: 8px;
-            padding: 30px;
+            border: 3px solid #CDCCBB;
+            border-radius: 6px;
+            padding: 20px;
             text-align: center;
             z-index: 2000;
             animation: fadeIn 1s ease-in-out;
@@ -232,30 +239,30 @@
 
         #instructions h2 {
             margin-top: 0;
-            font-size: 32px;
+            font-size: 24px;
             color: #B04438;
             font-family: 'Press Start 2P', 'Courier New', monospace;
         }
 
         #instructions p {
             font-family: 'Press Start 2P', 'Courier New', monospace;
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 10px;
+            line-height: 1.4;
             color: #CDCCBB;
-            margin: 20px 0;
+            margin: 15px 0;
         }
 
         #start-button, #resume-button, #pause-button {
-            padding: 10px 20px;
+            padding: 8px 16px;
             background: #B04438;
             border: 2px solid #CDCCBB;
             border-radius: 2px;
             color: #CDCCBB;
-            font-size: 16px;
+            font-size: 12px;
             cursor: pointer;
             transition: background 0.3s;
             font-family: 'Press Start 2P', 'Courier New', monospace;
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         #start-button:hover, #resume-button:hover, #pause-button:hover {
@@ -304,37 +311,40 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(4, 19, 23, 0.9);
+            background: rgba(4, 19, 23, 0.95);
             display: none;
             justify-content: center;
             align-items: center;
             flex-direction: column;
             z-index: 3000;
-            padding: 20px;
+            padding: 15px;
             box-sizing: border-box;
         }
 
         #pause-overlay h2 {
             color: #CDCCBB;
-            font-size: 48px;
-            margin-bottom: 20px;
+            font-size: 24px;
+            margin-bottom: 15px;
         }
 
         #pause-level-select {
             width: 100%;
-            max-width: 300px;
-            margin-bottom: 20px;
+            max-width: 250px;
+            margin-bottom: 15px;
         }
 
         #pause-level-select li {
-            padding: 10px;
-            margin-bottom: 10px;
+            padding: 8px;
+            margin-bottom: 8px;
             background: #03363c;
             border: 2px solid #CDCCBB;
             border-radius: 4px;
             cursor: pointer;
             text-align: center;
-            font-size: 14px;
+            font-size: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         #pause-level-select li.active {
@@ -343,69 +353,313 @@
         }
 
         #resume-button {
-            width: 150px;
+            width: 120px;
+            font-size: 10px;
         }
 
         /* High Score Notification */
         #high-score-notification {
             position: fixed;
-            top: 80px;
-            right: 270px;
+            top: 50px;
+            right: 190px;
             background: #045760;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: 2px solid #B04438;
             border-radius: 4px;
             color: #B04438;
-            font-size: 18px;
+            font-size: 14px;
             display: none;
             z-index: 2500;
         }
 
+        /* Sound Controls */
+        #sound-controls {
+            position: fixed;
+            bottom: 15px;
+            right: 190px;
+            color: #CDCCBB;
+            font-size: 10px;
+        }
+
+        #sound-controls label {
+            margin-right: 5px;
+        }
+
+        /* Pause Button */
+        #pause-button {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            padding: 3px;
+            font-size: 10px;
+            border-radius: 50%;
+            background: #B04438;
+            border: 2px solid #CDCCBB;
+            color: #CDCCBB;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+            transition: background 0.3s, transform 0.2s;
+            z-index: 1500;
+        }
+
         /* Responsive Design */
+        @media (max-width: 1024px) {
+            #sidebar {
+                width: 160px;
+            }
+
+            #level-select li {
+                font-size: 11px;
+            }
+
+            #level-description {
+                font-size: 11px;
+            }
+
+            #falling-speed-label {
+                font-size: 13px;
+            }
+
+            #score, #level, #high-score, #typing-speed {
+                font-size: 15px;
+            }
+
+            #typing-speed {
+                font-size: 13px;
+            }
+
+            #instructions h2 {
+                font-size: 22px;
+            }
+
+            #instructions p {
+                font-size: 9px;
+            }
+
+            #start-button, #resume-button, #pause-button {
+                font-size: 11px;
+            }
+
+            #high-score-notification {
+                font-size: 13px;
+            }
+        }
+
         @media (max-width: 768px) {
             #sidebar {
                 width: 100%;
-                height: 150px;
+                height: 120px;
                 position: fixed;
                 bottom: 0;
                 left: 0;
                 flex-direction: row;
-                overflow-x: scroll;
+                overflow-x: auto;
                 overflow-y: hidden;
-                gap: 10px;
+                gap: 8px;
+                padding: 10px;
             }
 
             #game-container {
                 width: 100vw;
-                height: calc(100vh - 150px);
+                height: calc(100vh - 120px);
             }
 
             #level, #score, #high-score, #typing-speed {
-                top: 10px;
-                right: 10px;
+                top: 5px;
+                right: 5px;
                 left: auto;
+                font-size: 14px;
+            }
+
+            #level-description {
+                display: none;
             }
 
             #pause-overlay {
-                padding: 10px;
+                padding: 8px;
             }
 
             #pause-overlay h2 {
-                font-size: 32px;
+                font-size: 20px;
             }
 
             #pause-level-select li {
-                font-size: 14px;
+                font-size: 9px;
             }
 
             #resume-button {
-                width: 120px;
-                font-size: 14px;
+                width: 100px;
+                font-size: 9px;
             }
 
             .finger-info {
-                font-size: 16px;
-                margin-top: 8px;
+                font-size: 12px;
+                margin-top: 4px;
+            }
+
+            #high-score-notification {
+                top: 40px;
+                right: 190px;
+                font-size: 12px;
+            }
+
+            #sound-controls {
+                right: 10px;
+            }
+
+            #pause-button {
+                top: 5px;
+                left: auto;
+                right: 50%;
+                transform: translateX(50%);
+            }
+        }
+
+        @media (max-width: 480px) {
+            #sidebar {
+                flex-wrap: wrap;
+                height: auto;
+                position: fixed;
+                top: 0;
+                left: 0;
+                flex-direction: row;
+                overflow-x: scroll;
+                overflow-y: hidden;
+                gap: 5px;
+                padding: 8px;
+            }
+
+            #game-container {
+                width: 100vw;
+                height: calc(100vh - 120px);
+            }
+
+            #level, #score, #high-score, #typing-speed {
+                top: 5px;
+                right: 5px;
+                left: auto;
+                font-size: 13px;
+            }
+
+            #instructions h2 {
+                font-size: 20px;
+            }
+
+            #instructions p {
+                font-size: 8px;
+            }
+
+            #start-button, #resume-button, #pause-button {
+                font-size: 10px;
+            }
+
+            #high-score-notification {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 240px) {
+            body {
+                flex-direction: column;
+            }
+
+            #sidebar {
+                width: 100%;
+                height: auto;
+                position: fixed;
+                top: 0;
+                left: 0;
+                flex-direction: column;
+                overflow-x: hidden;
+                overflow-y: auto;
+                gap: 5px;
+                padding: 8px;
+            }
+
+            #game-container {
+                width: 100vw;
+                height: calc(100vh - 120px);
+            }
+
+            #score, #level, #high-score, #typing-speed {
+                position: static;
+                font-size: 12px;
+                margin: 5px 0;
+            }
+
+            #pause-button {
+                top: 5px;
+                right: 10px;
+                left: auto;
+                transform: none;
+            }
+
+            #pause-overlay {
+                padding: 5px;
+            }
+
+            #pause-overlay h2 {
+                font-size: 18px;
+            }
+
+            #pause-level-select li {
+                font-size: 8px;
+            }
+
+            #resume-button {
+                width: 90px;
+                font-size: 8px;
+            }
+
+            .finger-info {
+                font-size: 10px;
+                margin-top: 2px;
+            }
+
+            #high-score-notification {
+                top: 30px;
+                right: 10px;
+                font-size: 10px;
+            }
+
+            #falling-speed-container {
+                gap: 5px;
+            }
+
+            #falling-speed-label {
+                font-size: 12px;
+            }
+
+            #falling-speed-slider {
+                height: 5px;
+            }
+
+            #level-select li, #pause-level-select li {
+                font-size: 8px;
+            }
+
+            #level-description {
+                font-size: 10px;
+            }
+
+            #instructions h2 {
+                font-size: 18px;
+            }
+
+            #instructions p {
+                font-size: 7px;
+            }
+
+            #sound-controls {
+                bottom: 10px;
+                right: 10px;
+                font-size: 8px;
             }
         }
     </style></head><body>
@@ -449,29 +703,8 @@
         <p>Type the words as they appear on the screen to "shoot" them down. Complete 10 words to advance to the next level. Good luck and have fun!</p>
         <button id="start-button">Press Spacebar with Thumb to Start Game</button>
     </div>
-    <button id="pause-button" style="
-        position: fixed;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 40px;
-        height: 40px;
-        padding: 5px;
-        font-size: 12px;
-        border-radius: 50%;
-        background: #B04438;
-        border: 2px solid #CDCCBB;
-        color: #CDCCBB;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-        transition: background 0.3s, transform 0.2s;
-    ">
-        ❚❚
-    </button>
-    <div id="sound-controls" style="position: fixed; bottom: 20px; right: 270px; color: #CDCCBB;">
+    <button id="pause-button">❚❚</button>
+    <div id="sound-controls">
         <label for="sound-toggle">Sound:</label>
         <input type="checkbox" id="sound-toggle" checked="">
     </div>
@@ -616,6 +849,7 @@
                     if (e.target && e.target.nodeName === 'LI') {
                         const selectedLevel = parseInt(e.target.getAttribute('data-level'));
                         this.selectLevel(selectedLevel);
+                        this.togglePause(); // Unpause after selecting level
                     }
                 });
 
@@ -683,8 +917,8 @@
                             currentLetterElement.classList.add('poofing');
                             currentLetterElement.classList.add('highlight-letter');
                             this.createParticles(
-                                currentLetterElement.getBoundingClientRect().left + currentLetterElement.offsetWidth / 2,
-                                currentLetterElement.getBoundingClientRect().top + currentLetterElement.offsetHeight / 2
+                                currentLetterElement.getBoundingClientRect().left + currentLetterElement.offsetWidth / 2 - this.gameContainer.getBoundingClientRect().left,
+                                currentLetterElement.getBoundingClientRect().top + currentLetterElement.offsetHeight / 2 - this.gameContainer.getBoundingClientRect().top
                             );
                         }
 
@@ -743,7 +977,7 @@
                                     const fingerInfo = nextLetterElement.querySelector('.finger-info');
                                     if (fingerInfo) {
                                         fingerInfo.style.display = 'flex';
-                                        fingerInfo.style.top = `${nextLetterElement.offsetHeight + 4}px`;
+                                        fingerInfo.style.top = `${nextLetterElement.offsetHeight + 2}px`;
                                     }
                                 }
                             }
@@ -790,7 +1024,7 @@
             startGame() {
                 this.isGameStarted = true;
                 this.instructions.style.display = 'none';
-                this.pauseButton.style.display = 'block';
+                this.pauseButton.style.display = 'flex';
                 this.pauseOverlay.style.display = 'none';
                 this.isPaused = false;
                 this.startTime = Date.now();
@@ -803,7 +1037,7 @@
                 this.isPaused = !this.isPaused;
                 if (this.isPaused) {
                     this.pauseOverlay.style.display = 'flex';
-                    this.pauseButton.textContent = 'Resume';
+                    this.pauseButton.textContent = '▶';
                 } else {
                     this.pauseOverlay.style.display = 'none';
                     this.pauseButton.textContent = '❚❚';
@@ -867,7 +1101,7 @@
             }
 
             createWord() {
-                const maxWordsForLevel = this.level === 1 ? 1 : Math.min(3 + this.level, 15);
+                const maxWordsForLevel = this.level === 1 ? 1 : Math.min(3 + this.level, 10);
                 if (this.words.length >= maxWordsForLevel) return;
 
                 let wordList = this.level < 5 ? levelWords[this.level] : defaultWords;
@@ -889,7 +1123,7 @@
 
                 // Calculate available space
                 const containerWidth = this.gameContainer.clientWidth;
-                const maxLeft = containerWidth - wordWidth - 40; // 40px padding
+                const maxLeft = containerWidth - wordWidth - 20; // 20px padding
 
                 if (maxLeft <= 0) return; // Word too long to fit
 
@@ -897,7 +1131,7 @@
                 let leftPosition;
                 let attempts = 0;
                 do {
-                    leftPosition = Math.random() * maxLeft + 20; // 20px padding
+                    leftPosition = Math.random() * maxLeft + 10; // 10px padding
                     attempts++;
                     if (attempts > 100) break; // Prevent infinite loop
                 } while (this.isOverlapping(leftPosition, wordWidth));
@@ -911,23 +1145,23 @@
                 // Adjust font size based on level
                 let fontSize;
                 if (this.level === 1) {
-                    fontSize = 48;
-                } else if (this.level === 2) {
-                    fontSize = 36;
-                } else if (this.level === 3) {
                     fontSize = 24;
+                } else if (this.level === 2) {
+                    fontSize = 18;
+                } else if (this.level === 3) {
+                    fontSize = 14;
                 } else if (this.level === 4) {
-                    fontSize = 12; // 25% of level 1
+                    fontSize = 6; // 25% of level 1
                 } else if (this.level === 5) {
-                    fontSize = 30; // Free Play Mode
+                    fontSize = 15; // Free Play Mode
                 }
-                wordElement.style.fontSize = `${fontSize}px`;
+                wordElement.style.setProperty('--word-size', `${fontSize}px`);
 
                 // Adjust letter gap based on level
                 if (this.level >= 2 && this.level < 5) {
-                    wordElement.style.setProperty('--letter-gap', '16px');
+                    wordElement.style.setProperty('--letter-gap', '8px');
                 } else {
-                    wordElement.style.setProperty('--letter-gap', '24px');
+                    wordElement.style.setProperty('--letter-gap', '12px');
                 }
 
                 wordElement.innerHTML = this.decorateWord(word);
@@ -938,7 +1172,7 @@
                     element: wordElement,
                     word: word.toLowerCase(),
                     position: -50,
-                    speed: (this.level === 1 ? 0.5 : (Math.random() * 0.5 + 0.5 + this.level * 0.1)) * this.fallSpeedMultiplier,
+                    speed: (this.level === 1 ? 0.5 : (Math.random() * 0.5 + 0.5 + this.level * 0.05)) * this.fallSpeedMultiplier,
                     leftPosition: leftPosition,
                     width: wordWidth
                 });
@@ -952,7 +1186,7 @@
                         const fingerInfo = firstLetter.querySelector('.finger-info');
                         if (fingerInfo) {
                             fingerInfo.style.display = 'flex';
-                            fingerInfo.style.top = `${firstLetter.offsetHeight + 4}px`;
+                            fingerInfo.style.top = `${firstLetter.offsetHeight + 2}px`;
                         }
                     }
                 }, 0);
@@ -960,7 +1194,7 @@
 
             isOverlapping(left, width) {
                 for (let wordObj of this.words) {
-                    if (Math.abs(wordObj.leftPosition - left) < (wordObj.width + width) / 2 + 20) { // Added buffer of 20px
+                    if (Math.abs(wordObj.leftPosition - left) < (wordObj.width + width) / 2 + 10) { // Added buffer of 10px
                         return true;
                     }
                 }
@@ -982,12 +1216,12 @@
                     particle.style.left = `${x}px`;
                     particle.style.top = `${y}px`;
                     
-                    const size = Math.random() * 4 + 2;
+                    const size = Math.random() * 3 + 1;
                     particle.style.width = `${size}px`;
                     particle.style.height = `${size}px`;
                     
                     const angle = Math.random() * Math.PI * 2;
-                    const velocity = Math.random() * 100 + 50;
+                    const velocity = Math.random() * 50 + 25;
                     const vx = Math.cos(angle) * velocity;
                     const vy = Math.sin(angle) * velocity;
                     
@@ -1004,10 +1238,10 @@
 
                 // Adjust speed of existing words based on slider
                 this.words.forEach(wordObj => {
-                    wordObj.speed = (this.level === 1 ? 0.5 : (Math.random() * 0.5 + 0.5 + this.level * 0.1)) * this.fallSpeedMultiplier;
+                    wordObj.speed = (this.level === 1 ? 0.5 : (Math.random() * 0.5 + 0.5 + this.level * 0.05)) * this.fallSpeedMultiplier;
                 });
 
-                if (Math.random() < (this.level === 1 ? 0.01 : 0.02) + this.level * (this.level === 1 ? 0 : 0.005)) this.createWord();
+                if (Math.random() < (this.level === 1 ? 0.005 : 0.01) + this.level * (this.level === 1 ? 0 : 0.0025)) this.createWord();
 
                 this.words.forEach(wordObj => {
                     wordObj.position += wordObj.speed;
