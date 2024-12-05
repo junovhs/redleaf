@@ -1,0 +1,613 @@
+<html>
+<head>
+<base href=".">
+<style>
+:root {
+  --primary: #2a4d69;
+  --secondary: #4b86b4;
+  --accent: #adcbe3;
+  --light: #e7eff6;
+  --dark: #1b3242;
+  --success: #4CAF50;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: var(--light);
+  color: var(--dark);
+}
+
+.input-section {
+  margin-bottom: 2rem;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.brief-input {
+  width: 100%;
+  height: 150px;
+  padding: 1rem;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-family: inherit;
+}
+
+.parse-button, .add-spec-button {
+  background: var(--secondary);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.parse-button:hover, .add-spec-button:hover {
+  background: var(--primary);
+}
+
+.manual-input-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.form-group input, .form-group select, .form-group textarea {
+  padding: 0.5rem;
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+  font-family: inherit;
+}
+
+.preset-section {
+  margin-top: 1rem;
+}
+
+.preset-dropdown {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid var(--accent);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.spec-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  position: relative;
+}
+
+.spec-card.completed {
+  background: #e8f5e9;
+}
+
+.spec-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.icon {
+  width: 40px;
+  height: 40px;
+  fill: var(--secondary);
+}
+
+.title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.spec-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.spec-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.spec-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+
+.spec-label {
+  font-weight: 600;
+  color: var(--secondary);
+  min-width: 100px;
+}
+
+.complete-checkbox {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  border: 2px solid var(--secondary);
+  border-radius: 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: white;
+  transition: all 0.2s;
+}
+
+.complete-checkbox:checked {
+  background: var(--success);
+  border-color: var(--success);
+}
+
+.complete-checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.delete-button {
+  position: absolute;
+  top: 1rem;
+  right: 3rem; /* Position it to the left of the checkbox */
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.delete-button:hover {
+  color: #dc3545; /* Red color on hover */
+}
+
+@keyframes celebrate {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.9); }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 1rem;
+  }
+  
+  .container {
+    grid-template-columns: 1fr;
+  }
+  
+  .manual-input-form {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="input-section">
+  <h2>Paste Design Brief</h2>
+  <textarea class="brief-input" placeholder="Paste your design brief here..."></textarea>
+  <button class="parse-button" onclick="parseBrief()">Generate Spec Cards</button>
+</div>
+
+<div class="input-section">
+  <h2>Add Single Spec Card</h2>
+  <div class="preset-section">
+    <select id="preset-category" class="preset-dropdown" onchange="updatePresets()">
+      <option value="">Select Category...</option>
+      <option value="digital">Digital</option>
+      <option value="print">Print</option>
+    </select>
+    <select id="preset-specific" class="preset-dropdown" onchange="applyPreset()">
+      <option value="">Select Specific Format...</option>
+    </select>
+  </div>
+  <form id="manual-input-form" class="manual-input-form">
+    <div class="form-group">
+      <label for="title">Title/Project Name</label>
+      <input type="text" id="title" required>
+    </div>
+    <div class="form-group">
+      <label for="format">Format Type</label>
+      <select id="format" required>
+        <option value="digital">Digital</option>
+        <option value="print">Print</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="dimensions">Dimensions</label>
+      <input type="text" id="dimensions" placeholder="e.g., 1920px x 1080px">
+    </div>
+    <div class="form-group">
+      <label for="resolution">Resolution/DPI</label>
+      <input type="text" id="resolution" placeholder="e.g., 300">
+    </div>
+    <div class="form-group">
+      <label for="colorspace">Color Space</label>
+      <select id="colorspace">
+        <option value="RGB">RGB</option>
+        <option value="CMYK">CMYK</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="bleed">Bleed</label>
+      <input type="text" id="bleed" placeholder="e.g., 0.125">
+    </div>
+    <div class="form-group">
+      <label for="notes">Notes/Instructions</label>
+      <textarea id="notes"></textarea>
+    </div>
+  </form>
+  <button class="add-spec-button" onclick="addManualSpec()">Add Spec Card</button>
+</div>
+
+<div class="container" id="specs-container"></div>
+
+<script>
+// MASSIVELY EXPANDED PRESETS
+
+const digitalPresets = {
+  "Social Media & Video Platforms": {
+    "Instagram Post (Square)": { dimensions: "1080 x 1080px", resolution: "72 DPI", colorspace: "RGB" },
+    "Instagram Portrait Post": { dimensions: "1080 x 1350px", resolution: "72 DPI", colorspace: "RGB" },
+    "Instagram Story/Reel Cover": { dimensions: "1080 x 1920px", resolution: "72 DPI", colorspace: "RGB" },
+    "Facebook Post": { dimensions: "1200 x 630px", resolution: "72 DPI", colorspace: "RGB" },
+    "Facebook Cover Photo (Page)": { dimensions: "820 x 312px", resolution: "72 DPI", colorspace: "RGB" },
+    "Facebook Event Cover": { dimensions: "1200 x 628px", resolution: "72 DPI", colorspace: "RGB" },
+    "LinkedIn Personal Banner": { dimensions: "1584 x 396px", resolution: "72 DPI", colorspace: "RGB" },
+    "LinkedIn Company Banner": { dimensions: "1536 x 768px", resolution: "72 DPI", colorspace: "RGB" },
+    "LinkedIn Sponsored Content Image": { dimensions: "1200 x 627px", resolution: "72 DPI", colorspace: "RGB" },
+    "Twitter Post Image": { dimensions: "1200 x 675px", resolution: "72 DPI", colorspace: "RGB" },
+    "Twitter Header": { dimensions: "1500 x 500px", resolution: "72 DPI", colorspace: "RGB" },
+    "YouTube Thumbnail": { dimensions: "1280 x 720px", resolution: "72 DPI", colorspace: "RGB" },
+    "YouTube Channel Art": { dimensions: "2560 x 1440px", resolution: "72 DPI", colorspace: "RGB" },
+    "Pinterest Pin": { dimensions: "1000 x 1500px", resolution: "72 DPI", colorspace: "RGB" },
+    "TikTok Video Cover": { dimensions: "1080 x 1920px", resolution: "72 DPI", colorspace: "RGB" },
+    "Snapchat Geofilter": { dimensions: "1080 x 1920px", resolution: "72 DPI", colorspace: "RGB" }
+  },
+  "Web & App Graphics": {
+    "Website Hero Banner (Full HD)": { dimensions: "1920 x 1080px", resolution: "72 DPI", colorspace: "RGB" },
+    "Website Hero Banner (Wide)": { dimensions: "2000 x 1200px", resolution: "72 DPI", colorspace: "RGB" },
+    "Website Sidebar Image": { dimensions: "300 x 600px", resolution: "72 DPI", colorspace: "RGB" },
+    "Email Header": { dimensions: "600 x 200px", resolution: "72 DPI", colorspace: "RGB" },
+    "Email Footer Banner": { dimensions: "600 x 100px", resolution: "72 DPI", colorspace: "RGB" },
+    "Blog Header Image (Standard)": { dimensions: "1200 x 600px", resolution: "72 DPI", colorspace: "RGB" },
+    "Blog Header Image (Wide)": { dimensions: "1920 x 600px", resolution: "72 DPI", colorspace: "RGB" },
+    "E-Commerce Product Image (Amazon)": { dimensions: "2000 x 2000px", resolution: "72 DPI", colorspace: "RGB" },
+    "Etsy Listing Image": { dimensions: "2000 x 2000px", resolution: "72 DPI", colorspace: "RGB" },
+    "eBay Store Banner": { dimensions: "1200 x 270px", resolution: "72 DPI", colorspace: "RGB" },
+    "Shopify Store Header": { dimensions: "2048 x 1024px", resolution: "72 DPI", colorspace: "RGB" },
+    "Favicon": { dimensions: "32 x 32px", resolution: "72 DPI", colorspace: "RGB" },
+    "App Icon (iOS)": { dimensions: "1024 x 1024px", resolution: "72 DPI", colorspace: "RGB" },
+    "App Icon (Android)": { dimensions: "512 x 512px", resolution: "72 DPI", colorspace: "RGB" },
+    "Web App Splash Screen": { dimensions: "2048 x 2732px", resolution: "72 DPI", colorspace: "RGB" }
+  },
+  "Online Ads & Streams": {
+    "Google Display Ad – Leaderboard": { dimensions: "728 x 90px", resolution: "72 DPI", colorspace: "RGB" },
+    "Google Display Ad – Medium Rectangle": { dimensions: "300 x 250px", resolution: "72 DPI", colorspace: "RGB" },
+    "Google Display Ad – Skyscraper": { dimensions: "160 x 600px", resolution: "72 DPI", colorspace: "RGB" },
+    "Google Display Ad – Large Rectangle": { dimensions: "336 x 280px", resolution: "72 DPI", colorspace: "RGB" },
+    "Google Display Ad – Mobile Banner": { dimensions: "320 x 50px", resolution: "72 DPI", colorspace: "RGB" },
+    "YouTube Masthead (Desktop)": { dimensions: "3000 x 1000px", resolution: "72 DPI", colorspace: "RGB" },
+    "Twitch Channel Banner": { dimensions: "1200 x 480px", resolution: "72 DPI", colorspace: "RGB" },
+    "Twitch Offline Screen": { dimensions: "1920 x 1080px", resolution: "72 DPI", colorspace: "RGB" },
+    "Twitch Panel": { dimensions: "320 x 300px", resolution: "72 DPI", colorspace: "RGB" }
+  },
+  "Presentations & E-Learning": {
+    "PowerPoint/Google Slides (16:9)": { dimensions: "1920 x 1080px", resolution: "72 DPI", colorspace: "RGB" },
+    "PowerPoint/Google Slides (4:3)": { dimensions: "1024 x 768px", resolution: "72 DPI", colorspace: "RGB" },
+    "Keynote (16:9)": { dimensions: "1920 x 1080px", resolution: "72 DPI", colorspace: "RGB" },
+    "Udemy Course Image": { dimensions: "750 x 422px", resolution: "72 DPI", colorspace: "RGB" },
+    "Online Course Banner (Generic)": { dimensions: "1200 x 300px", resolution: "72 DPI", colorspace: "RGB" }
+  },
+  "Digital Publications & Infographics": {
+    "eBook Cover (Kindle)": { dimensions: "1563 x 2500px", resolution: "72–150 DPI", colorspace: "RGB" },
+    "Apple Books Cover": { dimensions: "1400 x 1873px", resolution: "72–150 DPI", colorspace: "RGB" },
+    "Digital PDF Magazine (Letter)": { dimensions: "8.5\" x 11\" @150 DPI", resolution: "150 DPI", colorspace: "RGB" },
+    "Digital PDF Magazine (A4)": { dimensions: "210mm x 297mm @150 DPI", resolution: "150 DPI", colorspace: "RGB" },
+    "Infographic (Vertical)": { dimensions: "800 x 2000px", resolution: "72 DPI", colorspace: "RGB" }
+  },
+  "Streaming & Gaming": {
+    "Steam Capsule Main": { dimensions: "616 x 353px", resolution: "72 DPI", colorspace: "RGB" },
+    "Steam Portrait Capsule": { dimensions: "300 x 450px", resolution: "72 DPI", colorspace: "RGB" },
+    "Podcast Cover": { dimensions: "3000 x 3000px", resolution: "72 DPI", colorspace: "RGB" }
+  }
+};
+
+const printPresets = {
+  "Stationery": {
+    "US Business Card": { dimensions: '3.5" x 2"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "European Business Card": { dimensions: '85mm x 55mm', resolution: "300 DPI", colorspace: "CMYK", bleed: '3mm' },
+    "Letterhead (US Letter)": { dimensions: '8.5" x 11"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Letterhead (A4)": { dimensions: '210mm x 297mm', resolution: "300 DPI", colorspace: "CMYK", bleed: '3mm' },
+    "Envelope #10 (US)": { dimensions: '9.5" x 4.125"', resolution: "300 DPI", colorspace: "CMYK" },
+    "Envelope DL (ISO)": { dimensions: '220mm x 110mm', resolution: "300 DPI", colorspace: "CMYK" },
+    "Notecard (A6)": { dimensions: '105mm x 148mm', resolution: "300 DPI", colorspace: "CMYK", bleed: '3mm' }
+  },
+  "Marketing Materials": {
+    "Flyer (US Letter)": { dimensions: '8.5" x 11"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Flyer (A5)": { dimensions: '148mm x 210mm', resolution: "300 DPI", colorspace: "CMYK", bleed: '3mm' },
+    "Bi-Fold Brochure (Letter)": { dimensions: '8.5" x 11" flat', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Tri-Fold Brochure (Letter)": { dimensions: '8.5" x 11" flat', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Rack Card": { dimensions: '4" x 9"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Door Hanger": { dimensions: '4.25" x 11"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Postcard (5\" x 7\")": { dimensions: '5" x 7"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' }
+  },
+  "Ads & Publications": {
+    "Magazine Ad (Full Page)": { dimensions: '8.5" x 11"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Magazine Ad (Half Page)": { dimensions: '8.5" x 5.5"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Newspaper Ad (Small)": { dimensions: '~5" x 5"', resolution: "300 DPI", colorspace: "CMYK" },
+    "Catalog (Letter)": { dimensions: '8.5" x 11"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Report/Whitepaper (Letter)": { dimensions: '8.5" x 11"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' }
+  },
+  "Large Format Print": {
+    "Poster (Small - 11\" x 17\")": { dimensions: '11" x 17"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Poster (A3)": { dimensions: '297mm x 420mm', resolution: "300 DPI", colorspace: "CMYK", bleed: '3mm' },
+    "Poster (A2)": { dimensions: '420mm x 594mm', resolution: "300 DPI", colorspace: "CMYK", bleed: '3mm' },
+    "Poster (A1)": { dimensions: '594mm x 841mm', resolution: "300 DPI", colorspace: "CMYK", bleed: '3mm' },
+    "Poster (A0)": { dimensions: '841mm x 1189mm', resolution: "300 DPI", colorspace: "CMYK", bleed: '3mm' },
+    "Vinyl Banner (4\' x 8\')": { dimensions: 'Work at scale', resolution: "300 DPI", colorspace: "CMYK" },
+    "Pull-Up Banner (33\" x 79\")": { dimensions: '33" x 79"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Billboard (14\' x 48\')": { dimensions: 'Scale down', resolution: "300 DPI", colorspace: "CMYK" }
+  },
+  "Packaging & Labels": {
+    "Product Box (Die-Cut)": { dimensions: 'Varies', resolution: "300 DPI", colorspace: "CMYK" },
+    "Bottle/Can Label": { dimensions: '~3" x 5"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "CD/DVD Cover": { dimensions: '4.72" x 4.72"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Vinyl Record Cover": { dimensions: '12" x 12"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Gift Card Holder": { dimensions: '~4" x 6"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Hang Tags (Clothing)": { dimensions: '2" x 3.5"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' }
+  },
+  "Merch & Apparel": {
+    "T-Shirt Print Area": { dimensions: '~12" x 16"', resolution: "300 DPI", colorspace: "CMYK" },
+    "Tote Bag Print Area": { dimensions: '~12" x 14"', resolution: "300 DPI", colorspace: "CMYK" },
+    "Hat Embroidery Area": { dimensions: '~4" x 2"', resolution: "Vector Preferred", colorspace: "CMYK" },
+    "Clothing Labels": { dimensions: '~1" x 3"', resolution: "300 DPI", colorspace: "CMYK" }
+  },
+  "Event Materials": {
+    "Tickets": { dimensions: '2" x 5.5"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Wristbands": { dimensions: '~10" x 1"', resolution: "300 DPI", colorspace: "CMYK" },
+    "Name Badges": { dimensions: '3" x 4"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Invitations (5\" x 7\")": { dimensions: '5" x 7"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Greeting Cards (A2)": { dimensions: '4.25" x 5.5"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Menus (Letter)": { dimensions: '8.5" x 11"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Menus (Tabloid)": { dimensions: '11" x 17"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Place Cards": { dimensions: '~3.5" x 2" folded', resolution: "300 DPI", colorspace: "CMYK" }
+  },
+  "Promotional Items": {
+    "Bookmarks": { dimensions: '2" x 6"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Calendars (Wall - 11\" x 17\")": { dimensions: '11" x 17"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Calendars (Desk - 8.5\" x 5.5\")": { dimensions: '8.5" x 5.5"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Notepads": { dimensions: '5.5" x 8.5"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Door Signs": { dimensions: '~9" x 3"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' }
+  },
+  "Signage & Displays": {
+    "Yard Signs": { dimensions: '24" x 18"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Window Clings": { dimensions: 'Varies e.g. 18" x 24"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Floor Decals": { dimensions: 'Varies e.g. 24" x 24"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Point-of-Sale Displays": { dimensions: 'Varies', resolution: "300 DPI", colorspace: "CMYK" }
+  },
+  "Specialized Print Formats": {
+    "Wine Bottle Label": { dimensions: '~4" x 6"', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Nutritional Label (FDA)": { dimensions: '~2" x 3"', resolution: "300 DPI", colorspace: "CMYK" },
+    "DVD Sleeve": { dimensions: '184mm x 273mm', resolution: "300 DPI", colorspace: "CMYK", bleed: '3mm' },
+    "Hardcover Book Dust Jacket": { dimensions: 'Varies', resolution: "300 DPI", colorspace: "CMYK", bleed: '0.125"' },
+    "Blueprints/Plans (24\" x 36\")": { dimensions: '24" x 36"', resolution: "300 DPI", colorspace: "CMYK" },
+    "Architectural Plans (A0)": { dimensions: '841mm x 1189mm', resolution: "300 DPI", colorspace: "CMYK", bleed: '3mm' }
+  }
+};
+
+function updatePresets() {
+  const category = document.getElementById('preset-category').value;
+  const specificDropdown = document.getElementById('preset-specific');
+  specificDropdown.innerHTML = '<option value="">Select Specific Format...</option>';
+  
+  const presets = category === 'digital' ? digitalPresets : printPresets;
+  
+  for (const group in presets) {
+    const optgroup = document.createElement('optgroup');
+    optgroup.label = group;
+    
+    for (const preset in presets[group]) {
+      const option = document.createElement('option');
+      option.value = JSON.stringify({ group, preset });
+      option.textContent = preset;
+      optgroup.appendChild(option);
+    }
+    
+    specificDropdown.appendChild(optgroup);
+  }
+}
+
+function applyPreset() {
+  const selected = document.getElementById('preset-specific').value;
+  if (!selected) return;
+  
+  const { group, preset } = JSON.parse(selected);
+  const category = document.getElementById('preset-category').value;
+  const presets = category === 'digital' ? digitalPresets : printPresets;
+  const specs = presets[group][preset];
+  
+  document.getElementById('title').value = preset;
+  document.getElementById('format').value = category;
+  document.getElementById('dimensions').value = specs.dimensions || '';
+  document.getElementById('resolution').value = specs.resolution || '';
+  document.getElementById('colorspace').value = specs.colorspace || 'RGB';
+  document.getElementById('bleed').value = specs.bleed || '';
+  document.getElementById('notes').value = '';
+}
+
+function addManualSpec() {
+  const spec = {
+    title: document.getElementById('title').value,
+    icon: getIconForTitle(document.getElementById('title').value),
+    specs: {
+      Format: document.getElementById('format').value,
+      Dimensions: document.getElementById('dimensions').value,
+      Resolution: document.getElementById('resolution').value,
+      'Color Space': document.getElementById('colorspace').value,
+      Bleed: document.getElementById('bleed').value,
+      Notes: document.getElementById('notes').value
+    }
+  };
+  
+  createSpecCards([spec]);
+  document.getElementById('manual-input-form').reset();
+}
+
+function parseBrief() {
+  const briefText = document.querySelector('.brief-input').value;
+  const sections = briefText.split(/\d+\.\s+/).filter(section => section.trim());
+  
+  const parsedSpecs = sections.map(section => {
+    const lines = section.trim().split('\n');
+    const title = lines[0].trim();
+    const specs = {};
+    
+    for (let i = 1; i < lines.length; i++) {
+      const [label, value] = lines[i].split(':').map(s => s.trim());
+      if (label && value) {
+        specs[label] = value;
+      }
+    }
+    
+    return {
+      title,
+      icon: getIconForTitle(title),
+      specs
+    };
+  });
+  
+  createSpecCards(parsedSpecs);
+}
+
+function getIconForTitle(title) {
+  if (title.toLowerCase().includes('billboard')) return '🖥️';
+  if (title.toLowerCase().includes('postcard')) return '📬';
+  if (title.toLowerCase().includes('flyer')) return '📄';
+  if (title.toLowerCase().includes('poster')) return '🖼️';
+  if (title.toLowerCase().includes('social')) return '📱';
+  return '📋';
+}
+
+function createSpecCards(specs) {
+  const container = document.getElementById('specs-container');
+  
+  specs.forEach(spec => {
+    const card = document.createElement('div');
+    card.className = 'spec-card';
+    
+    const header = document.createElement('div');
+    header.className = 'spec-header';
+    header.innerHTML = `
+      <span class="icon">${spec.icon}</span>
+      <h2 class="title">${spec.title}</h2>
+    `;
+    
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'delete-button';
+    deleteButton.innerHTML = '×';
+    deleteButton.addEventListener('click', () => {
+      card.style.animation = 'fadeOut 0.3s ease';
+      setTimeout(() => {
+        card.remove();
+      }, 300);
+    });
+    
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.className = 'complete-checkbox';
+    checkbox.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        card.classList.add('completed');
+        card.style.animation = 'celebrate 0.5s ease';
+        setTimeout(() => {
+          card.style.animation = '';
+        }, 500);
+      } else {
+        card.classList.remove('completed');
+      }
+    });
+    
+    const list = document.createElement('ul');
+    list.className = 'spec-list';
+    
+    Object.entries(spec.specs).forEach(([label, value]) => {
+      if (value) {  
+        const item = document.createElement('li');
+        item.className = 'spec-item';
+        item.innerHTML = `
+          <span class="spec-label">${label}:</span>
+          <span class="spec-value">${value}</span>
+        `;
+        list.appendChild(item);
+      }
+    });
+    
+    card.appendChild(deleteButton);
+    card.appendChild(checkbox);
+    card.appendChild(header);
+    card.appendChild(list);
+    container.insertBefore(card, container.firstChild);
+  });
+}
+</script>
+
+</body>
+</html>
