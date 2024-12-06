@@ -1,0 +1,200 @@
+<html><head><base href="." /><style>
+body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: monospace;
+}
+
+.container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.frog-container {
+    position: absolute;
+    animation: float 3s ease-in-out infinite;
+    z-index: 2;
+}
+
+.hypno-frog {
+    width: 1545px;
+    height: 780px;
+    object-fit: none;
+}
+
+.spiral-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.eye-spiral {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    z-index: 3;
+    background: transparent;
+}
+
+.eye-spiral.left {
+    left: 600px;
+    top: 138px;
+}
+
+.eye-spiral.right {
+    left: 830px;
+    top: 131px;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+}
+
+.title {
+    position: fixed;
+    top: 20px;
+    color: #FFF2A9;
+    font-size: 2em;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px #FFF2A9;
+    animation: pulse 2s infinite;
+    z-index: 4;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+</style></head><body>
+<div class="container">
+    <h1 class="title">ALL GLORY TO THE HYPNOTOAD</h1>
+    <div class="frog-container">
+        <img src="assets/hypnotoad.png" class="hypno-frog" alt="Hypnotoad">
+        <canvas id="leftEyeSpiral" class="eye-spiral left"></canvas>
+        <canvas id="rightEyeSpiral" class="eye-spiral right"></canvas>
+    </div>
+    <canvas id="spiralCanvas" class="spiral-background"></canvas>
+</div>
+
+<script>
+const canvas = document.getElementById('spiralCanvas');
+const leftEyeCanvas = document.getElementById('leftEyeSpiral');
+const rightEyeCanvas = document.getElementById('rightEyeSpiral');
+const ctx = canvas.getContext('2d');
+const leftCtx = leftEyeCanvas.getContext('2d');
+const rightCtx = rightEyeCanvas.getContext('2d');
+
+// Set canvas sizes
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    leftEyeCanvas.width = 100;
+    leftEyeCanvas.height = 100;
+    rightEyeCanvas.width = 100;
+    rightEyeCanvas.height = 100;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+// Animation parameters
+let time = 0;
+const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFF2A9', '#FF00FF'];
+const pixelSize = 8;
+
+function drawEyeSpiral(ctx) {
+    const centerX = ctx.canvas.width / 2;
+    const centerY = ctx.canvas.height / 2;
+    
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    
+    for (let radius = 0; radius < 50; radius += 4) {
+        const angle = (radius * 0.8) + time * 2;
+        ctx.beginPath();
+        ctx.strokeStyle = `hsl(${(time * 100 + radius * 8) % 360}, 100%, 50%)`;
+        ctx.lineWidth = 2;
+        
+        for (let a = 0; a < Math.PI * 2; a += Math.PI / 8) {
+            const x = centerX + Math.cos(angle + a) * radius;
+            const y = centerY + Math.sin(angle + a) * radius;
+            if (a === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        ctx.closePath();
+        ctx.stroke();
+    }
+}
+
+function drawPixelatedSpiral() {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    
+    for (let radius = 0; radius < Math.max(canvas.width, canvas.height); radius += pixelSize) {
+        const angle = (radius * 0.3) + time;
+        for (let a = 0; a < Math.PI * 2; a += Math.PI / 16) {
+            const x = centerX + Math.cos(angle + a) * radius;
+            const y = centerY + Math.sin(angle + a) * radius;
+            
+            const colorIndex = Math.floor((radius + time * 100) / 50) % colors.length;
+            ctx.fillStyle = colors[colorIndex];
+            ctx.fillRect(
+                Math.floor(x / pixelSize) * pixelSize, 
+                Math.floor(y / pixelSize) * pixelSize, 
+                pixelSize, 
+                pixelSize
+            );
+        }
+    }
+    
+    for (let x = 0; x < canvas.width; x += pixelSize * 2) {
+        for (let y = 0; y < canvas.height; y += pixelSize * 2) {
+            if ((x + y) % (pixelSize * 4) === 0) {
+                ctx.fillStyle = `rgba(255, 242, 169, ${Math.sin(time + x + y) * 0.3 + 0.3})`;
+                ctx.fillRect(x, y, pixelSize, pixelSize);
+            }
+        }
+    }
+    
+    // Draw eye spirals
+    drawEyeSpiral(leftCtx);
+    drawEyeSpiral(rightCtx);
+    
+    time += 0.02;
+    requestAnimationFrame(drawPixelatedSpiral);
+}
+
+// Start the animation
+drawPixelatedSpiral();
+
+// Add psychedelic color cycling to the frog's eyes
+const frog = document.querySelector('.hypno-frog');
+frog.style.filter = 'hue-rotate(0deg)';
+
+function cycleFrogColors() {
+    const hue = (time * 100) % 360;
+    frog.style.filter = `hue-rotate(${hue}deg) brightness(1.2) contrast(1.2)`;
+    requestAnimationFrame(cycleFrogColors);
+}
+
+cycleFrogColors();
+</script></body></html>
