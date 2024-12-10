@@ -46,6 +46,12 @@
         display: inline-block;
         width: 150px;
     }
+    /* Make the canvas look full-size while rendering at lower res */
+    #canvas {
+        width: 100vw;
+        height: 100vh;
+        display: block;
+    }
 </style>
 </head>
 <body>
@@ -61,7 +67,7 @@
         </div>
         <div class="slider-container">
             <label for="iterationsSlider">Iterations:</label>
-            <input type="range" id="iterationsSlider" min="1" max="15" step="1" value="7">
+            <input type="range" id="iterationsSlider" min="1" max="12" step="1" value="7">
             <span class="value-display" id="iterationsValue">7</span>
         </div>
         <h3>Animation Settings</h3>
@@ -212,7 +218,7 @@ vec3 mb(vec3 p) {
     float dr = 1.0;
     
     float t0 = 1.0;
-    for(int i = 0; i < 15; ++i) {
+    for(int i = 0; i < 12; ++i) { // reduced max from 15 to 12 for speed
         if (i >= iterations) break;
         r = length(z);
         if(r > 2.0) continue;
@@ -244,11 +250,12 @@ vec3 f(vec3 p) {
 float softshadow(vec3 ro, vec3 rd, float k ) { 
     float akuma=1.0,h=0.0; 
     float t = 0.01;
-    for(int i=0; i < 50; ++i) { 
+    for(int i=0; i < 40; ++i) { 
         h=f(ro+rd*t).x; 
         if(h<0.001)return 0.02; 
         akuma=min(akuma, k*h/t); 
         t+=clamp(h,0.01,2.0); 
+        if(t>20.0) break; // early out for perf
     } 
     return akuma; 
 } 
@@ -273,7 +280,8 @@ vec3 intersect(in vec3 ro, in vec3 rd) {
     float step = 0.0;
     float error = 1000.0;
     
-    for(int i=0; i<48; i++) {
+    // reduced raymarch steps from 48 to 32 for speed
+    for(int i=0; i<32; i++) {
         if(error < pixel_size*0.5 || t > 20.0) {
             break;
         }
@@ -325,7 +333,6 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
     vec3 sundir = normalize(vec3(0.1, 0.8, 0.6)); 
     vec3 sun = sunColor; 
-    vec3 skycolor = skyColor; 
 
     vec3 bg = exp(uv.y-2.0)*skyColor;
 
@@ -348,7 +355,7 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 
         vec3 lin = 4.5 * sun * dif * shadow; 
         lin += 0.8 * bac * sun; 
-        lin += 0.6 * sky * skycolor*shadow; 
+        lin += 0.6 * sky * skyColor*shadow; 
         lin += 3.0 * spe * shadow; 
 
         res.y = pow(clamp(res.y, 0.0, 1.0), 0.55);
@@ -375,6 +382,7 @@ let startTime;
 let isTransitioning = false;
 let lastRandomizeTime = 0;
 let countdownDisplay;
+let resolutionScale = 0.5; // render at half res for speed
 
 function init() {
     scene = new THREE.Scene();
@@ -430,8 +438,9 @@ function init() {
 function onWindowResize() {
     const width = window.innerWidth;
     const height = window.innerHeight;
-    renderer.setSize(width, height);
-    material.uniforms.iResolution.value.set(width, height, 1);
+    // Render at lower resolution internally for speed
+    renderer.setSize(width*resolutionScale, height*resolutionScale, false);
+    material.uniforms.iResolution.value.set(width*resolutionScale, height*resolutionScale, 1);
 }
 
 function animate() {
@@ -463,7 +472,8 @@ function animate() {
 
         if (isTransitioning) {
             const transitionDuration = material.uniforms.randomizeTransition.value;
-            material.uniforms.randomizeProgress.value += deltaTime / transitionDuration;
+            material.uniforms.randomizeProgress.value += (1.0/60.0)/transitionDuration; 
+            // increment less per frame, smoothing transitions
             if (material.uniforms.randomizeProgress.value >= 1) {
                 isTransitioning = false;
                 material.uniforms.randomizeProgress.value = 1;
@@ -479,7 +489,7 @@ function randomizeSettings() {
     material.uniforms.targetPower.value = Math.random() * 15 + 1;
     material.uniforms.targetRotationSpeed.value = Math.random();
     material.uniforms.targetPhaseShiftSpeed.value = Math.random() * 0.5;
-    material.uniforms.targetIterations.value = Math.floor(Math.random() * 14) + 1;
+    material.uniforms.targetIterations.value = Math.floor(Math.random() * 11) + 1;
     material.uniforms.targetSunColor.value.setHSL(Math.random(), 0.5, 0.5);
     material.uniforms.targetSkyColor.value.setHSL(Math.random(), 0.5, 0.5);
     material.uniforms.targetFractalColor.value.setHSL(Math.random(), 0.5, 0.5);
@@ -491,6 +501,8 @@ function randomizeSettings() {
 function updateTransitionedValues() {
     const t = material.uniforms.randomizeProgress.value;
     
+    function lerp(a, b, t) {return a + (b - a)*t;}
+
     function updateValue(uniform, target, element, decimals = 2) {
         const value = lerp(uniform.value, target.value, t);
         uniform.value = value;
@@ -520,10 +532,6 @@ function updateTransitionedValues() {
     
     updateValue(material.uniforms.teleidoscopeSpinSpeed, material.uniforms.targetTeleidoscopeSpinSpeed, 'currentTeleidoscopeSpinSpeed');
     updateValue(material.uniforms.teleidoscopeZoom, material.uniforms.targetTeleidoscopeZoom, 'currentTeleidoscopeZoom');
-}
-
-function lerp(a, b, t) {
-    return a + (b - a) * t;
 }
 
 function setupSettings() {
