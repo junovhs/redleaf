@@ -66,7 +66,6 @@
       transition: transform 0.3s ease;
     }
 
-    /* Pixel-Style Arrow using CSS */
     .nav-expand-toggle::before {
       content: "";
       display: block;
@@ -121,7 +120,6 @@
       cursor: pointer;
       transition: all 0.1s;
       white-space: nowrap;
-      /* Removed flex properties to allow natural sizing */
       display: inline-block;
       position: relative;
     }
@@ -145,18 +143,15 @@
       transition: transform 0.3s ease;
     }
 
-    /* Change arrow to V when dropdown is open */
     .nav-item.has-dropdown.open::after {
       content: "V";
       transform: translateY(-50%);
     }
 
-    /* Adjust hover state for dropdown items */
     .nav-item.has-dropdown:hover {
       background: #B04438;
     }
 
-    /* Make the arrow more prominent on hover */
     .nav-item.has-dropdown:hover::after {
       color: #FFFFFF;
     }
@@ -182,25 +177,24 @@
       left: 0;
       background: #041317;
       border: 4px solid #CDCCBB;
-      z-index: 1000; /* Very high z-index to stay above everything else */
+      z-index: 1000;
       min-width: 200px;
       padding: 4px;
       max-height: 400px;
-      overflow-y: auto; /* Ensure scrolling within dropdown */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); /* Adding more shadow for better visibility */
+      overflow-y: auto;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
       transition: visibility 0.3s ease-in-out, opacity 0.3s ease-in-out;
-      opacity: 0; /* Initially hidden */
-      visibility: hidden; /* Initially hidden */
-      /* Ensure overflow visible where needed */
+      opacity: 0;
+      visibility: hidden;
       overflow: visible;
     }
 
     .nav-item.has-dropdown:hover .dropdown-content,
     .nav-item.has-dropdown.open .dropdown-content {
-      display: block; /* Ensure dropdown is shown when open */
-      opacity: 1; /* Fully visible when active */
+      display: block;
+      opacity: 1;
       visibility: visible;
-      z-index: 1001; /* This ensures the dropdown content is on top when it is active */
+      z-index: 1001;
     }
 
     .dropdown-item {
@@ -234,7 +228,7 @@
       flex-direction: column;
       background: #041317;
       border: 4px solid #CDCCBB;
-      padding: 20px; /* Increased padding for better whitespace */
+      padding: 20px;
     }
 
     #content-frame {
@@ -249,7 +243,7 @@
       padding: 20px;
       color: #CDCCBB;
       font-family: 'Press Start 2P', monospace;
-      line-height: 1.6; /* Increased line-height for better readability */
+      line-height: 1.6;
     }
 
     /* Footer Styles */
@@ -271,13 +265,13 @@
     @media (max-width: 768px) {
       .navbar-inner {
         flex-direction: column;
-        max-height: 0; /* Collapsed by default on mobile */
+        max-height: 0;
         overflow: hidden;
       }
 
       .navbar-inner.collapsed {
-        max-height: 1000px; /* Expanded state on mobile */
-        overflow: visible; /* Allow overflow when expanded */
+        max-height: 1000px;
+        overflow: visible;
       }
 
       .nav-items {
@@ -286,12 +280,10 @@
       }
 
       .nav-item {
-        /* Ensure nav items take full width on mobile */
         display: block;
       }
 
       .nav-expand-toggle {
-        /* Position remains the same */
         position: absolute;
         top: 50%;
         right: 16px;
@@ -307,26 +299,21 @@
     }
 
     @media (min-width: 769px) {
-      .nav-item {
-        /* Removed flex properties to allow natural sizing */
-      }
-
       .nav-expand-toggle {
         margin-left: 8px;
       }
     }
 
-    /* Prevent Navigation Overflow */
     .navbar-inner {
       width: 100%;
-      max-height: 1000px; /* Expanded by default */
-      overflow: visible; /* Allow dropdowns to be visible */
+      max-height: 1000px;
+      overflow: visible;
       transition: max-height 0.3s ease-in-out;
     }
 
     .navbar-inner.collapsed {
-      max-height: 0; /* Collapsed state */
-      overflow: hidden; /* Hide overflow only when collapsed */
+      max-height: 0;
+      overflow: hidden;
     }
   </style>
   
@@ -345,11 +332,7 @@
     <div class="container">
       <nav class="navbar">
         <span>Redleaf OS - Tools Initialized</span>
-        
-        <!-- Expand/Collapse Toggle Button -->
-        <button class="nav-expand-toggle" aria-label="Expand/Collapse Navigation">
-          <!-- The arrow is created using CSS pseudo-element ::before -->
-        </button>
+        <button class="nav-expand-toggle" aria-label="Expand/Collapse Navigation"></button>
       </nav>
       <div class="navbar-inner">
         <div class="nav-items" id="navbar" style="background-color: black; padding: 8px;">
@@ -379,20 +362,21 @@
     const navExpandToggle = document.querySelector('.nav-expand-toggle');
     let isLoading = false;
     let availablePages = [];
-    
+
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const basePath = isLocal ? '/' : '/redleaf/';
-    
+
     async function fetchPages() {
-      if (isLocal) {
-        try {
-          const response = await fetch('pages/');
+      try {
+        let pages = [];
+        let response;
+        if (isLocal) {
+          response = await fetch('pages/');
           if (!response.ok) throw new Error('Failed to fetch local pages directory');
           const text = await response.text();
           const parser = new DOMParser();
           const doc = parser.parseFromString(text, 'text/html');
           const links = Array.from(doc.querySelectorAll('a'));
-          const pages = [];
           for (const link of links) {
             const href = link.getAttribute('href');
             if (href.endsWith('.html')) {
@@ -405,7 +389,7 @@
               const folderText = await folderResponse.text();
               const folderDoc = parser.parseFromString(folderText, 'text/html');
               const folderLinks = Array.from(folderDoc.querySelectorAll('a'));
-              const htmlFiles = Array.from(folderLinks)
+              const htmlFiles = folderLinks
                 .filter(a => a.getAttribute('href').endsWith('.html'))
                 .map(a => ({
                   name: a.getAttribute('href').replace('.html', ''),
@@ -417,17 +401,10 @@
               }
             }
           }
-          return pages;
-        } catch (error) {
-          console.error('Error fetching local pages:', error);
-          return [];
-        }
-      } else {
-        try {
-          const response = await fetch('https://api.github.com/repos/junovhs/redleaf/contents/pages');
+        } else {
+          response = await fetch('https://api.github.com/repos/junovhs/redleaf/contents/pages');
           if (!response.ok) throw new Error('Failed to fetch pages list');
           const items = await response.json();
-          const pages = [];
           for (const item of items) {
             if (item.type === 'file' && item.name.endsWith('.html')) {
               pages.push({type: 'file', name: item.name.replace('.html', ''), path: `pages/${item.name}`});
@@ -448,11 +425,11 @@
               }
             }
           }
-          return pages;
-        } catch (error) {
-          console.error('Error fetching pages:', error);
-          return [];
         }
+        return pages;
+      } catch (error) {
+        console.error('Error fetching pages:', error);
+        return [];
       }
     }
     
@@ -487,35 +464,19 @@
 
           folderNav.appendChild(dropdown);
 
-          // Add event listeners for hover to open/close the dropdown
+          // Hover behavior for desktop, click behavior for mobile handled in events
           folderNav.addEventListener('mouseenter', () => {
-            dropdown.style.display = 'block'; // Show dropdown on hover
+            if (window.innerWidth > 768) dropdown.style.display = 'block';
           });
           folderNav.addEventListener('mouseleave', () => {
-            dropdown.style.display = 'none'; // Hide dropdown when the mouse leaves
+            if (window.innerWidth > 768) dropdown.style.display = 'none';
           });
 
           navbar.appendChild(folderNav);
         }
       });
     }
-    
-    function checkNavOverflow() {
-      const navbarElement = document.querySelector('.navbar-inner');
-      const navItems = navbarElement.querySelectorAll('.nav-item');
-      navItems.forEach(item => {
-        item.style.fontSize = '';
-      });
-      
-      if (navbarElement.scrollWidth > navbarElement.clientWidth) {
-        const currentSize = parseInt(window.getComputedStyle(navItems[0]).fontSize);
-        const newSize = Math.max(currentSize * 0.9, 10);
-        navItems.forEach(item => {
-          item.style.fontSize = `${newSize}px`;
-        });
-      }
-    }
-    
+
     function handleNavClick(event) {
       const target = event.target;
       if (target.classList.contains('nav-item') && !target.classList.contains('has-dropdown')) {
@@ -529,26 +490,25 @@
           navigateTo(pagePath);
         }
       } else if (target.parentElement.classList.contains('has-dropdown')) {
-        // Toggle dropdown on click for accessibility and mobile support
+        // Toggle dropdown on click for mobile devices
         if (window.innerWidth <= 768) {
           target.parentElement.classList.toggle('open');
         }
       }
     }
     
+    // Instead of history.pushState, use the hash
     function navigateTo(pagePath) {
-      const isHome = pagePath === 'home';
-      const url = isHome ? `${basePath}` : `${basePath}${pagePath}`;
-      history.pushState({ pagePath }, '', url);
-      loadContent(pagePath);
+      // Set location.hash to the pagePath
+      location.hash = pagePath;
     }
-    
+
     async function loadContent(pagePath) {
       if (isLoading) return;
       isLoading = true;
       loading.style.display = 'block';
       try {
-        if (pagePath === 'home' || !availablePages.includes(pagePath)) {
+        if (pagePath === 'home' || pagePath === '') {
           contentFrame.style.display = 'none';
           homeContent.style.display = 'block';
           homeContent.innerHTML = `
@@ -560,14 +520,20 @@
             <ul>
               <li><strong>Cash Counter:</strong> A tool to help cashiers close their drawers.</li>
               <li><strong>Workday Timer:</strong> A timer for hourly workers who need to keep track of their day.</li>
-              <li><strong>Research Tool:</strong> Companion app for doing research with AI. I use it when writing articles. I ask AI to give me a list of questions that would inform the article I'm writing, and I gather the answers here, and export an informational doc that I give back to the AI to inform my writing.</li>
+              <li><strong>Research Tool:</strong> Companion app for doing research with AI.</li>
             </ul>
             <p>Feel free to navigate through the menu to explore and use the tools. If you encounter any issues or have suggestions, don't hesitate to reach out!</p>
           `;
-          if (pagePath !== 'home' && pagePath !== '') {
-            homeContent.innerHTML += `<p>The requested page "${pagePath}" was not found. Please check the navigation menu and try again.</p>`;
-          }
+        } else if (!availablePages.includes(pagePath)) {
+          // Page not found
+          contentFrame.style.display = 'none';
+          homeContent.style.display = 'block';
+          homeContent.innerHTML = `
+            <h1>404 Not Found</h1>
+            <p>The requested page "${pagePath}" was not found. Please check the navigation menu and try again.</p>
+          `;
         } else {
+          // Load from iframe
           homeContent.style.display = 'none';
           contentFrame.style.display = 'block';
           const response = await fetch(pagePath);
@@ -584,23 +550,34 @@
         isLoading = false;
       }
     }
-    
-    function handleRoute() {
-      const path = window.location.pathname.replace(basePath, '');
-      const fullPath = path === '' ? 'home' : path;
-      loadContent(fullPath);
+
+    function handleHashChange() {
+      // Extract the pagePath from the hash
+      let pagePath = location.hash.replace(/^#/, '');
+      // Load content based on hash
+      loadContent(pagePath);
     }
-    
-    window.addEventListener('popstate', handleRoute);
-    
-    // Expand/Collapse Toggle for Navigation Menu
+
+    window.addEventListener('hashchange', handleHashChange);
+
+    // On first load
+    window.addEventListener('load', async () => {
+      const pages = await fetchPages();
+      createNavLinks(pages);
+      // If no hash, default to home
+      if (!location.hash) {
+        location.hash = 'home';
+      } else {
+        handleHashChange();
+      }
+    });
+
     navExpandToggle.addEventListener('click', () => {
       const navbarInner = document.querySelector('.navbar-inner');
       navbarInner.classList.toggle('collapsed');
       navExpandToggle.classList.toggle('expanded');
     });
-    
-    // Close Dropdowns When Clicking Outside
+
     document.addEventListener('click', function(event) {
       const isClickInsideNavbar = navbar.contains(event.target) || navExpandToggle.contains(event.target);
       if (!isClickInsideNavbar) {
@@ -608,13 +585,6 @@
         dropdowns.forEach(dropdown => dropdown.classList.remove('open'));
       }
     });
-    
-    // Initialize Navigation Links and Route
-    (async () => {
-      const pages = await fetchPages();
-      createNavLinks(pages);
-      handleRoute();
-    })();
 
     // Handle window resize to reset navbar state if needed
     window.addEventListener('resize', () => {
