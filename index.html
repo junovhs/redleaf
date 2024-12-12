@@ -1,4 +1,10 @@
-<html><head><base href="https://junovhs.github.io/redleaf/"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Redleaf</title>
+<!DOCTYPE html>
+<html>
+<head>
+  <base href="https://junovhs.github.io/redleaf/">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redleaf</title>
   
   <!-- Link to Google Fonts for 'Press Start 2P' -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet">
@@ -45,20 +51,6 @@
       width: 100%;
     }
 
-    .navbar-toggle {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 8px;
-      display: none; /* Hidden by default, shown on mobile */
-    }
-
-    .navbar-toggle svg {
-      fill: #CDCCBB;
-      width: 24px;
-      height: 24px;
-    }
-
     /* Expand/Collapse Toggle Button */
     .nav-expand-toggle {
       background: none;
@@ -71,6 +63,7 @@
       justify-content: center;
       position: relative;
       image-rendering: pixelated;
+      transition: transform 0.3s ease;
     }
 
     /* Pixel-Style Arrow using CSS */
@@ -100,12 +93,13 @@
       width: 100%;
       background-color: #B04438;
       transition: max-height 0.3s ease-in-out;
-      overflow: hidden;
-      max-height: 0; /* Collapsed by default */
+      max-height: 1000px; /* Expanded by default */
+      overflow: visible; /* Allow dropdowns to be visible */
     }
 
-    .navbar-inner.expanded {
-      max-height: 1000px; /* Large enough to display all items */
+    .navbar-inner.collapsed {
+      max-height: 0; /* Collapsed state */
+      overflow: hidden; /* Hide overflow only when collapsed */
     }
 
     /* Navigation Items */
@@ -127,10 +121,8 @@
       cursor: pointer;
       transition: all 0.1s;
       white-space: nowrap;
-      flex: 1 1 calc(33.333% - 16px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      /* Removed flex properties to allow natural sizing */
+      display: inline-block;
       position: relative;
     }
 
@@ -180,7 +172,6 @@
     }
 
     .nav-item.has-dropdown {
-      position: relative;
       z-index: 10; /* Ensure this item and its dropdown are above others */
     }
 
@@ -195,11 +186,13 @@
       min-width: 200px;
       padding: 4px;
       max-height: 400px;
-      overflow-y: auto;
+      overflow-y: auto; /* Ensure scrolling within dropdown */
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8); /* Adding more shadow for better visibility */
       transition: visibility 0.3s ease-in-out, opacity 0.3s ease-in-out;
       opacity: 0; /* Initially hidden */
       visibility: hidden; /* Initially hidden */
+      /* Ensure overflow visible where needed */
+      overflow: visible;
     }
 
     .nav-item.has-dropdown:hover .dropdown-content,
@@ -276,17 +269,15 @@
 
     /* Responsive Styles */
     @media (max-width: 768px) {
-      .navbar-toggle {
-        display: block;
-      }
-
       .navbar-inner {
         flex-direction: column;
-        max-height: 0;
+        max-height: 0; /* Collapsed by default on mobile */
+        overflow: hidden;
       }
 
-      .navbar-inner.expanded {
-        max-height: 1000px;
+      .navbar-inner.collapsed {
+        max-height: 1000px; /* Expanded state on mobile */
+        overflow: visible; /* Allow overflow when expanded */
       }
 
       .nav-items {
@@ -295,10 +286,12 @@
       }
 
       .nav-item {
-        flex: 1 1 100%;
+        /* Ensure nav items take full width on mobile */
+        display: block;
       }
 
       .nav-expand-toggle {
+        /* Position remains the same */
         position: absolute;
         top: 50%;
         right: 16px;
@@ -315,7 +308,7 @@
 
     @media (min-width: 769px) {
       .nav-item {
-        flex: 1 1 calc(33.333% - 16px);
+        /* Removed flex properties to allow natural sizing */
       }
 
       .nav-expand-toggle {
@@ -326,6 +319,14 @@
     /* Prevent Navigation Overflow */
     .navbar-inner {
       width: 100%;
+      max-height: 1000px; /* Expanded by default */
+      overflow: visible; /* Allow dropdowns to be visible */
+      transition: max-height 0.3s ease-in-out;
+    }
+
+    .navbar-inner.collapsed {
+      max-height: 0; /* Collapsed state */
+      overflow: hidden; /* Hide overflow only when collapsed */
     }
   </style>
   
@@ -344,13 +345,6 @@
     <div class="container">
       <nav class="navbar">
         <span>Redleaf OS - Tools Initialized</span>
-        <button class="navbar-toggle" aria-label="Toggle Navigation">
-          <svg viewBox="0 0 100 80" width="24" height="24">
-            <rect width="100" height="15"></rect>
-            <rect y="30" width="100" height="15"></rect>
-            <rect y="60" width="100" height="15"></rect>
-          </svg>
-        </button>
         
         <!-- Expand/Collapse Toggle Button -->
         <button class="nav-expand-toggle" aria-label="Expand/Collapse Navigation">
@@ -359,8 +353,8 @@
       </nav>
       <div class="navbar-inner">
         <div class="nav-items" id="navbar" style="background-color: black; padding: 8px;">
-    <!-- Dynamic nav items will be inserted here -->
-</div>
+          <!-- Dynamic nav items will be inserted here -->
+        </div>
       </div>
     </div>
   </header>
@@ -382,7 +376,6 @@
     const contentFrame = document.getElementById('content-frame');
     const homeContent = document.getElementById('home-content');
     const loading = document.getElementById('loading');
-    const navbarToggle = document.querySelector('.navbar-toggle');
     const navExpandToggle = document.querySelector('.nav-expand-toggle');
     let isLoading = false;
     let availablePages = [];
@@ -529,21 +522,14 @@
         const pagePath = target.getAttribute('data-page');
         if (pagePath) {
           navigateTo(pagePath);
-          if (window.innerWidth <= 768) {
-            navbarToggle.classList.remove('active');
-            document.querySelector('.navbar-inner').classList.remove('open');
-          }
         }
       } else if (target.classList.contains('dropdown-item')) {
         const pagePath = target.getAttribute('data-page');
         if (pagePath) {
           navigateTo(pagePath);
-          if (window.innerWidth <= 768) {
-            navbarToggle.classList.remove('active');
-            document.querySelector('.navbar-inner').classList.remove('open');
-          }
         }
       } else if (target.parentElement.classList.contains('has-dropdown')) {
+        // Toggle dropdown on click for accessibility and mobile support
         if (window.innerWidth <= 768) {
           target.parentElement.classList.toggle('open');
         }
@@ -607,16 +593,10 @@
     
     window.addEventListener('popstate', handleRoute);
     
-    // Mobile Navbar Toggle
-    navbarToggle.addEventListener('click', () => {
-      const navbarInner = document.querySelector('.navbar-inner');
-      navbarInner.classList.toggle('open');
-    });
-    
-    // Expand/Collapse Toggle for Lower Navigation
+    // Expand/Collapse Toggle for Navigation Menu
     navExpandToggle.addEventListener('click', () => {
       const navbarInner = document.querySelector('.navbar-inner');
-      navbarInner.classList.toggle('expanded');
+      navbarInner.classList.toggle('collapsed');
       navExpandToggle.classList.toggle('expanded');
     });
     
@@ -635,6 +615,16 @@
       createNavLinks(pages);
       handleRoute();
     })();
+
+    // Handle window resize to reset navbar state if needed
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        const navbarInner = document.querySelector('.navbar-inner');
+        navbarInner.classList.remove('collapsed');
+        navExpandToggle.classList.remove('expanded');
+      }
+    });
   </script>
 
-</body></html>
+</body>
+</html>
