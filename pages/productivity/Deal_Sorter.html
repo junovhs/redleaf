@@ -1,0 +1,738 @@
+<html><head><base href="https://example.com/">
+    <meta charset="UTF-8">
+    <title>Hot Deals Sorting Tool</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        #input-section, #output-section {
+            max-width: 800px;
+            margin: 0 auto 30px auto;
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        #input-section:hover, #output-section:hover {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        h2, h3 {
+            color: #34495e;
+            margin-bottom: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .potm-section {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-radius: 8px;
+        }
+
+        .potm-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .potm-input div {
+            flex: 1;
+            min-width: 220px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            background-color: #fff;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 25px;
+            margin-top: 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .button:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .deal-category {
+            margin-bottom: 40px;
+        }
+
+        .deal-category h2 {
+            position: relative;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            color: #2980b9;
+            display: inline-block;
+        }
+
+        .deal-category h2::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 4px;
+            background-color: #2980b9;
+            bottom: 0;
+            left: 0;
+            border-radius: 2px;
+        }
+
+        .deal {
+            background: #f9f9f9;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .deal:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .deal-overline {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #f9f9f9;
+            padding: 5px 10px;
+            font-weight: bold;
+            color: #2980b9;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .deal-content {
+            margin-top: 15px;
+        }
+
+        .deal h3 {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            font-size: 1.4em;
+            font-weight: 500;
+        }
+
+        .deal p {
+            margin: 0;
+            color: #555;
+            font-size: 1em;
+        }
+
+        .copy-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background-color: #ecf0f1;
+        }
+
+        .copy-button svg {
+            width: 20px;
+            height: 20px;
+            fill: #3498db;
+            transition: fill 0.3s ease;
+        }
+
+        .copy-button:hover svg {
+            fill: #2980b9;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .potm-input {
+                flex-direction: column;
+            }
+
+            .deal h3 {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .copy-button {
+                margin-top: 10px;
+            }
+        }
+
+        /* Tooltip Styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 100px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%; 
+            left: 50%;
+            margin-left: -50px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Hot Deals Sorting Tool</h1>
+
+    <div id="input-section">
+        <h2>Paste Your Deals Here</h2>
+        <textarea id="deals-input" placeholder="Paste your list of deals here..."></textarea>
+        
+        <div class="potm-section">
+            <h3>Partners of the Month (Up to 3)</h3>
+            <div class="potm-input">
+                <div>
+                    <label for="potm1-name">Partner 1 Name:</label>
+                    <select id="potm1-name">
+                        <option value="">Select Partner 1</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="potm1-range">Time Range:</label>
+                    <select id="potm1-range">
+                        <option value="">Select Time Range</option>
+                        <option value="first-half">First half of the month</option>
+                        <option value="second-half">Second half of the month</option>
+                        <option value="full-month">Full month</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="potm2-name">Partner 2 Name:</label>
+                    <select id="potm2-name">
+                        <option value="">Select Partner 2</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="potm2-range">Time Range:</label>
+                    <select id="potm2-range">
+                        <option value="">Select Time Range</option>
+                        <option value="first-half">First half of the month</option>
+                        <option value="second-half">Second half of the month</option>
+                        <option value="full-month">Full month</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="potm3-name">Partner 3 Name:</label>
+                    <select id="potm3-name">
+                        <option value="">Select Partner 3</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="potm3-range">Time Range:</label>
+                    <select id="potm3-range">
+                        <option value="">Select Time Range</option>
+                        <option value="first-half">First half of the month</option>
+                        <option value="second-half">Second half of the month</option>
+                        <option value="full-month">Full month</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button class="button" onclick="processDeals()">Sort Deals</button>
+    </div>
+
+    <div id="output-section" style="display:none;">
+        <div id="sorted-deals"></div>
+    </div>
+
+    <script>
+        // Supplier Order and Categories
+        const suppliersOrder = [
+            { name: "Viking", domain: "viking.com" },
+            { name: "Norwegian Cruise Line", domain: "ncl.com" },
+            { name: "Royal Caribbean", domain: "royalcaribbean.com" },
+            { name: "Disney Cruise Line", domain: "disneycruise.com" },
+            { name: "Celebrity Cruises", domain: "celebrity.com" },
+            { name: "Virgin Voyages", domain: "virginvoyages.com" },
+            { name: "Holland America Line", domain: "hollandamerica.com" },
+            { name: "Princess Cruises", domain: "princess.com" },
+            { name: "Avalon Waterways", domain: "avalonwaterways.com" },
+            { name: "AmaWaterways", domain: "amawaterways.com" },
+            { name: "Scenic Luxury Cruises & Tours", domain: "scenic.com.au" },
+            { name: "Silversea", domain: "silversea.com" },
+            { name: "Regent Seven Seas Cruises", domain: "regentsevenseas.com" },
+            { name: "Seabourn", domain: "seabourn.com" },
+            { name: "Azamara", domain: "azamara.com" },
+            { name: "Sandals", domain: "sandals.com" },
+            { name: "Oceania Cruises", domain: "oceaniacruises.com" },
+            { name: "MSC Cruises", domain: "msccruises.com" },
+            { name: "Carnival Cruise Line", domain: "carnival.com" },
+            { name: "Trafalgar", domain: "trafalgar.com" },
+            { name: "Globus", domain: "globusjourneys.com" },
+            { name: "Aulani, a Disney Resort & Spa", domain: "aulanihawaii.com" },
+            { name: "Disneyland Resort", domain: "disneyland.com" },
+            { name: "Walt Disney World", domain: "disneyworld.disney.go.com" },
+            { name: "Rocky Mountaineer", domain: "rockymountaineer.com" },
+            { name: "Hard Rock Hotel & Casino", domain: "hardrock.com" },
+            { name: "Palace Resorts", domain: "palaceresorts.com" },
+            { name: "Iberostar Beachfront Resorts", domain: "iberostar.com" },
+            { name: "G Adventures", domain: "gadventures.com" },
+            { name: "RIU Hotels & Resorts", domain: "riu.com" },
+            { name: "Hurtigruten", domain: "hurtigruten.com" },
+            { name: "Delta Vacations", domain: "delta.com" },
+            { name: "Karisma Hotels & Resorts", domain: "karisma.com" },
+            { name: "Abercrombie & Kent", domain: "abercrombiekent.com" },
+            { name: "Beaches Resorts", domain: "beaches.com" },
+            { name: "Tauck Tours", domain: "taucktours.com" },
+            { name: "Crystal Cruises", domain: "crystalcruises.com" },
+            { name: "Windstar", domain: "windstarcruises.com" },
+            { name: "Villas of Distinction", domain: "villasofdistinction.com" },
+            { name: "Uniworld", domain: "uniworld.com" },
+        ];
+
+        const categories = {
+            "Hottest Deals": [],
+            "Popular Cruises": [
+                "Norwegian Cruise Line",
+                "Royal Caribbean",
+                "Celebrity Cruises",
+                "Disney Cruise Line",
+                "Virgin Voyages",
+                "Holland America Line",
+                "Princess Cruises",
+                "Carnival Cruise Line",
+                "MSC Cruises",
+                "Costa Cruises",
+                "Viking"
+            ],
+            "Luxury Cruises": [
+                "Viking",
+                "Seabourn",
+                "Regent Seven Seas Cruises",
+                "Oceania Cruises",
+                "Silversea",
+                "Explora Journeys",
+                "Azamara",
+                "Scenic Luxury Cruises & Tours",
+                "Crystal Cruises",
+                "Emerald Cruises",
+                "Cunard",
+                "Windstar",
+                "Paul Gauguin Cruises",
+                "Ponant",
+                "American Cruise Line",
+                "Tauck Tours",
+                "Star Clippers"
+            ],
+            "River Cruises & Expeditions": [
+                "Viking River",
+                "Avalon Waterways",
+                "AmaWaterways",
+                "American Cruise Line",
+                "CroisiEurope",
+                "Riverside Cruises",
+                "Scenic River",
+                "Tauck Tours",
+                "Riviera River Cruises",
+                "Uniworld",
+                "Rocky Mountaineer"
+            ],
+            "Resorts & Tours": [
+                "Sandals",
+                "Beaches Resorts",
+                "Breathless",
+                "Club Med",
+                "El Dorado Spa Resorts & Hotels",
+                "DisneyWorld",
+                "Disneyland Resort",
+                "Aulani, a Disney Resort & Spa",
+                "Excellence Resorts",
+                "Hard Rock Hotel & Casino",
+                "Iberostar Hotels & Resorts",
+                "Dreams",
+                "Karisma Hotels & Resorts",
+                "Villas of Distinction",
+                "Palace Resorts",
+                "Atlantis Paradise Island Bahamas",
+                "Melia",
+                "RIU Hotels & Resorts",
+                "Outrigger Hotels & Resorts",
+                "Zoëtry Wellness & Spa Resorts",
+                "Secrets"
+            ],
+            "Luxury Deals": [
+                "Viking",
+                "Seabourn",
+                "Regent Seven Seas Cruises",
+                "Oceania Cruises",
+                "Silversea",
+                "Explora Journeys",
+                "Azamara",
+                "Scenic Luxury Cruises & Tours",
+                "Crystal Cruises",
+                "Emerald Cruises",
+                "Cunard",
+                "Windstar",
+                "Paul Gauguin Cruises",
+                "Ponant",
+                "American Cruise Line",
+                "Tauck Tours",
+                "Star Clippers"
+            ]
+        };
+
+        let allDeals = [];
+        let activePOTMs = [];
+
+        function populatePOTMDropdowns() {
+            const potmSelectors = ["potm1-name", "potm2-name", "potm3-name"];
+            potmSelectors.forEach(selectorId => {
+                const select = document.getElementById(selectorId);
+                suppliersOrder.forEach(supplier => {
+                    const option = document.createElement('option');
+                    option.value = supplier.name;
+                    option.textContent = supplier.name;
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        window.onload = populatePOTMDropdowns;
+
+        function processDeals() {
+            const rawInput = document.getElementById('deals-input').value;
+            activePOTMs = getActivePOTMs();
+
+            if (activePOTMs.length === 0) {
+                alert("Please enter at least one active Partner of the Month with valid time ranges.");
+                return;
+            }
+
+            allDeals = parseDeals(rawInput);
+            allDeals = removeDuplicates(allDeals);
+            allDeals = sortDeals(allDeals);
+            renderDeals();
+            document.getElementById('output-section').style.display = 'block';
+        }
+
+        function getActivePOTMs() {
+            const potms = [];
+            const currentDate = new Date();
+
+            for (let i = 1; i <= 3; i++) {
+                const name = document.getElementById(`potm${i}-name`).value.trim();
+                const range = document.getElementById(`potm${i}-range`).value;
+
+                if (name && range) {
+                    let isActive = false;
+                    const day = currentDate.getDate();
+                    if (range === "first-half" && day >= 1 && day <= 15) {
+                        isActive = true;
+                    } else if (range === "second-half" && day >= 16 && day <= 31) {
+                        isActive = true;
+                    } else if (range === "full-month") {
+                        isActive = true;
+                    }
+
+                    if (isActive) {
+                        potms.push(name);
+                    }
+                }
+            }
+
+            const uniquePotms = [...new Set(potms.map(p => p.toLowerCase()))].map(p => {
+                const supplier = suppliersOrder.find(s => s.name.toLowerCase() === p);
+                return supplier ? supplier.name : p;
+            });
+
+            return uniquePotms;
+        }
+
+        function parseDeals(rawInput) {
+            const lines = rawInput.split('\n');
+            const deals = [];
+            let currentDeal = null;
+
+            lines.forEach(line => {
+                line = line.trim();
+                if (line === "") return;
+
+                if (line.toLowerCase().includes("logo") || line.toLowerCase().includes("expires soon")) {
+                    return;
+                }
+
+                const matchedSupplier = suppliersOrder.find(supplier => supplier.name.toLowerCase() === line.toLowerCase());
+
+                if (matchedSupplier) {
+                    currentDeal = { supplier: matchedSupplier.name, exclusives: false, title: "", description: "" };
+                    deals.push(currentDeal);
+                } else if (currentDeal) {
+                    if (!currentDeal.title) {
+                        currentDeal.title = line;
+                        if (line.toUpperCase().includes("EXCLUSIVE")) {
+                            currentDeal.exclusives = true;
+                        }
+                    } else if (!currentDeal.description) {
+                        currentDeal.description = line;
+                    }
+                }
+            });
+
+            return deals;
+        }
+
+        function removeDuplicates(deals) {
+            const unique = [];
+            const seen = new Set();
+
+            deals.forEach(deal => {
+                if (!deal.supplier || !deal.title) {
+                    return;
+                }
+                const identifier = `${deal.supplier.toLowerCase()}_${deal.title.toLowerCase()}`;
+                if (!seen.has(identifier)) {
+                    seen.add(identifier);
+                    unique.push(deal);
+                }
+            });
+
+            return unique;
+        }
+
+        function sortDeals(deals) {
+            deals.forEach(deal => {
+                const supplierIndex = suppliersOrder.findIndex(s => s.name.toLowerCase() === deal.supplier.toLowerCase());
+                deal.supplierPriority = supplierIndex !== -1 ? supplierIndex : suppliersOrder.length;
+                deal.category = getCategory(deal.supplier);
+                deal.isExclusive = deal.exclusives ? 1 : 0;
+                deal.isInPOTM = activePOTMs.includes(deal.supplier) ? 1 : 0;
+            });
+
+            deals.sort((a, b) => {
+                if (a.isInPOTM !== b.isInPOTM) {
+                    return b.isInPOTM - a.isInPOTM;
+                }
+                if (a.isExclusive !== b.isExclusive) {
+                    return b.isExclusive - a.isExclusive;
+                }
+                return a.supplierPriority - b.supplierPriority;
+            });
+
+            return deals;
+        }
+
+        function getCategory(supplier) {
+            for (const [category, suppliers] of Object.entries(categories)) {
+                if (suppliers.includes(supplier)) {
+                    return category;
+                }
+            }
+            return "Other";
+        }
+
+        function renderDeals() {
+            const sortedDealsDiv = document.getElementById('sorted-deals');
+            sortedDealsDiv.innerHTML = "";
+
+            const categorized = {
+                "Hottest Deals": [],
+                "Popular Cruises": [],
+                "River Cruises & Expeditions": [],
+                "Resorts & Tours": [],
+                "Luxury Deals": []
+            };
+
+            const usedSuppliers = new Set();
+
+            activePOTMs.forEach(potm => {
+                const potmDeals = allDeals.filter(deal => deal.isInPOTM && deal.supplier.toLowerCase() === potm.toLowerCase());
+                if (potmDeals.length > 0 && categorized["Hottest Deals"].length < 3 && !usedSuppliers.has(potm.toLowerCase())) {
+                    potmDeals.sort((a, b) => {
+                        if (a.isExclusive !== b.isExclusive) {
+                            return b.isExclusive - a.isExclusive;
+                        }
+                        return a.supplierPriority - b.supplierPriority;
+                    });
+                    const selectedDeal = potmDeals[0];
+                    categorized["Hottest Deals"].push(selectedDeal);
+                    usedSuppliers.add(selectedDeal.supplier.toLowerCase());
+                }
+            });
+
+            const categoryOrder = ["Popular Cruises", "River Cruises & Expeditions", "Resorts & Tours", "Luxury Deals"];
+
+            categoryOrder.forEach(category => {
+                const dealsForCategory = allDeals.filter(deal => {
+                    return deal.category === category && !usedSuppliers.has(deal.supplier.toLowerCase());
+                });
+
+                const selectedDeals = [];
+                for (let deal of dealsForCategory) {
+                    if (selectedDeals.length >= 3) break;
+                    selectedDeals.push(deal);
+                    usedSuppliers.add(deal.supplier.toLowerCase());
+                }
+
+                categorized[category] = selectedDeals;
+            });
+
+            for (const [category, deals] of Object.entries(categorized)) {
+                if (deals.length === 0) continue;
+
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'deal-category';
+                categoryDiv.id = `category-${category.replace(/\s+/g, '-').toLowerCase()}`;
+
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.textContent = category;
+                categoryDiv.appendChild(categoryTitle);
+
+                deals.forEach(deal => {
+                    const dealDiv = document.createElement('div');
+                    dealDiv.className = 'deal';
+                    dealDiv.dataset.category = category;
+                    dealDiv.dataset.supplier = deal.supplier;
+
+                    const overline = document.createElement('div');
+                    overline.className = 'deal-overline';
+                    overline.textContent = deal.supplier;
+                    dealDiv.appendChild(overline);
+
+                    const dealContentDiv = document.createElement('div');
+                    dealContentDiv.className = 'deal-content';
+
+                    const dealTitle = document.createElement('h3');
+                    dealTitle.textContent = deal.title;
+
+                    const copyTitleButton = document.createElement('button');
+                    copyTitleButton.className = 'copy-button tooltip';
+                    copyTitleButton.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                        <span class="tooltiptext">Copy Title</span>
+                    `;
+                    copyTitleButton.onclick = () => copyToClipboard(deal.title);
+                    dealTitle.appendChild(copyTitleButton);
+                    dealContentDiv.appendChild(dealTitle);
+
+                    const dealDesc = document.createElement('p');
+                    dealDesc.textContent = deal.description;
+
+                    const copyDescButton = document.createElement('button');
+                    copyDescButton.className = 'copy-button tooltip';
+                    copyDescButton.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>
+                        <span class="tooltiptext">Copy Details</span>
+                    `;
+                    copyDescButton.onclick = () => copyToClipboard(deal.description);
+                    dealDesc.appendChild(copyDescButton);
+                    dealContentDiv.appendChild(dealDesc);
+
+                    dealDiv.appendChild(dealContentDiv);
+
+                    categoryDiv.appendChild(dealDiv);
+                });
+
+                sortedDealsDiv.appendChild(categoryDiv);
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Copied to clipboard!");
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        }
+    </script>
+
+</body>
+</html>
