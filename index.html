@@ -345,7 +345,8 @@
   <main>
     <div id="content-container">
       <div id="home-content"></div>
-      <iframe id="content-frame" sandbox="allow-scripts allow-same-origin" style="display:none;"></iframe>
+      <!-- Updated sandbox attribute to include 'allow-downloads' -->
+      <iframe id="content-frame" sandbox="allow-scripts allow-same-origin allow-downloads" style="display:none;"></iframe>
     </div>
     <div id="loading" style="display:none;">Loading...</div>
   </main>
@@ -594,6 +595,31 @@
         navExpandToggle.classList.remove('expanded');
       }
     });
+
+    // Listen for messages from iframe to handle downloads
+    window.addEventListener('message', (event) => {
+      // Validate the origin of the message for security
+      const allowedOrigin = window.location.origin;
+      if (event.origin !== allowedOrigin) {
+        console.warn('Blocked message from unauthorized origin:', event.origin);
+        return;
+      }
+
+      const { action, filename, dataURL } = event.data;
+
+      if (action === 'download') {
+        downloadFile(dataURL, filename);
+      }
+    });
+
+    function downloadFile(dataURL, filename) {
+      const link = document.createElement('a');
+      link.href = dataURL;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   </script>
 
 </body>
