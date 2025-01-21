@@ -366,6 +366,7 @@ document.getElementById('parseButton').addEventListener('click', () => {
 
 // ---------------
 // 11) Table UI Helper Functions (Thumbs Up/Down)
+// Note the addition of data-fa-i2svg="false" prevents auto-replacement of the icons
 function addDuplicateRow(hqDeal, siteDeal, tableBody) {
   const tr = document.createElement('tr');
   tr.innerHTML = `
@@ -375,7 +376,7 @@ function addDuplicateRow(hqDeal, siteDeal, tableBody) {
     <td><strong>${siteDeal.supplier}</strong> (Active: ${siteDeal.isActive ? 'Yes' : 'No'})<br/>
       ${siteDeal.dealText}<br/><small>End: ${siteDeal.endDate || '(n/a)'}</small></td>
     <td>${hqDeal.exclusive ? 'Yes' : 'No'}</td>
-    <td><i class="icon-btn fas fa-thumbs-down" title="Move to New Deals"></i></td>
+    <td><i data-fa-i2svg="false" class="icon-btn fas fa-thumbs-down" title="Move to New Deals"></i></td>
   `;
   const downBtn = tr.querySelector('.fa-thumbs-down');
   downBtn.addEventListener('click', () => {
@@ -392,7 +393,7 @@ function addNewDealRow(hqDeal, tableBody) {
     <td><small>Start: ${hqDeal.startDate || '-'}<br/>End: ${hqDeal.endDate || '-'}</small></td>
     <td>${hqDeal.score || 0}</td>
     <td>${hqDeal.exclusive ? 'Yes' : 'No'}</td>
-    <td><i class="icon-btn fas fa-thumbs-up" title="Move to Duplicates"></i></td>
+    <td><i data-fa-i2svg="false" class="icon-btn fas fa-thumbs-up" title="Move to Duplicates"></i></td>
   `;
   const upBtn = tr.querySelector('.fa-thumbs-up');
   upBtn.addEventListener('click', () => {
