@@ -1,4 +1,6 @@
-<html><head><base href="https://example.com/">
+<html>
+<head>
+    <base href="https://example.com/">
     <meta charset="UTF-8">
     <title>Hot Deals Sorting Tool</title>
     <style>
@@ -216,7 +218,6 @@
             fill: #2980b9;
         }
 
-        /* Responsive Design */
         @media (max-width: 600px) {
             .potm-input {
                 flex-direction: column;
@@ -232,7 +233,6 @@
             }
         }
 
-        /* Tooltip Styles */
         .tooltip {
             position: relative;
             display: inline-block;
@@ -259,11 +259,9 @@
             visibility: visible;
             opacity: 1;
         }
-
     </style>
 </head>
 <body>
-
     <h1>Hot Deals Sorting Tool</h1>
 
     <div id="input-section">
@@ -331,138 +329,116 @@
     </div>
 
     <script>
-        // Supplier Order and Categories
         const suppliersOrder = [
-            { name: "Viking", domain: "viking.com" },
-            { name: "Norwegian Cruise Line", domain: "ncl.com" },
+            // Ocean/Yacht Cruises
+            { name: "Norwegian", domain: "ncl.com" },
             { name: "Royal Caribbean", domain: "royalcaribbean.com" },
+            { name: "Celebrity", domain: "celebrity.com" },
             { name: "Disney Cruise Line", domain: "disneycruise.com" },
-            { name: "Celebrity Cruises", domain: "celebrity.com" },
             { name: "Virgin Voyages", domain: "virginvoyages.com" },
             { name: "Holland America Line", domain: "hollandamerica.com" },
-            { name: "Princess Cruises", domain: "princess.com" },
-            { name: "Avalon Waterways", domain: "avalonwaterways.com" },
-            { name: "AmaWaterways", domain: "amawaterways.com" },
-            { name: "Scenic Luxury Cruises & Tours", domain: "scenic.com.au" },
-            { name: "Silversea", domain: "silversea.com" },
-            { name: "Regent Seven Seas Cruises", domain: "regentsevenseas.com" },
-            { name: "Seabourn", domain: "seabourn.com" },
-            { name: "Azamara", domain: "azamara.com" },
-            { name: "Sandals", domain: "sandals.com" },
-            { name: "Oceania Cruises", domain: "oceaniacruises.com" },
+            { name: "Princess", domain: "princess.com" },
+            { name: "Carnival", domain: "carnival.com" },
             { name: "MSC Cruises", domain: "msccruises.com" },
-            { name: "Carnival Cruise Line", domain: "carnival.com" },
-            { name: "Trafalgar", domain: "trafalgar.com" },
-            { name: "Globus", domain: "globusjourneys.com" },
-            { name: "Aulani, a Disney Resort & Spa", domain: "aulanihawaii.com" },
-            { name: "Disneyland Resort", domain: "disneyland.com" },
-            { name: "Walt Disney World", domain: "disneyworld.disney.go.com" },
-            { name: "Rocky Mountaineer", domain: "rockymountaineer.com" },
-            { name: "Hard Rock Hotel & Casino", domain: "hardrock.com" },
-            { name: "Palace Resorts", domain: "palaceresorts.com" },
-            { name: "Iberostar Beachfront Resorts", domain: "iberostar.com" },
-            { name: "G Adventures", domain: "gadventures.com" },
-            { name: "RIU Hotels & Resorts", domain: "riu.com" },
-            { name: "Hurtigruten", domain: "hurtigruten.com" },
-            { name: "Delta Vacations", domain: "delta.com" },
-            { name: "Karisma Hotels & Resorts", domain: "karisma.com" },
-            { name: "Abercrombie & Kent", domain: "abercrombiekent.com" },
-            { name: "Beaches Resorts", domain: "beaches.com" },
-            { name: "Tauck Tours", domain: "taucktours.com" },
+            { name: "Costa Cruises", domain: "costacruises.com" },
+            { name: "Viking Ocean", domain: "viking.com" },
+            { name: "Seabourn", domain: "seabourn.com" },
+            { name: "Regent Seven Seas Cruises", domain: "rssc.com" },
+            { name: "Oceania Cruises", domain: "oceaniacruises.com" },
+            { name: "Silversea", domain: "silversea.com" },
+            { name: "Explora Journeys", domain: "explorajourneys.com" },
+            { name: "Azamara", domain: "azamara.com" },
+            { name: "Scenic Eclipse Ocean Voyages", domain: "scenicusa.com" },
+            { name: "Atlas Ocean Voyages", domain: "atlasoceanvoyages.com" },
             { name: "Crystal Cruises", domain: "crystalcruises.com" },
+            { name: "Emerald Cruises", domain: "emeraldcruises.com" },
+            { name: "Cunard", domain: "cunard.com" },
             { name: "Windstar", domain: "windstarcruises.com" },
-            { name: "Villas of Distinction", domain: "villasofdistinction.com" },
+            { name: "Paul Gauguin Cruises", domain: "pgcruises.com" },
+            { name: "Ponant", domain: "ponant.com" },
+            { name: "American Cruise Line", domain: "americancruiselines.com" },
+            { name: "Tauck Cruises", domain: "tauck.com" },
+            { name: "Star Clippers", domain: "starclippers.com" },
+            { name: "Four Seasons Yachts", domain: "fourseasons.com" },
+            { name: "Ritz-Carlton Yacht Collection", domain: "ritzcarltonyachtcollection.com" },
+
+            // River Cruises
+            { name: "Viking River", domain: "viking.com" },
+            { name: "Avalon Waterways", domain: "avalonwaterways.com" },
+            { name: "Ama Waterways", domain: "amawaterways.com" },
+            { name: "CroisiEurope", domain: "croisieurope.com" },
+            { name: "Riverside Cruises", domain: "riversidecruises.com" },
+            { name: "Scenic River", domain: "scenicusa.com" },
+            { name: "Tauck Tours", domain: "tauck.com" },
+            { name: "Riviera River Cruises", domain: "rivierarivercruises.com" },
             { name: "Uniworld", domain: "uniworld.com" },
+
+            // Adventure Cruising
+            { name: "Lindblad Expeditions & National Geographic", domain: "natgeoexpeditions.com" },
+            { name: "Hurtigruten", domain: "hurtigruten.com" },
+            { name: "UnCruise Adventures", domain: "uncruise.com" },
+
+            // Resorts & Vacation Packages
+            { name: "DisneyWorld", domain: "disneyworld.com" },
+            { name: "Disneyland", domain: "disneyland.com" },
+            { name: "Aulani, A Disney Resort & Spa", domain: "aulaniresort.com" },
+            { name: "Adventures by Disney", domain: "adventuresbydisney.com" },
+            { name: "Sandals", domain: "sandals.com" },
+            { name: "Beaches", domain: "beaches.com" },
+            { name: "Breathless", domain: "breathlessresorts.com" },
+            { name: "Club Med", domain: "clubmed.com" },
+            { name: "El Dorado Spa Resorts & Hotels", domain: "karismahotels.com" },
+            { name: "Excellence Resorts", domain: "excellenceresorts.com" },
+            { name: "Hard Rock Hotels", domain: "hardrockhotels.com" },
+            { name: "Iberostar Hotels & Resorts", domain: "iberostar.com" },
+            { name: "Dreams", domain: "dreamsresorts.com" },
+            { name: "Karisma Hotels & Resorts", domain: "karismahotels.com" },
+            { name: "Villas of Distinction", domain: "villasofdistinction.com" },
+            { name: "Palace Resorts", domain: "palaceresorts.com" },
+            { name: "Atlantis Paradise Island Bahamas", domain: "atlantisbahamas.com" },
+            { name: "Melia", domain: "melia.com" },
+            { name: "RIU Hotels & Resorts", domain: "riu.com" },
+            { name: "Outrigger Hotels & Resorts", domain: "outrigger.com" },
+            { name: "Zoëtry Wellness & Spa Resorts", domain: "zoetryresorts.com" },
+            { name: "Secrets", domain: "secretsresorts.com" },
+            { name: "American Airline Vacations", domain: "aavacations.com" },
+            { name: "Delta Vacations", domain: "deltavacations.com" },
+            { name: "Southwest Vacations", domain: "southwestvacations.com" },
+            { name: "United Vacations", domain: "unitedvacations.com" }
         ];
 
         const categories = {
             "Hottest Deals": [],
-            "Popular Cruises": [
-                "Norwegian Cruise Line",
-                "Royal Caribbean",
-                "Celebrity Cruises",
-                "Disney Cruise Line",
-                "Virgin Voyages",
-                "Holland America Line",
-                "Princess Cruises",
-                "Carnival Cruise Line",
-                "MSC Cruises",
-                "Costa Cruises",
-                "Viking"
+            "Ocean/Yacht Cruises": [
+                "Norwegian", "Royal Caribbean", "Celebrity", "Disney Cruise Line",
+                "Virgin Voyages", "Holland America Line", "Princess", "Carnival",
+                "MSC Cruises", "Costa Cruises", "Viking Ocean", "Seabourn",
+                "Regent Seven Seas Cruises", "Oceania Cruises", "Silversea",
+                "Explora Journeys", "Azamara", "Scenic Eclipse Ocean Voyages",
+                "Atlas Ocean Voyages", "Crystal Cruises", "Emerald Cruises",
+                "Cunard", "Windstar", "Paul Gauguin Cruises", "Ponant",
+                "American Cruise Line", "Tauck Cruises", "Star Clippers",
+                "Four Seasons Yachts", "Ritz-Carlton Yacht Collection"
             ],
-            "Luxury Cruises": [
-                "Viking",
-                "Seabourn",
-                "Regent Seven Seas Cruises",
-                "Oceania Cruises",
-                "Silversea",
-                "Explora Journeys",
-                "Azamara",
-                "Scenic Luxury Cruises & Tours",
-                "Crystal Cruises",
-                "Emerald Cruises",
-                "Cunard",
-                "Windstar",
-                "Paul Gauguin Cruises",
-                "Ponant",
-                "American Cruise Line",
-                "Tauck Tours",
-                "Star Clippers"
+            "River Cruises": [
+                "Viking River", "Avalon Waterways", "Ama Waterways",
+                "CroisiEurope", "Riverside Cruises", "Scenic River",
+                "Tauck Tours", "Riviera River Cruises", "Uniworld"
             ],
-            "River Cruises & Expeditions": [
-                "Viking River",
-                "Avalon Waterways",
-                "AmaWaterways",
-                "American Cruise Line",
-                "CroisiEurope",
-                "Riverside Cruises",
-                "Scenic River",
-                "Tauck Tours",
-                "Riviera River Cruises",
-                "Uniworld",
-                "Rocky Mountaineer"
+            "Adventure Cruising": [
+                "Lindblad Expeditions & National Geographic",
+                "Hurtigruten", "UnCruise Adventures"
             ],
-            "Resorts & Tours": [
-                "Sandals",
-                "Beaches Resorts",
-                "Breathless",
-                "Club Med",
-                "El Dorado Spa Resorts & Hotels",
-                "DisneyWorld",
-                "Disneyland Resort",
-                "Aulani, a Disney Resort & Spa",
-                "Excellence Resorts",
-                "Hard Rock Hotel & Casino",
-                "Iberostar Hotels & Resorts",
-                "Dreams",
-                "Karisma Hotels & Resorts",
-                "Villas of Distinction",
-                "Palace Resorts",
-                "Atlantis Paradise Island Bahamas",
-                "Melia",
-                "RIU Hotels & Resorts",
-                "Outrigger Hotels & Resorts",
-                "Zoëtry Wellness & Spa Resorts",
-                "Secrets"
-            ],
-            "Luxury Deals": [
-                "Viking",
-                "Seabourn",
-                "Regent Seven Seas Cruises",
-                "Oceania Cruises",
-                "Silversea",
-                "Explora Journeys",
-                "Azamara",
-                "Scenic Luxury Cruises & Tours",
-                "Crystal Cruises",
-                "Emerald Cruises",
-                "Cunard",
-                "Windstar",
-                "Paul Gauguin Cruises",
-                "Ponant",
-                "American Cruise Line",
-                "Tauck Tours",
-                "Star Clippers"
+            "Resorts & Vacation Packages": [
+                "DisneyWorld", "Disneyland", "Aulani, A Disney Resort & Spa",
+                "Adventures by Disney", "Sandals", "Beaches", "Breathless",
+                "Club Med", "El Dorado Spa Resorts & Hotels", "Excellence Resorts",
+                "Hard Rock Hotels", "Iberostar Hotels & Resorts", "Dreams",
+                "Karisma Hotels & Resorts", "Villas of Distinction", "Palace Resorts",
+                "Atlantis Paradise Island Bahamas", "Melia", "RIU Hotels & Resorts",
+                "Outrigger Hotels & Resorts", "Zoëtry Wellness & Spa Resorts", "Secrets",
+                "American Airline Vacations", "Delta Vacations", "Southwest Vacations",
+                "United Vacations"
             ]
         };
 
@@ -621,10 +597,10 @@
 
             const categorized = {
                 "Hottest Deals": [],
-                "Popular Cruises": [],
-                "River Cruises & Expeditions": [],
-                "Resorts & Tours": [],
-                "Luxury Deals": []
+                "Ocean/Yacht Cruises": [],
+                "River Cruises": [],
+                "Adventure Cruising": [],
+                "Resorts & Vacation Packages": []
             };
 
             const usedSuppliers = new Set();
@@ -644,7 +620,12 @@
                 }
             });
 
-            const categoryOrder = ["Popular Cruises", "River Cruises & Expeditions", "Resorts & Tours", "Luxury Deals"];
+            const categoryOrder = [
+                "Ocean/Yacht Cruises",
+                "River Cruises",
+                "Adventure Cruising",
+                "Resorts & Vacation Packages"
+            ];
 
             categoryOrder.forEach(category => {
                 const dealsForCategory = allDeals.filter(deal => {
@@ -733,6 +714,5 @@
             });
         }
     </script>
-
 </body>
 </html>
