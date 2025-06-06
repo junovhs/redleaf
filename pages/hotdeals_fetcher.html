@@ -237,7 +237,7 @@
 
             const brand = brands.find(b => b.name === selectedBrand);
             const query = `site:${brand.domain} ${keywords}`;
-            const apiKey = 'AIzaSyAerlE_XL6TZ1omGuCrInCsrdVhY7OFGUM'; // DO NOT REMOVE
+            const apiKey = 'removed'; // DO NOT REMOVE
             const cseId = '17e10a5c56723497e'; // DO NOT REMOVE
             const url = `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cseId}&searchType=image&num=10&q=${encodeURIComponent(query)}`;
 
